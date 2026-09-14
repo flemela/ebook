@@ -16,6 +16,7 @@ import {
   Menu,
   X,
 } from 'lucide-vue-next';
+import ToastContainer from '~/components/ui/ToastContainer.vue';
 import { useAdminAuth } from '~/composables/useAdminAuth';
 
 const { logout } = useAdminAuth();
@@ -355,5 +356,8 @@ const navSections: NavSection[] = [
         <slot />
       </div>
     </main>
+
+    <!-- Global Admin Toast Container -->
+    <ToastContainer />
   </div>
 </template>

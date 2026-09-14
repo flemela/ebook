@@ -1,772 +1,406 @@
-<!-- pages/admin/books/new.vue -->
-<script setup lang="ts">
-import { ref, computed } from 'vue';
-import {
-  ArrowLeft,
-  Trash2,
-  Upload,
-  BookOpen,
-  AlertCircle,
-  Sparkles,
-  Link as LinkIcon,
-  RefreshCw,
-  ShieldCheck,
-  CheckCircle2,
-  FolderPlus,
-  X,
-} from 'lucide-vue-next';
-import AdminLayout from '~/components/admin/AdminLayout.vue';
-import AddCategoryModal from '~/components/admin/AddCategoryModal.vue';
-import { useToast } from '~/composables/useToast';
-import type { BookFormatType } from '~/types';
+<!-- =============================================================================
+     flemela/pages/admin/books/new.vue
+     Add Book: Comprehensive Form with Live Cloudflare R2 Single PDF Uploader
+     ============================================================================= -->
 
-definePageMeta({
-  middleware: 'admin-auth',
-});
+<template>
+  <div class="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-4xl mx-auto">
+      
+      <!-- Top Navigation Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center space-x-3">
+          <NuxtLink
+            to="/admin/books"
+            class="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 transition-colors shadow-sm"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </NuxtLink>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Add New Book</h1>
+            <p class="text-xs text-gray-500 mt-0.5">Publish physical hardcopies and instant PDF eBooks to your catalog</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <NuxtLink
+            to="/admin/books"
+            class="px-4 py-2 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            Cancel
+          </NuxtLink>
+          <button
+            type="button"
+            :disabled="isSubmitting"
+            @click="handleSubmit"
+            class="inline-flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 rounded-lg transition-all shadow-sm"
+          >
+            <svg v-if="isSubmitting" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span>{{ isSubmitting ? 'Publishing Book...' : 'Publish Book' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Form Body -->
+      <form @submit.prevent="handleSubmit" class="space-y-6">
+
+        <!-- Banner Error Alert -->
+        <div v-if="formError" class="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start space-x-3">
+          <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h4 class="text-xs font-bold text-red-900">Submission Blocked</h4>
+            <p class="text-xs text-red-700 mt-0.5">{{ formError }}</p>
+          </div>
+        </div>
+
+        <!-- Section 1: Book Essentials -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
+          <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3">
+            Book Information
+          </h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Book Title *</label>
+              <input
+                v-model="form.name"
+                type="text"
+                placeholder="e.g. The Psychology of Money"
+                class="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 transition-all"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Author</label>
+              <input
+                v-model="form.author"
+                type="text"
+                placeholder="e.g. Morgan Housel"
+                class="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 transition-all"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Category *</label>
+              <select
+                v-model="form.category_id"
+                class="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 transition-all"
+                required
+              >
+                <option value="" disabled>Select category</option>
+                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">ISBN / SKU</label>
+              <input
+                v-model="form.sku"
+                type="text"
+                placeholder="e.g. 978-0857197689"
+                class="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 transition-all"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Promotional Badge</label>
+              <select
+                v-model="form.badge"
+                class="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 transition-all"
+              >
+                <option :value="null">None</option>
+                <option value="BESTSELLER">Bestseller</option>
+                <option value="FLASH_SALE">Flash Sale</option>
+                <option value="NO1_PICK">#1 Staff Pick</option>
+                <option value="DEAL_OF_WEEK">Deal of the Week</option>
+              </select>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Synopsis / Description</label>
+              <textarea
+                v-model="form.description"
+                rows="3"
+                placeholder="Enter a captivating overview of the book..."
+                class="w-full px-3.5 py-2.5 bg-gray-50/50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 transition-all"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Formats & Pricing Matrix -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-6">
+          <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3">
+            Formats &amp; Inventory
+          </h2>
+
+          <!-- A. Physical Hardcopy Format -->
+          <div class="p-5 rounded-xl border border-gray-200 bg-gray-50/30 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                <h3 class="text-sm font-bold text-gray-900">Physical Hardcopy Edition</h3>
+              </div>
+              <span class="text-xs text-gray-500 font-medium">Delivered to customer doorstep</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Selling Price (KSh) *</label>
+                <input
+                  v-model.number="form.hardcopyPrice"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="999"
+                  class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Strike-Through Price (KSh)</label>
+                <input
+                  v-model.number="form.hardcopyCompareAt"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="Optional discount"
+                  class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Initial Stock Count *</label>
+                <input
+                  v-model.number="form.hardcopyStock"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="10"
+                  class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- B. Digital PDF Format (Integrated with SinglePdfUploader) -->
+          <div class="p-5 rounded-xl border border-gray-200 bg-gray-50/30 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <input
+                  id="includePdf"
+                  v-model="form.hasPdf"
+                  type="checkbox"
+                  class="w-4 h-4 text-emerald-700 border-gray-300 rounded focus:ring-emerald-700"
+                />
+                <label for="includePdf" class="text-sm font-bold text-gray-900 cursor-pointer">
+                  Offer Digital PDF Edition (Instant Download)
+                </label>
+              </div>
+              <span v-if="form.hasPdf" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                Cloudflare R2 Direct
+              </span>
+            </div>
+
+            <!-- PDF Configuration Sub-panel -->
+            <div v-if="form.hasPdf" class="space-y-4 pt-2">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">PDF eBook Price (KSh) *</label>
+                  <input
+                    v-model.number="form.pdfPrice"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="149"
+                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">PDF Strike-Through Price (KSh)</label>
+                  <input
+                    v-model.number="form.pdfCompareAt"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Optional discount"
+                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm"
+                  />
+                </div>
+              </div>
+
+              <!-- MOUNTED SINGLE PDF UPLOADER COMPONENT -->
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">
+                  Upload PDF eBook File *
+                </label>
+                <SinglePdfUploader
+                  v-model="form.pdfKey"
+                  :initial-file-name="form.pdfFileName"
+                  :initial-file-size="form.pdfFileSize"
+                  :max-file-size-mb="50"
+                  @success="handlePdfUploadSuccess"
+                  @error="handlePdfUploadError"
+                  @remove="handlePdfRemove"
+                />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import SinglePdfUploader from '~/components/admin/SinglePdfUploader.vue';
 
 const router = useRouter();
-const { push: pushToast } = useToast();
-
-const { data: categories } = await useFetch<Array<{ id: string; name: string }>>('/api/admin/categories');
-
-// Dynamic Inline Category State
-const showAddCategoryModal = ref(false);
-
-// Book base fields
-const name = ref('');
-const author = ref('');
-const categoryId = ref('');
-const description = ref('');
-const price = ref(999);
-const compareAtPrice = ref<number | null>(null);
-const badge = ref<'BESTSELLER' | 'FLASH_SALE' | 'NO1_PICK' | 'DEAL_OF_WEEK' | 'LIMITED_TIME' | null>(null);
-const saleEndsAt = ref<string>('');
-const status = ref<'draft' | 'published'>('published');
-
-// Cover art state
-const coverUrl = ref('');
-const coverPublicId = ref('');
-const isUploadingCover = ref(false);
-const isSearchingCover = ref(false);
-
-interface FormatDraft {
-  format: BookFormatType;
-  price: number;
-  compare_at_price: number | null;
-  stock: number | null;
-  file_url: string | null;
-  file_public_id: string | null;
-  file_size_bytes: number | null;
-  uploading: boolean;
-  uploadProgress: number;
-  fileName?: string;
-}
-
-const formats = ref<FormatDraft[]>([
-  {
-    format: 'hardcopy',
-    price: 999,
-    compare_at_price: null,
-    stock: 25,
-    file_url: null,
-    file_public_id: null,
-    file_size_bytes: null,
-    uploading: false,
-    uploadProgress: 0,
-  },
-  {
-    format: 'pdf',
-    price: 149,
-    compare_at_price: null,
-    stock: null,
-    file_url: null,
-    file_public_id: null,
-    file_size_bytes: null,
-    uploading: false,
-    uploadProgress: 0,
-  },
-]);
-
-// Modal State: Cloudflare R2 Upload Confirmation Dialog
-const showR2SuccessModal = ref(false);
-const r2ConfirmedAsset = ref<{
-  fileName: string;
-  format: string;
-  fileSizeMb: string;
-  key: string;
-} | null>(null);
 
 const isSubmitting = ref(false);
-const formError = ref<string | null>(null);
+const formError = ref('');
+const categories = ref<Array<{ id: string; name: string }>>([]);
 
-const isAnyUploadInProgress = computed(() => {
-  return isUploadingCover.value || formats.value.some((f) => f.uploading);
+const form = reactive({
+  name: '',
+  author: '',
+  category_id: '',
+  sku: '',
+  badge: null as string | null,
+  description: '',
+  hardcopyPrice: 999,
+  hardcopyCompareAt: null as number | null,
+  hardcopyStock: 10,
+  hasPdf: true,
+  pdfPrice: 149,
+  pdfCompareAt: null as number | null,
+  pdfKey: null as string | null,
+  pdfFileUrl: null as string | null,
+  pdfFileSize: 0,
+  pdfFileName: '',
 });
 
-function handleCategoryCreated(newCat: { id: string; name: string; slug: string }): void {
-  if (categories.value) {
-    categories.value.push({ id: newCat.id, name: newCat.name });
-  }
-  categoryId.value = newCat.id;
-}
-
-function addFormatRow(type: BookFormatType): void {
-  if (formats.value.some((f) => f.format === type)) return;
-  formats.value.push({
-    format: type,
-    price: type === 'hardcopy' ? 999 : 149,
-    compare_at_price: null,
-    stock: type === 'hardcopy' ? 20 : null,
-    file_url: null,
-    file_public_id: null,
-    file_size_bytes: null,
-    uploading: false,
-    uploadProgress: 0,
-  });
-}
-
-function removeFormatRow(index: number): void {
-  formats.value.splice(index, 1);
-}
-
-function removeFormatFile(index: number): void {
-  formats.value[index].file_url = null;
-  formats.value[index].file_public_id = null;
-  formats.value[index].file_size_bytes = null;
-  formats.value[index].fileName = undefined;
-  formats.value[index].uploadProgress = 0;
-}
-
-async function handleAutoFindCover(): Promise<void> {
-  if (!name.value.trim()) {
-    pushToast({ message: 'Enter a book title first to auto-discover cover art', variant: 'error' });
-    return;
-  }
-
-  isSearchingCover.value = true;
+// Load category options from BFF
+onMounted(async () => {
   try {
-    const res = await $fetch<{ coverUrl: string | null; title: string; source: string | null }>(
-      '/api/admin/books/find-cover',
-      {
-        query: {
-          title: name.value.trim(),
-          author: author.value.trim() || undefined,
-        },
+    const res = await $fetch<{ success: boolean; data: Array<{ id: string; name: string }> }>('/api/admin/categories');
+    if (res.data) {
+      categories.value = res.data;
+      if (categories.value.length > 0) {
+        form.category_id = categories.value[0].id;
       }
-    );
-
-    if (res?.coverUrl) {
-      coverUrl.value = res.coverUrl;
-      coverPublicId.value = `auto_${res.source || 'web'}`;
-      pushToast({
-        message: `Discovered cover art from ${res.source === 'googlebooks' ? 'Google Books' : 'Open Library'}!`,
-        variant: 'success',
-      });
-    } else {
-      pushToast({ message: 'No online cover found. You can upload or paste an image link.', variant: 'info' });
     }
-  } catch {
-    pushToast({ message: 'Auto-discovery timed out. You can upload an image directly.', variant: 'error' });
-  } finally {
-    isSearchingCover.value = false;
+  } catch (e) {
+    console.error('Failed to load categories', e);
   }
+});
+
+function handlePdfUploadSuccess(payload: { key: string; fileUrl: string; sizeBytes: number; fileName: string }) {
+  form.pdfKey = payload.key;
+  form.pdfFileUrl = payload.fileUrl;
+  form.pdfFileSize = payload.sizeBytes;
+  form.pdfFileName = payload.fileName;
+  formError.value = '';
 }
 
-async function handleCoverUpload(event: Event): Promise<void> {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  isUploadingCover.value = true;
-  try {
-    const sig = await $fetch<{
-      signature: string;
-      timestamp: number;
-      folder: string;
-      apiKey: string;
-      cloudName: string;
-    }>('/api/admin/upload-signature', { method: 'POST' });
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('api_key', sig.apiKey);
-    formData.append('timestamp', String(sig.timestamp));
-    formData.append('signature', sig.signature);
-    formData.append('folder', sig.folder);
-
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-
-    if (data.secure_url) {
-      coverUrl.value = data.secure_url;
-      coverPublicId.value = data.public_id;
-      pushToast({ message: 'Cover image uploaded to Cloudinary', variant: 'success' });
-    }
-  } catch {
-    pushToast({ message: 'Cloudinary upload failed', variant: 'error' });
-  } finally {
-    isUploadingCover.value = false;
-  }
+function handlePdfUploadError(err: { message: string }) {
+  formError.value = `PDF upload error: ${err.message}`;
 }
 
-async function handleEbookUpload(event: Event, index: number): Promise<void> {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  const currentFmt = formats.value[index];
-  currentFmt.uploading = true;
-  currentFmt.uploadProgress = 0;
-  currentFmt.fileName = file.name;
-
-  try {
-    const mimeType = file.type || (currentFmt.format === 'pdf' ? 'application/pdf' : 'application/epub+zip');
-
-    const presigned = await $fetch<{ uploadUrl: string; key: string }>('/api/admin/books/upload-url', {
-      method: 'POST',
-      body: {
-        filename: file.name,
-        format: currentFmt.format,
-        contentType: mimeType,
-      },
-    });
-
-    await new Promise<void>((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('PUT', presigned.uploadUrl);
-      xhr.setRequestHeader('Content-Type', mimeType);
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          currentFmt.uploadProgress = Math.round((e.loaded / e.total) * 100);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve();
-        } else {
-          reject(new Error(`Cloudflare R2 returned HTTP ${xhr.status}`));
-        }
-      };
-
-      xhr.onerror = () => {
-        reject(new Error('Network error or CORS failure communicating with Cloudflare R2'));
-      };
-
-      xhr.send(file);
-    });
-
-    currentFmt.file_url = presigned.key;
-    currentFmt.file_public_id = presigned.key;
-    currentFmt.file_size_bytes = file.size;
-
-    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-
-    r2ConfirmedAsset.value = {
-      fileName: file.name,
-      format: currentFmt.format.toUpperCase(),
-      fileSizeMb: `${sizeMb} MB`,
-      key: presigned.key,
-    };
-    showR2SuccessModal.value = true;
-  } catch (err: any) {
-    pushToast({
-      message: err.message || 'eBook upload to Cloudflare R2 failed',
-      variant: 'error',
-    });
-    removeFormatFile(index);
-  } finally {
-    currentFmt.uploading = false;
-  }
+function handlePdfRemove() {
+  form.pdfKey = null;
+  form.pdfFileUrl = null;
+  form.pdfFileSize = 0;
+  form.pdfFileName = '';
 }
 
-async function handleSubmit(): Promise<void> {
-  if (!name.value.trim() || formats.value.length === 0) return;
+async function handleSubmit() {
+  formError.value = '';
 
-  if (isAnyUploadInProgress.value) {
-    pushToast({
-      message: 'Please wait for file uploads to complete before saving.',
-      variant: 'error',
-    });
+  if (!form.name.trim()) {
+    formError.value = 'Book title is required.';
     return;
   }
-
-  for (const f of formats.value) {
-    if (f.compare_at_price !== null && f.compare_at_price <= f.price) {
-      formError.value = `Strike-through price for ${f.format.toUpperCase()} must be greater than its selling price.`;
-      return;
-    }
+  if (!form.category_id) {
+    formError.value = 'Please select a catalog category.';
+    return;
+  }
+  if (form.hasPdf && !form.pdfKey) {
+    formError.value = 'Please upload a PDF document for the digital edition or uncheck the digital option.';
+    return;
   }
 
   isSubmitting.value = true;
-  formError.value = null;
 
   try {
-    await $fetch('/api/admin/books', {
+    // 1. Create Base Product via BFF proxy
+    const productPayload = {
+      name: form.name.trim(),
+      category_id: form.category_id,
+      price: form.hardcopyPrice,
+      compare_at_price: form.hardcopyCompareAt || null,
+      sku: form.sku.trim() || null,
+      badge: form.badge || null,
+      description: form.author ? `By ${form.author.trim()}. ${form.description}` : form.description,
+      stock: form.hardcopyStock,
+      publish: true,
+    };
+
+    const createProductRes = await $fetch<{ success: boolean; data: { id: string } }>('/api/admin/products', {
+      method: 'POST',
+      body: productPayload,
+    });
+
+    const productId = createProductRes.data.id;
+
+    // 2. Attach Hardcopy Format
+    await $fetch(`/api/admin/products/${productId}/formats`, {
       method: 'POST',
       body: {
-        name: name.value.trim(),
-        author: author.value.trim() || undefined,
-        category_id: categoryId.value || null,
-        description: description.value.trim() || undefined,
-        price: formats.value[0]?.price || price.value,
-        compare_at_price: compareAtPrice.value || null,
-        badge: badge.value || null,
-        sale_ends_at: saleEndsAt.value ? new Date(saleEndsAt.value).toISOString() : null,
-        cover_image_url: coverUrl.value.trim() || undefined,
-        cover_image_public_id: coverPublicId.value || undefined,
-        status: status.value,
-        formats: formats.value.map((f) => ({
-          format: f.format,
-          price: Number(f.price),
-          compare_at_price: f.compare_at_price ? Number(f.compare_at_price) : null,
-          file_url: f.file_url,
-          file_public_id: f.file_public_id,
-          file_size_bytes: f.file_size_bytes,
-          stock: f.format === 'hardcopy' ? Number(f.stock) : null,
-        })),
+        format: 'hardcopy',
+        price: form.hardcopyPrice,
+        compare_at_price: form.hardcopyCompareAt || null,
+        stock: form.hardcopyStock,
       },
     });
 
-    pushToast({ message: `Book "${name.value}" created and published!`, variant: 'success' });
-    router.push('/admin/books');
+    // 3. Attach Digital PDF Format (if enabled and uploaded to R2)
+    if (form.hasPdf && form.pdfKey) {
+      await $fetch(`/api/admin/products/${productId}/formats`, {
+        method: 'POST',
+        body: {
+          format: 'pdf',
+          price: form.pdfPrice,
+          compare_at_price: form.pdfCompareAt || null,
+          file_url: form.pdfFileUrl || form.pdfKey,
+          file_public_id: form.pdfKey,
+          file_size_bytes: form.pdfFileSize,
+        },
+      });
+    }
+
+    // Success: navigate back to catalog table
+    await router.push('/admin/books');
   } catch (err: any) {
-    formError.value = err.data?.message || err.data?.statusMessage || err.statusMessage || 'Failed to save book';
+    formError.value = err.data?.message || err.message || 'Failed to publish book. Please check inputs and retry.';
   } finally {
     isSubmitting.value = false;
   }
 }
 </script>
-
-<template>
-  <AdminLayout>
-    <div class="max-w-4xl mx-auto space-y-6">
-      <NuxtLink to="/admin/books" class="inline-flex items-center gap-1.5 text-xs font-bold text-forest-900 hover:underline">
-        <ArrowLeft :size="14" /> Back to Books
-      </NuxtLink>
-
-      <div class="bg-white rounded-xl shadow-subtle border border-ink-border p-6 sm:p-8 space-y-6">
-        <div class="pb-4 border-b border-ink-border">
-          <h1 class="font-display text-2xl font-bold text-forest-950">Add New Book</h1>
-          <p class="text-xs text-ink-muted">
-            Configure catalog details, custom categories, strike-through discounts, and verified Cloudflare R2 digital storage.
-          </p>
-        </div>
-
-        <form class="space-y-6" @submit.prevent="handleSubmit">
-          <!-- 1. General Details -->
-          <div class="space-y-4">
-            <h3 class="text-xs font-bold uppercase text-forest-950 tracking-wider font-mono">
-              Book Information
-            </h3>
-
-            <div class="grid sm:grid-cols-2 gap-4">
-              <div class="space-y-1">
-                <label class="text-xs font-semibold text-forest-950">Book Title *</label>
-                <div class="flex gap-2">
-                  <input
-                    v-model="name"
-                    type="text"
-                    placeholder="e.g. Atomic Habits"
-                    class="flex-1 px-3 py-2 border border-ink-border rounded text-xs outline-none focus:border-forest-900"
-                    required
-                    @blur="
-                      () => {
-                        if (!coverUrl && name) handleAutoFindCover();
-                      }
-                    "
-                  />
-                  <button
-                    type="button"
-                    class="px-3 py-2 bg-paper-cream border border-ink-border hover:border-forest-900 text-forest-950 rounded text-xs font-bold flex items-center gap-1 cursor-pointer transition-all whitespace-nowrap"
-                    :disabled="isSearchingCover || !name"
-                    @click="handleAutoFindCover"
-                  >
-                    <RefreshCw v-if="isSearchingCover" :size="12" class="animate-spin" />
-                    <Sparkles v-else :size="12" class="text-gold-600" />
-                    <span>{{ isSearchingCover ? 'Searching...' : '🪄 Find Cover' }}</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="space-y-1">
-                <label class="text-xs font-semibold text-forest-950">Author Name</label>
-                <input
-                  v-model="author"
-                  type="text"
-                  placeholder="e.g. James Clear"
-                  class="w-full px-3 py-2 border border-ink-border rounded text-xs outline-none focus:border-forest-900"
-                />
-              </div>
-            </div>
-
-            <div class="grid sm:grid-cols-2 gap-4">
-              <!-- Category Selector with Inline + New Category Trigger -->
-              <div class="space-y-1">
-                <div class="flex justify-between items-center">
-                  <label class="text-xs font-semibold text-forest-950">Category</label>
-                  <button
-                    type="button"
-                    class="text-[11px] font-bold text-forest-900 hover:text-gold-600 flex items-center gap-1 cursor-pointer"
-                    @click="showAddCategoryModal = true"
-                  >
-                    <FolderPlus :size="12" />
-                    <span>+ New Category</span>
-                  </button>
-                </div>
-                <select
-                  v-model="categoryId"
-                  class="w-full px-3 py-2 border border-ink-border rounded text-xs outline-none focus:border-forest-900 bg-white"
-                >
-                  <option value="">Select category (or leave for default)...</option>
-                  <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
-                </select>
-              </div>
-
-              <div class="space-y-1">
-                <label class="text-xs font-semibold text-forest-950">Publishing Status</label>
-                <select
-                  v-model="status"
-                  class="w-full px-3 py-2 border border-ink-border rounded text-xs outline-none focus:border-forest-900 bg-white"
-                >
-                  <option value="published">Published &amp; Live</option>
-                  <option value="draft">Draft Mode</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Merchandising & Compare-at Price -->
-            <div class="p-4 bg-paper-cream/60 rounded-xl border border-ink-border grid sm:grid-cols-2 gap-4">
-              <div class="space-y-1">
-                <label class="text-xs font-semibold text-forest-950">
-                  Promotional Badge / Placement
-                </label>
-                <select
-                  v-model="badge"
-                  class="w-full px-3 py-2 bg-white border border-ink-border rounded text-xs outline-none focus:border-forest-900 font-semibold"
-                >
-                  <option :value="null">None (Standard Catalog)</option>
-                  <option value="BESTSELLER">🔥 Bestseller (Monthly Section)</option>
-                  <option value="NO1_PICK">⭐ #1 Pick (Featured Top Slot)</option>
-                  <option value="FLASH_SALE">⚡ Flash Sale (High Urgency)</option>
-                  <option value="DEAL_OF_WEEK">🏷️ Deal of the Week</option>
-                  <option value="LIMITED_TIME">⏳ Limited Time Sale</option>
-                </select>
-              </div>
-
-              <div class="space-y-1">
-                <label class="text-xs font-semibold text-forest-950">Sale Expiration (Optional)</label>
-                <input
-                  v-model="saleEndsAt"
-                  type="datetime-local"
-                  class="w-full px-3 py-1.5 bg-white border border-ink-border rounded text-xs font-mono outline-none focus:border-forest-900"
-                />
-                <span class="text-[10px] text-ink-muted">
-                  Auto-removes flash sale badge once passed.
-                </span>
-              </div>
-            </div>
-
-            <div class="space-y-1">
-              <label class="text-xs font-semibold text-forest-950">Description / Synopsis</label>
-              <textarea
-                v-model="description"
-                rows="3"
-                placeholder="Overview of the book..."
-                class="w-full px-3 py-2 border border-ink-border rounded text-xs outline-none focus:border-forest-900 resize-none"
-              />
-            </div>
-          </div>
-
-          <!-- 2. Cover Art -->
-          <div class="space-y-3 pt-4 border-t border-ink-border">
-            <h3 class="text-xs font-bold uppercase text-forest-950 tracking-wider font-mono">
-              Cover Art
-            </h3>
-            <div class="flex items-start gap-4">
-              <div
-                class="w-20 h-28 bg-paper-cream rounded border border-ink-border overflow-hidden flex items-center justify-center flex-shrink-0 shadow-sm relative"
-              >
-                <img
-                  v-if="coverUrl"
-                  :src="coverUrl"
-                  :alt="name ? `${name} Cover` : 'Cover'"
-                  class="w-full h-full object-cover"
-                  @error="coverUrl = ''"
-                />
-                <BookOpen v-else :size="24" class="text-ink-muted opacity-40" />
-              </div>
-              <div class="space-y-2 flex-1">
-                <div class="flex flex-wrap gap-2 items-center">
-                  <button
-                    type="button"
-                    class="bg-forest-950 text-white hover:bg-forest-800 text-xs font-bold px-3 py-1.5 rounded inline-flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
-                    :disabled="isSearchingCover || !name"
-                    @click="handleAutoFindCover"
-                  >
-                    <Sparkles :size="13" class="text-gold-300" /> Auto-Find HD Cover
-                  </button>
-
-                  <label
-                    class="cursor-pointer bg-white border border-ink-border text-forest-950 text-xs font-bold px-3 py-1.5 rounded hover:bg-slate-50 transition-colors inline-flex items-center gap-1.5 shadow-xs"
-                  >
-                    <Upload :size="13" /> {{ isUploadingCover ? 'Uploading...' : 'Upload File' }}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      class="hidden"
-                      :disabled="isUploadingCover"
-                      @change="handleCoverUpload"
-                    />
-                  </label>
-                </div>
-
-                <div class="space-y-1 pt-1">
-                  <label class="text-[11px] text-ink-muted flex items-center gap-1">
-                    <LinkIcon :size="12" /> Direct Cover Image URL:
-                  </label>
-                  <input
-                    v-model="coverUrl"
-                    type="url"
-                    placeholder="https://..."
-                    class="w-full px-3 py-1.5 border border-ink-border rounded text-xs outline-none focus:border-forest-900"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. Formats & Verified Cloudflare R2 Uploads -->
-        	<div class="space-y-4 pt-4 border-t border-ink-border">
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="text-xs font-bold uppercase text-forest-950 tracking-wider font-mono">
-                  Reading Formats &amp; Digital Assets
-                </h3>
-                <p class="text-[11px] text-ink-muted">
-                  Stream files directly into private Cloudflare R2 storage buckets.
-                </p>
-              </div>
-              <div class="flex gap-2">
-                <button
-                  type="button"
-                  class="text-[10px] font-mono font-bold uppercase px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 rounded hover:bg-amber-100 cursor-pointer"
-                  @click="addFormatRow('hardcopy')"
-                >
-                  + Hardcopy
-                </button>
-                <button
-                  type="button"
-                  class="text-[10px] font-mono font-bold uppercase px-2.5 py-1 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded hover:bg-emerald-100 cursor-pointer"
-                  @click="addFormatRow('pdf')"
-                >
-                  + PDF
-                </button>
-                <button
-                  type="button"
-                  class="text-[10px] font-mono font-bold uppercase px-2.5 py-1 bg-blue-50 text-blue-900 border border-blue-200 rounded hover:bg-blue-100 cursor-pointer"
-                  @click="addFormatRow('epub')"
-                >
-                  + EPUB
-                </button>
-              </div>
-            </div>
-
-            <div class="space-y-3">
-              <div
-                v-for="(fmt, idx) in formats"
-                :key="fmt.format"
-                class="p-4 bg-slate-50 border border-ink-border rounded-xl grid sm:grid-cols-12 gap-3 items-center"
-              >
-                <div class="sm:col-span-2">
-                  <span class="text-xs font-bold uppercase text-forest-950 font-mono">{{ fmt.format }}</span>
-                </div>
-
-                <div class="sm:col-span-2 space-y-1">
-                  <label class="text-[10px] text-ink-muted font-semibold">Sale (KSh) *</label>
-                  <input
-                    v-model.number="fmt.price"
-                    type="number"
-                    min="1"
-                    class="w-full px-2.5 py-1.5 bg-white border border-ink-border rounded text-xs font-mono font-bold"
-                  />
-                </div>
-
-                <div class="sm:col-span-3 space-y-1">
-                  <label class="text-[10px] text-ink-muted font-semibold">Strike-through (KSh)</label>
-                  <input
-                    v-model.number="fmt.compare_at_price"
-                    type="number"
-                    min="1"
-                    placeholder="e.g. 1200"
-                    class="w-full px-2.5 py-1.5 bg-white border border-ink-border rounded text-xs font-mono"
-                  />
-                </div>
-
-                <div v-if="fmt.format === 'hardcopy'" class="sm:col-span-4 space-y-1">
-                  <label class="text-[10px] text-ink-muted font-semibold">Physical Stock</label>
-                  <input
-                    v-model.number="fmt.stock"
-                    type="number"
-                    min="0"
-                    class="w-full px-2.5 py-1.5 bg-white border border-ink-border rounded text-xs font-mono"
-                  />
-                </div>
-
-                <!-- Digital Format File Picker with Real-Time Progress -->
-                <div v-else class="sm:col-span-4 space-y-1">
-                  <label class="text-[10px] text-ink-muted font-semibold">Digital File (Cloudflare R2)</label>
-                  
-                  <div v-if="fmt.uploading" class="space-y-1">
-                    <div class="flex justify-between text-[10px] font-mono text-forest-950 font-bold">
-                      <span>Uploading to R2...</span>
-                      <span>{{ fmt.uploadProgress }}%</span>
-                    </div>
-                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                      <div
-                        class="bg-forest-950 h-full transition-all duration-150 rounded-full"
-                        :style="{ width: `${fmt.uploadProgress}%` }"
-                      />
-                    </div>
-                  </div>
-
-                  <div v-else-if="fmt.file_public_id" class="flex items-center justify-between bg-emerald-50 border border-emerald-300 px-2.5 py-1 rounded-lg text-[11px]">
-                    <span class="text-emerald-900 font-semibold truncate flex items-center gap-1">
-                      <ShieldCheck :size="13" class="text-emerald-700" /> R2 Asset Verified
-                    </span>
-                    <button
-                      type="button"
-                      class="text-ink-muted hover:text-red-700 text-[10px] font-mono underline ml-2"
-                      @click="removeFormatFile(idx)"
-                    >
-                      Remove
-                    </button>
-                  </div>
-
-                  <label
-                    v-else
-                    class="w-full bg-white border border-ink-border text-forest-950 text-[11px] font-medium px-2 py-1.5 rounded flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
-                  >
-                    <span class="truncate">Upload {{ fmt.format.toUpperCase() }} to R2</span>
-                    <input
-                      type="file"
-                      :accept="fmt.format === 'pdf' ? '.pdf' : '.epub'"
-                      class="hidden"
-                      :disabled="fmt.uploading"
-                      @change="handleEbookUpload($event, idx)"
-                    />
-                  </label>
-                </div>
-
-                <div class="sm:col-span-1 text-right">
-                  <button
-                    type="button"
-                    class="text-red-500 hover:text-red-700 p-1 cursor-pointer"
-                    @click="removeFormatRow(idx)"
-                  >
-                    <Trash2 :size="14" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            v-if="formError"
-            class="p-3 bg-red-50 border border-red-200 rounded text-xs text-red-700 flex items-center gap-2"
-          >
-            <AlertCircle :size="14" class="flex-shrink-0" />
-            <span>{{ formError }}</span>
-          </div>
-
-          <div class="pt-4 border-t border-ink-border flex justify-end gap-3">
-            <NuxtLink
-              to="/admin/books"
-              class="px-4 py-2.5 border border-ink-border rounded text-xs font-semibold hover:bg-slate-50"
-            >
-              Cancel
-            </NuxtLink>
-            <button
-              type="submit"
-              class="bg-forest-900 text-white text-xs font-bold uppercase px-6 py-2.5 rounded hover:bg-forest-800 transition-colors shadow cursor-pointer disabled:opacity-50 flex items-center gap-2"
-              :disabled="isSubmitting || isAnyUploadInProgress"
-            >
-              <RefreshCw v-if="isSubmitting || isAnyUploadInProgress" :size="14" class="animate-spin" />
-              <span>{{ isAnyUploadInProgress ? 'Upload in Progress...' : (isSubmitting ? 'Saving Book...' : 'Save & Publish Book') }}</span>
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- DIALOGUE MODAL: Cloudflare R2 Upload Verification -->
-    <Teleport to="body">
-      <div
-        v-if="showR2SuccessModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
-      >
-        <div class="bg-white rounded-2xl shadow-2xl border border-paper-border max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
-          <div class="flex items-start justify-between pb-2 border-b border-paper-border">
-            <div class="flex items-center gap-2 text-emerald-800 font-display font-bold text-base">
-              <CheckCircle2 :size="20" class="text-emerald-600" />
-              <span>Cloudflare R2 Asset Verified</span>
-            </div>
-            <button
-              type="button"
-              class="text-ink-muted hover:text-ink p-1 cursor-pointer"
-              @click="showR2SuccessModal = false"
-            >
-              <X :size="16" />
-            </button>
-          </div>
-
-          <div class="p-4 bg-paper-cream/60 rounded-xl border border-gold-300 space-y-2 text-xs">
-            <div class="flex justify-between">
-              <span class="text-ink-muted">File:</span>
-              <strong class="text-forest-950 font-mono truncate max-w-[200px]">{{ r2ConfirmedAsset?.fileName }}</strong>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-ink-muted">Format:</span>
-              <span class="font-mono font-bold text-forest-950">{{ r2ConfirmedAsset?.format }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-ink-muted">Payload Size:</span>
-              <span class="font-mono font-bold text-forest-950">{{ r2ConfirmedAsset?.fileSizeMb }}</span>
-            </div>
-            <div class="pt-2 border-t border-paper-border/60">
-              <span class="text-[10px] text-ink-muted block">Storage Key:</span>
-              <code class="text-[10px] font-mono text-forest-950 break-all bg-white px-2 py-1 rounded block mt-0.5 border border-ink-border">
-                {{ r2ConfirmedAsset?.key }}
-              </code>
-            </div>
-          </div>
-
-          <p class="text-[11px] text-ink-muted leading-relaxed">
-            This digital file is now stored in your private R2 bucket. Customers who purchase this edition will receive verified, expiring signed tokens.
-          </p>
-
-          <div class="flex justify-end pt-2">
-            <button
-              type="button"
-              class="bg-forest-950 text-paper text-xs font-bold uppercase px-5 py-2.5 rounded-xl hover:bg-forest-900 cursor-pointer transition-colors shadow-sm"
-              @click="showR2SuccessModal = false"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-
-    <!-- INLINE MODAL: Create New Category on the fly -->
-    <AddCategoryModal
-      :open="showAddCategoryModal"
-      @close="showAddCategoryModal = false"
-      @created="handleCategoryCreated"
-    />
-  </AdminLayout>
-</template>
