@@ -204,7 +204,6 @@ types/
   index.ts
 utils/
   phone.ts
-.env.example
 .gitignore
 app.vue
 dump.rdb
@@ -16386,16 +16385,6 @@ export function detectKenyanCarrier(input: string): KenyanCarrier {
 
   return null;
 }
-</file>
-
-<file path=".env.example">
-# Server-only Soko Backend Connection
-SOKO_API_BASE_URL=http://localhost:3000/api/v1
-SOKO_ORG_API_KEY=your_organization_api_key_here
-NUXT_PUBLIC_STORE_SLUG=flemela
-
-FLEMELA_ADMIN_EMAIL=flemelabookstore@gmail.com
-FLEMELA_ADMIN_PASSWORD=flemela@321
 </file>
 
 <file path=".gitignore">
