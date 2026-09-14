@@ -1,24 +1,22 @@
 /* =============================================================================
    assets/css/main.css
-   Full-Stack Editorial Design System & Unified Typography
-   70% White / 20% Deep Charcoal / 10% Crimson Red System
+   Single Source of Truth — 70/20/10 White/Charcoal/Red System
    ============================================================================= */
 
-/* 1. Unified Typography Imports */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600;1,9..144,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
-/* 2. Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 3. Global CSS Custom Properties (Value-Remapped 70/20/10 Palette) */
 :root {
-  /* 70% White & Neutral Canvas */
+  /* -------------------------------------------------------------------------
+     70% White Canvas & Surfaces
+     ------------------------------------------------------------------------- */
   --theme-canvas: #FFFFFF;
   --theme-surface: #FFFFFF;
-  --theme-sand: #F8F9FA;
-  --theme-cream: #F8F9FA;
+  --theme-surface-subtle: #F8F9FA;
+  --theme-surface-muted: #F1F3F5;
   --theme-border: #E5E7EB;
   --theme-border-strong: #D1D5DB;
 
@@ -27,20 +25,36 @@
   --theme-ink-muted: #656F7D;
   --theme-ink-subtle: #9AA2AD;
 
-  /* 20% Deep Charcoal Black (replaces Forest Green) */
-  --theme-dark: #111315;              /* Core Deep Obsidian Charcoal */
-  --theme-forest: #1A1D20;            /* Elevated Charcoal */
-  --theme-sage: #8A94A0;
+  /* -------------------------------------------------------------------------
+     20% Deep Charcoal Black (Structural Anchor)
+     ------------------------------------------------------------------------- */
+  --theme-dark-deep: #0B0C0E;             /* Footer & deepest ground */
+  --theme-dark: #111315;                  /* Hero ambient background */
+  --theme-dark-surface: #1A1D20;          /* Dark card / elevated element */
+  --theme-dark-border: rgba(255, 255, 255, 0.12);
+  --theme-dark-muted: #8E98A5;
 
-  /* 10% Crimson Red Accent (replaces Gold/Coral/Mint) */
-  --theme-coral: #E50914;             /* Primary Brand Red */
-  --theme-coral-hover: #CC0812;
-  --theme-orange: #DC2626;
-  --theme-mint: #E50914;              /* Remapped for zero template breakages */
-  --theme-turquoise: #DC2626;         /* Remapped for zero template breakages */
+  /* -------------------------------------------------------------------------
+     10% Vibrant Crimson Red (High-Impact Accent)
+     ------------------------------------------------------------------------- */
+  --theme-accent: #E50914;                /* Primary CTA & Brand Red */
+  --theme-accent-hover: #CC0812;
+  --theme-accent-active: #B20710;
+  --theme-accent-soft: #FEF2F2;
+  --theme-accent-border: #FECACA;
+  --theme-accent-text: #FFFFFF;
+
+  /* Backward Compatibility Mapping (keeps legacy component bindings intact) */
+  --theme-forest: var(--theme-dark-surface);
+  --theme-coral: var(--theme-accent);
+  --theme-coral-hover: var(--theme-accent-hover);
+  --theme-sand: var(--theme-surface-subtle);
+  --theme-cream: var(--theme-surface-subtle);
+  --theme-mint: var(--theme-accent);
+  --theme-turquoise: var(--theme-accent);
+  --theme-orange: var(--theme-accent);
 }
 
-/* 4. Base Element Rules */
 @layer base {
   html {
     background-color: var(--theme-canvas);
@@ -59,7 +73,6 @@
     overflow-x: hidden;
   }
 
-  /* Canonical Typography Classes */
   .font-poster {
     font-family: 'Bebas Neue', 'Oswald', sans-serif;
     letter-spacing: 0.015em;
@@ -79,18 +92,17 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Selection Highlight in Brand Red */
   ::selection {
     background-color: rgba(229, 9, 20, 0.18);
-    color: var(--theme-dark);
+    color: var(--theme-accent);
   }
 }
 
-/* 5. Custom 3D Book Cover Treatment (Polished Charcoal Shadows) */
+/* Studio 3D Book Cover Shader */
 .book-cover-3d {
   position: relative;
   border-radius: 2px 8px 8px 2px;
-  box-shadow: -2px 0 6px -1px rgba(0, 0, 0, 0.08), 3px 6px 18px -2px rgba(17, 19, 21, 0.12);
+  box-shadow: -2px 0 6px -1px rgba(0, 0, 0, 0.10), 3px 6px 18px -2px rgba(17, 19, 21, 0.14);
   transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -111,37 +123,24 @@
 
 .book-hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: -3px 0 10px -1px rgba(0, 0, 0, 0.12), 6px 16px 30px -3px rgba(17, 19, 21, 0.18);
+  box-shadow: -3px 0 10px -1px rgba(0, 0, 0, 0.12), 6px 16px 30px -3px rgba(17, 19, 21, 0.20);
 }
 
-/* 6. Hero Staggered Book Stack Top-Gradient Fade Mask */
 .hero-faded-stack {
   mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 15%, black 35%, black 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 15%, black 35%, black 100%);
 }
 
-/* 7. Deep 50/50 Overlapping Pill Drop Shadow */
-.shadow-search-pill {
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04);
-}
-
-/* 8. Cross-Browser Invisible Scrollbar Utility */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* 9. Prevent Form Autofill Color Shifts */
 input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus {
+textarea:-webkit-autofill {
   -webkit-text-fill-color: var(--theme-ink);
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
   transition: background-color 5000s ease-in-out 0s;

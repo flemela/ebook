@@ -9,17 +9,17 @@ import {
 } from 'lucide-vue-next';
 import type { PublicBanner } from '~/server/api/banners/index.get';
 
-// 1. Remote Promotional Banners
+// -----------------------------------------------------------------------------
+// Carousel Logic & State Machine (PRESERVED 100% UNTOUCHED)
+// -----------------------------------------------------------------------------
 const { data: remoteBanners } = await useFetch<PublicBanner[]>('/api/banners');
 const bannersList = computed(() => remoteBanners.value || []);
 const totalSlides = computed(() => bannersList.value.length);
 
-// 2. Carousel State Machine
 const activeIndex = ref(0);
 const isPaused = ref(false);
 let autoplayTimer: ReturnType<typeof setInterval> | undefined;
 
-// 3. Touch Gesture Support
 const touchStartX = ref(0);
 const currentTouchX = ref(0);
 const isSwiping = ref(false);
@@ -41,7 +41,6 @@ function stopAutoplay(): void {
   }
 }
 
-// Resets and resumes rotation after manual interaction
 function resumeAutoplay(): void {
   stopAutoplay();
   if (totalSlides.value > 1 && !isPaused.value) {
@@ -107,7 +106,6 @@ function handleTouchEnd(): void {
     prevSlide();
   }
   dragOffset.value = 0;
-  // Always safely resume autoplay after touch interaction completes
   resumeAutoplay();
 }
 
@@ -151,42 +149,74 @@ onUnmounted(() => {
 
 <template>
   <section
-    class="relative select-none bg-[#052219] text-white overflow-hidden"
+    class="relative select-none bg-theme-dark text-white overflow-hidden"
     aria-roledescription="carousel"
-    aria-label="Bookstore Highlights & Promotions"
+    aria-label="Ebook Highlights & Promotions"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
   >
-    <!-- Viewport with Responsive Aspect Ratios: ~1.65:1 on Mobile, ~4:1 on Desktop -->
+    <!-- Viewport with Responsive Height -->
     <div
-      class="relative w-full overflow-hidden h-[225px] sm:h-[270px] lg:h-[315px]"
+      class="relative w-full overflow-hidden min-h-[380px] sm:min-h-[440px] lg:min-h-[480px] flex items-center"
       @touchstart.passive="handleTouchStart"
       @touchmove.passive="handleTouchMove"
       @touchend="handleTouchEnd"
     >
-      <!-- Fallback when no custom banners are configured yet -->
+      <!-- 1. Hero Showcase matching Reference Visual -->
       <div
         v-if="totalSlides === 0"
-        class="w-full h-full relative flex items-center justify-center bg-[#052219]"
+        class="w-full h-full relative py-12 px-6 sm:px-10 lg:px-16 flex items-center"
       >
-        <img
-          src="/images/hero-cover.jpg"
-          alt="The Sunrise Bookstore"
-          class="w-full h-full object-cover brightness-75"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6 sm:p-10">
-          <div class="space-y-1">
-            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-[#2EE59D]">
-              Welcome to The Sunrise Bookstore
+        <div class="max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          <!-- Left Content (7 Cols) -->
+          <div class="md:col-span-7 space-y-4 sm:space-y-6 text-left">
+            <span class="text-[11px] font-mono font-bold tracking-widest text-theme-accent uppercase block">
+              READ ANYTIME, ANYWHERE
             </span>
-            <h2 class="font-display text-xl sm:text-2xl font-bold text-white">
-              Books that change the way you think.
-            </h2>
+
+            <h1 class="font-sans font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white leading-[1.08] tracking-tight">
+              Discover Your Next <br />
+              <span class="text-theme-accent">Great Book</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-theme-dark-muted font-normal max-w-lg leading-relaxed">
+              Thousands of ebooks. Endless possibilities. Read, learn, and grow — all in one place.
+            </p>
+
+            <div class="pt-2">
+              <a
+                href="#catalog-results"
+                class="inline-flex items-center gap-2 bg-theme-accent hover:bg-theme-accent-hover text-white text-xs sm:text-sm font-bold uppercase tracking-wider px-6 py-3.5 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer"
+              >
+                <span>Browse Ebooks</span>
+                <ArrowRight :size="15" />
+              </a>
+            </div>
           </div>
+
+          <!-- Right Showcase: 3D Book Cover & Circular Price Tag (5 Cols) -->
+          <div class="md:col-span-5 flex justify-center items-center relative">
+            <div class="relative w-48 sm:w-56 aspect-[1/1.45] rounded-md overflow-hidden book-cover-3d shadow-2xl z-10 border border-white/10">
+              <img
+                src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&auto=format&fit=crop&q=80"
+                alt="The Midnight Library Featured Ebook"
+                class="w-full h-full object-cover"
+              />
+            </div>
+
+            <!-- Red Circular Price Badge matching Visual Guide -->
+            <div class="absolute -top-3 right-4 sm:right-8 z-20 w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-theme-accent text-white flex flex-col items-center justify-center shadow-lg transform rotate-6 border-2 border-white">
+              <span class="font-mono text-xs sm:text-sm font-black leading-tight">KSh 499</span>
+              <span class="font-mono text-[9px] line-through text-white/75">KSh 999</span>
+              <span class="text-[8px] font-mono font-black uppercase bg-black/25 px-1 rounded mt-0.5">50% OFF</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- Continuous Sliding Track (ONLY set banners rotate) -->
+      <!-- 2. Remote Carousel Track -->
       <div
         v-else
         class="flex w-full h-full will-change-transform"
@@ -197,7 +227,7 @@ onUnmounted(() => {
           :key="banner.id"
           class="w-full flex-shrink-0 relative h-full flex items-center overflow-hidden"
           :class="{ 'cursor-pointer': Boolean(banner.cta_link) }"
-          :style="{ backgroundColor: banner.bg_color || '#052219' }"
+          :style="{ backgroundColor: banner.bg_color || 'var(--theme-dark)' }"
           role="group"
           aria-roledescription="slide"
           :aria-label="`${index + 1} of ${totalSlides}`"
@@ -218,7 +248,7 @@ onUnmounted(() => {
             />
           </picture>
 
-          <!-- Optional Typography Overlay -->
+          <!-- Typography Overlay -->
           <div
             v-if="banner.title || banner.subtitle || banner.badge || banner.cta_label"
             class="absolute inset-0 z-10 flex items-center pointer-events-none px-6 sm:px-12"
@@ -226,34 +256,34 @@ onUnmounted(() => {
             <div class="max-w-xl space-y-2 pointer-events-auto">
               <div
                 v-if="banner.badge"
-                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#052219]/90 border border-gold-400 text-[10px] font-mono font-bold text-gold-300 shadow-xs"
+                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-theme-dark/90 border border-theme-accent text-[10px] font-mono font-bold text-theme-accent shadow-xs"
               >
-                <Sparkles :size="10" class="text-gold-400" />
+                <Sparkles :size="10" />
                 <span>{{ banner.badge }}</span>
               </div>
 
               <h2
                 v-if="banner.title"
-                class="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                class="font-display text-2xl sm:text-4xl font-extrabold text-white leading-tight drop-shadow-md"
               >
                 {{ banner.title }}
               </h2>
 
               <p
                 v-if="banner.subtitle"
-                class="text-[11px] sm:text-xs text-white/90 font-medium line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]"
+                class="text-xs sm:text-sm text-theme-dark-muted font-medium line-clamp-2"
               >
                 {{ banner.subtitle }}
               </p>
 
-              <div v-if="banner.cta_label" class="pt-1">
+              <div v-if="banner.cta_label" class="pt-2">
                 <button
                   type="button"
-                  class="bg-[#F05A36] hover:bg-[#D94827] text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-full transition-all flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
+                  class="bg-theme-accent hover:bg-theme-accent-hover text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition-all flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
                   @click.stop="handleBannerClick(banner)"
                 >
                   <span>{{ banner.cta_label }}</span>
-                  <ArrowRight :size="12" />
+                  <ArrowRight :size="13" />
                 </button>
               </div>
             </div>
@@ -261,14 +291,14 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Navigation Arrows (Only shown when multiple custom banners exist) -->
+      <!-- Navigation Arrows -->
       <div
         v-if="totalSlides > 1"
-        class="absolute inset-y-0 inset-x-2 sm:inset-x-4 z-20 flex items-center justify-between pointer-events-none"
+        class="absolute inset-y-0 inset-x-3 sm:inset-x-5 z-20 flex items-center justify-between pointer-events-none"
       >
         <button
           type="button"
-          class="w-8 h-8 rounded-full bg-[#052219]/70 hover:bg-[#052219] text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-xs active:scale-90 cursor-pointer border border-white/10"
+          class="w-9 h-9 rounded-full bg-theme-dark/80 hover:bg-theme-dark text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-xs active:scale-90 cursor-pointer border border-white/10"
           aria-label="Previous slide"
           @click="prevSlide"
         >
@@ -277,7 +307,7 @@ onUnmounted(() => {
 
         <button
           type="button"
-          class="w-8 h-8 rounded-full bg-[#052219]/70 hover:bg-[#052219] text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-xs active:scale-90 cursor-pointer border border-white/10"
+          class="w-9 h-9 rounded-full bg-theme-dark/80 hover:bg-theme-dark text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-xs active:scale-90 cursor-pointer border border-white/10"
           aria-label="Next slide"
           @click="nextSlide"
         >
@@ -285,17 +315,17 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <!-- Pagination Dots (Only shown when multiple custom banners exist) -->
+      <!-- Pagination Dots -->
       <div
         v-if="totalSlides > 1"
-        class="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5"
+        class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5"
       >
         <button
           v-for="(_, idx) in totalSlides"
           :key="idx"
           type="button"
           class="h-1.5 rounded-full cursor-pointer transition-all duration-300"
-          :class="idx === activeIndex ? 'w-6 bg-[#2EE59D]' : 'w-2 bg-white/40 hover:bg-white/70'"
+          :class="idx === activeIndex ? 'w-6 bg-theme-accent' : 'w-2 bg-white/40 hover:bg-white/70'"
           :aria-label="`Navigate to slide ${idx + 1}`"
           @click="goToSlide(idx)"
         />

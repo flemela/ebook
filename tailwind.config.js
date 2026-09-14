@@ -9,61 +9,74 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Theme variables bridge
         theme: {
-          dark: 'var(--theme-dark)',
-          forest: 'var(--theme-forest)',
-          coral: 'var(--theme-coral)',
-          'coral-hover': 'var(--theme-coral-hover)',
-          sand: 'var(--theme-sand)',
+          // 70% White Canvas & Surfaces
           canvas: 'var(--theme-canvas)',
           surface: 'var(--theme-surface)',
-          cream: 'var(--theme-cream)',
+          'surface-subtle': 'var(--theme-surface-subtle)',
+          'surface-muted': 'var(--theme-surface-muted)',
           border: 'var(--theme-border)',
           'border-strong': 'var(--theme-border-strong)',
+
+          // Typography Ink
           ink: 'var(--theme-ink)',
           muted: 'var(--theme-ink-muted)',
           subtle: 'var(--theme-ink-subtle)',
+
+          // 20% Deep Charcoal Black
+          'dark-deep': 'var(--theme-dark-deep)',
+          dark: 'var(--theme-dark)',
+          'dark-surface': 'var(--theme-dark-surface)',
+          'dark-border': 'var(--theme-dark-border)',
+          'dark-muted': 'var(--theme-dark-muted)',
+
+          // 10% Crimson Red
+          accent: 'var(--theme-accent)',
+          'accent-hover': 'var(--theme-accent-hover)',
+          'accent-active': 'var(--theme-accent-active)',
+          'accent-soft': 'var(--theme-accent-soft)',
+          'accent-border': 'var(--theme-accent-border)',
+          'accent-text': 'var(--theme-accent-text)',
+
+          // Legacy Compatibility Bindings
+          forest: 'var(--theme-dark-surface)',
+          coral: 'var(--theme-accent)',
+          'coral-hover': 'var(--theme-accent-hover)',
+          sand: 'var(--theme-surface-subtle)',
+          cream: 'var(--theme-surface-subtle)',
         },
 
-        // 20% Charcoal mapped to existing forest classes
+        // Direct fallback aliases so legacy classes keep rendering properly
         forest: {
-          950: '#111315', // Core deep charcoal
-          900: '#1A1D20', // Elevated charcoal surface
-          800: '#272B30', // Charcoal borders & subtle dark states
+          950: 'var(--theme-dark)',
+          900: 'var(--theme-dark-surface)',
+          800: '#272B30',
           700: '#383D45',
         },
-
-        // 10% Crimson Red mapped to existing gold & accent classes
         gold: {
-          600: '#B91C1C',
-          500: '#DC2626',
-          400: '#E50914',
+          600: 'var(--theme-accent-hover)',
+          500: 'var(--theme-accent)',
+          400: 'var(--theme-accent)',
           300: '#FCA5A5',
-          100: '#FEF2F2',
+          100: 'var(--theme-accent-soft)',
         },
-
-        // 70% White / Soft White mapped to existing paper classes
         paper: {
-          DEFAULT: '#FFFFFF',
-          canvas: '#FFFFFF',
-          cream: '#F8F9FA',
-          surface: '#FFFFFF',
-          border: '#E5E7EB',
+          DEFAULT: 'var(--theme-canvas)',
+          canvas: 'var(--theme-canvas)',
+          cream: 'var(--theme-surface-subtle)',
+          surface: 'var(--theme-surface)',
+          border: 'var(--theme-border)',
         },
-
         ink: {
-          DEFAULT: '#14171A',
-          muted: '#656F7D',
-          subtle: '#9AA2AD',
+          DEFAULT: 'var(--theme-ink)',
+          muted: 'var(--theme-ink-muted)',
+          subtle: 'var(--theme-ink-subtle)',
         },
-
-        // Heals the 148+ unregistered brand-* classes without template rewrites
         brand: {
-          green: '#111315',          // Maps to Charcoal
-          'green-hover': '#1A1D20',
-          gold: '#E50914',           // Maps to Crimson Red
-          cream: '#F8F9FA',          // Maps to Clean White/Soft Gray
+          green: 'var(--theme-dark)',
+          'green-hover': 'var(--theme-dark-surface)',
+          gold: 'var(--theme-accent)',
+          cream: 'var(--theme-surface-subtle)',
         },
       },
       fontFamily: {
@@ -71,11 +84,6 @@ export default {
         sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         display: ['Fraunces', 'Georgia', 'serif'],
         mono: ['"IBM Plex Mono"', 'monospace'],
-      },
-      boxShadow: {
-        book: '-2px 0 6px -1px rgba(0, 0, 0, 0.10), 3px 6px 18px -2px rgba(17, 19, 21, 0.12)',
-        'book-hover': '-3px 0 10px -1px rgba(0, 0, 0, 0.12), 6px 14px 28px -3px rgba(17, 19, 21, 0.18)',
-        card: '0 2px 8px -1px rgba(17, 19, 21, 0.05), 0 1px 3px -1px rgba(17, 19, 21, 0.03)',
       },
     },
   },
