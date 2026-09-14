@@ -1,7 +1,7 @@
 <!-- components/storefront/BookCard.vue -->
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { ShoppingCart } from 'lucide-vue-next';
+import { Star, ShoppingCart } from 'lucide-vue-next';
 import { useCart } from '~/composables/useCart';
 import { useToast } from '~/composables/useToast';
 import type { Book, ProductFormat, BookFormatType } from '~/types';
@@ -21,7 +21,7 @@ const { push: pushToast } = useToast();
 const imageFailed = ref(false);
 const selectedFormatId = ref<string>('');
 
-// 1. Filter to available digital formats with valid files
+// 1. Filter available digital formats
 const availableDigitalFormats = computed<ProductFormat[]>(() => {
   if (!props.book?.formats || props.book.formats.length === 0) return [];
 
@@ -49,7 +49,7 @@ const hardcopyFormat = computed<ProductFormat | null>(() => {
       id: `synthetic-hardcopy-${props.book.id}`,
       product_id: props.book.id,
       format: 'hardcopy' as BookFormatType,
-      price: props.book.price || 999,
+      price: props.book.price || 699,
       compare_at_price: props.book.compare_at_price || null,
       file_url: null,
       file_public_id: null,
@@ -63,17 +63,16 @@ const hardcopyFormat = computed<ProductFormat | null>(() => {
   return null;
 });
 
-// 3. Combined Formats (Ordered: Hardcopy first, then eBooks)
+// 3. Combined Formats (Ordered: eBooks first, then Hardcopy)
 const availableFormats = computed<ProductFormat[]>(() => {
   const list: ProductFormat[] = [];
+  list.push(...availableDigitalFormats.value);
   if (hardcopyFormat.value) {
     list.push(hardcopyFormat.value);
   }
-  list.push(...availableDigitalFormats.value);
   return list;
 });
 
-// Default selection: Hardcopy if available, else first digital format
 watch(
   availableFormats,
   (fmts) => {
@@ -93,14 +92,6 @@ const activeFormat = computed<ProductFormat | undefined>(() => {
   if (!availableFormats.value.length) return undefined;
   return availableFormats.value.find((f) => f.id === selectedFormatId.value) || availableFormats.value[0];
 });
-
-// Format-specific display label helper (type-safe exhaustive narrowing)
-function getFormatDisplayLabel(fmt: ProductFormat): string {
-  if (fmt.format === 'hardcopy') return 'Hardcopy';
-  if (fmt.format === 'pdf') return 'eBook (PDF)';
-  if (fmt.format === 'epub') return 'eBook (EPUB)';
-  return String(fmt.format || '').toUpperCase();
-}
 
 // Pricing calculations
 const pricing = computed(() => {
@@ -164,39 +155,15 @@ const coverImage = computed(() => {
 
 const displayAuthor = computed(() => {
   if (!props.book.author) return 'Original Edition';
-  return props.book.author.startsWith('By ') ? props.book.author : `By ${props.book.author}`;
+  return props.book.author.replace(/^By\s+/i, '');
 });
 
-function formatBadge(badgeStr?: string | null): string {
-  if (!badgeStr) return '';
-  switch (badgeStr) {
-    case 'FLASH_SALE':
-      return '⚡ FLASH';
-    case 'BESTSELLER':
-      return '🔥 BESTSELLER';
-    case 'NO1_PICK':
-      return '⭐ #1 PICK';
-    case 'DEAL_OF_WEEK':
-      return '🏷️ DEAL';
-    case 'LIMITED_TIME':
-      return '⏳ LIMITED';
-    default:
-      return badgeStr.replace(/_/g, ' ');
-  }
-}
-
-function handleImageError(): void {
-  imageFailed.value = true;
-}
+const displayRating = computed(() => {
+  return props.book.rating ? props.book.rating.toFixed(1) : '4.8';
+});
 
 function formatCurrency(val: number): string {
   return `KSh ${val.toLocaleString('en-KE')}`;
-}
-
-function selectFormat(fmtId: string, event: Event): void {
-  event.preventDefault();
-  event.stopPropagation();
-  selectedFormatId.value = fmtId;
 }
 
 function handleCardClick(event: Event): void {
@@ -217,7 +184,7 @@ function handleAddToCart(event: Event): void {
 
   const fmt = activeFormat.value;
   const isPhysical = fmt?.format === 'hardcopy';
-  const formatType: BookFormatType = fmt ? fmt.format : 'hardcopy';
+  const formatType: BookFormatType = fmt ? fmt.format : 'pdf';
 
   const isSynthetic = !fmt || fmt.id.startsWith('synthetic-');
   const validFormatId = isSynthetic ? '' : fmt.id;
@@ -236,7 +203,7 @@ function handleAddToCart(event: Event): void {
   });
 
   pushToast({
-    message: `Added "${props.book.name}" (${formatType === 'hardcopy' ? 'Hardcopy' : formatType.toUpperCase()}) to cart!`,
+    message: `Added "${props.book.name}" to cart!`,
     variant: 'success',
   });
 
@@ -245,28 +212,29 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <div class="w-full max-w-none sm:max-w-[160px] bg-white text-[#141E1A] rounded-xl p-2.5 sm:p-3 shadow-card hover:shadow-high transition-all flex flex-col justify-between group select-none text-left border border-slate-100 hover:border-slate-200">
+  <div class="w-full bg-theme-surface text-theme-ink rounded-xl p-3 sm:p-4 border border-theme-border hover:border-theme-border-strong hover:shadow-card transition-all flex flex-col justify-between group select-none text-left">
+    
     <div>
       <!-- Book Cover -->
       <NuxtLink
         :to="book.isSeed ? '#' : `/book/${book.slug}`"
-        class="block relative aspect-[1/1.37] rounded-book overflow-hidden bg-stone-100 book-cover-3d mb-2 sm:mb-2.5 cursor-pointer"
+        class="block relative aspect-[1/1.42] rounded-md overflow-hidden bg-theme-surface-subtle book-cover-3d mb-3 cursor-pointer"
         @click="handleCardClick"
       >
         <div
           v-if="imageFailed || !coverImage"
-          class="w-full h-full flex flex-col justify-between p-2 bg-gradient-to-br from-[#052219] to-[#0C3A2B] text-white text-left select-none"
+          class="w-full h-full flex flex-col justify-between p-3 bg-theme-dark text-white text-left select-none"
         >
-          <div class="space-y-0.5">
-            <span class="text-[8px] font-mono uppercase tracking-widest text-[#2EE59D] font-bold block truncate">
-              {{ book.category_name || 'Book' }}
+          <div class="space-y-1">
+            <span class="text-[9px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
+              {{ book.category_name || 'Ebook' }}
             </span>
-            <h4 class="font-display font-bold text-[11px] leading-tight line-clamp-3 text-white">
+            <h4 class="font-sans font-bold text-xs leading-tight line-clamp-3 text-white">
               {{ book.name }}
             </h4>
           </div>
-          <span class="text-[8px] font-mono text-white/70 truncate block pt-0.5 border-t border-white/10">
-            {{ book.author || 'Edition' }}
+          <span class="text-[9px] font-mono text-theme-dark-muted truncate block pt-1 border-t border-white/10">
+            {{ displayAuthor }}
           </span>
         </div>
 
@@ -274,100 +242,84 @@ function handleAddToCart(event: Event): void {
           v-else
           :src="coverImage"
           :alt="book.name"
-          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
-          width="132"
-          height="170"
           referrerpolicy="no-referrer"
-          @error="handleImageError"
+          @error="imageFailed = true"
         />
 
+        <!-- Discount Badge -->
         <span
           v-if="discountPercentage > 0"
-          class="absolute top-1.5 right-1.5 bg-red-600 text-white font-mono font-extrabold text-[9px] px-1.5 py-0.5 rounded shadow-xs z-10"
+          class="absolute top-2 right-2 bg-theme-accent text-white font-mono font-black text-[9px] px-1.5 py-0.5 rounded shadow-xs z-10"
         >
           -{{ discountPercentage }}%
-        </span>
-
-        <span
-          v-if="book.badge"
-          class="absolute top-1.5 left-1.5 bg-[#052219] text-[#2EE59D] font-mono font-bold text-[8px] px-1.5 py-0.5 rounded uppercase z-10"
-        >
-          {{ formatBadge(book.badge) }}
         </span>
       </NuxtLink>
 
       <!-- Book Title -->
       <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
-        <h3 class="font-display text-[11px] sm:text-xs font-bold text-slate-900 group-hover:text-[#E8750D] transition-colors line-clamp-1 leading-snug">
+        <h3 class="font-sans text-xs sm:text-sm font-bold text-theme-ink group-hover:text-theme-accent transition-colors line-clamp-1 leading-snug">
           {{ book.name }}
         </h3>
       </NuxtLink>
 
       <!-- Author -->
-      <p class="text-[10px] text-slate-500 italic truncate mt-0.5">
+      <p class="text-[11px] text-theme-ink-muted truncate mt-0.5">
         {{ displayAuthor }}
       </p>
 
-      <!-- Stacked Format Selector with Brand Orange & Prices -->
-      <div class="mt-2 space-y-1">
-        <template v-if="availableFormats.length > 1">
-          <button
-            v-for="fmt in availableFormats"
-            :key="fmt.id"
-            type="button"
-            class="w-full flex items-center justify-between px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-sans transition-all cursor-pointer select-none leading-none border"
-            :class="
-              activeFormat?.id === fmt.id
-                ? 'bg-[#FFF7ED] border-[#E8750D] text-[#C25E00] font-extrabold shadow-2xs'
-                : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold'
-            "
-            @click="selectFormat(fmt.id, $event)"
-          >
-            <span class="truncate pr-1">{{ getFormatDisplayLabel(fmt) }}</span>
-            <span class="font-mono font-bold tracking-tight text-[9.5px] flex-shrink-0" :class="activeFormat?.id === fmt.id ? 'text-[#C25E00]' : 'text-slate-600'">
-              {{ formatCurrency(fmt.price) }}
-            </span>
-          </button>
-        </template>
-        <div
-          v-else-if="activeFormat"
-          class="w-full flex items-center justify-between px-2 py-1 rounded-lg text-[10px] font-sans font-bold bg-[#FFF7ED] border border-[#E8750D]/60 text-[#C25E00]"
-        >
-          <span class="truncate pr-1">{{ getFormatDisplayLabel(activeFormat) }}</span>
-          <span class="font-mono font-bold text-[9.5px] flex-shrink-0">
-            {{ formatCurrency(activeFormat.price) }}
-          </span>
+      <!-- Star Ratings matching Reference Visual -->
+      <div class="flex items-center gap-1 text-theme-accent mt-1.5">
+        <div class="flex items-center">
+          <Star v-for="i in 5" :key="i" :size="11" class="fill-current text-theme-accent" />
         </div>
+        <span class="text-[10px] font-bold text-theme-ink-muted ml-0.5">
+          ({{ displayRating }})
+        </span>
+      </div>
+
+      <!-- Multiple Format Switch (Compact & Clean) -->
+      <div v-if="availableFormats.length > 1" class="flex gap-1.5 mt-2">
+        <button
+          v-for="fmt in availableFormats"
+          :key="fmt.id"
+          type="button"
+          class="px-2 py-0.5 text-[9.5px] font-mono font-bold rounded border transition-colors cursor-pointer"
+          :class="activeFormat?.id === fmt.id ? 'bg-theme-accent-soft border-theme-accent text-theme-accent' : 'bg-white border-theme-border text-theme-ink-muted hover:border-theme-ink-subtle'"
+          @click.stop="selectedFormatId = fmt.id"
+        >
+          {{ fmt.format.toUpperCase() }}
+        </button>
       </div>
     </div>
 
-    <!-- Bottom Bar: Prices + Supermarket Shopping Cart Button -->
-    <div class="pt-2 mt-2.5 border-t border-slate-100 flex items-end justify-between gap-1.5">
-      <div class="min-w-0 flex flex-col justify-center">
-        <!-- Red Strike-Through Price -->
+    <!-- Bottom Pricing & Red 'Add to Cart' Button -->
+    <div class="pt-3 mt-3 border-t border-theme-border space-y-2.5">
+      <!-- Price Row -->
+      <div class="flex items-baseline gap-2">
+        <span class="text-sm sm:text-base font-black font-mono leading-none text-theme-ink tracking-tight">
+          {{ formatCurrency(currentPrice) }}
+        </span>
         <span
           v-if="originalPrice && originalPrice > currentPrice"
-          class="text-[10px] sm:text-[10.5px] text-red-600 line-through decoration-red-500 decoration-1 font-mono font-bold block leading-none mb-0.5"
+          class="text-xs text-theme-ink-subtle line-through font-mono font-semibold"
         >
           {{ formatCurrency(originalPrice) }}
         </span>
-        <!-- Bigger, Bolder, Solid Black Price -->
-        <span class="text-xs sm:text-sm font-black font-mono leading-tight text-black tracking-tight">
-          {{ formatCurrency(currentPrice) }}
-        </span>
       </div>
 
-      <!-- Supermarket Shopping Cart Action Button -->
+      <!-- Prominent Full-Width Brand Red Button matching Visual Guide -->
       <button
         type="button"
-        class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#052219] hover:bg-[#E8750D] text-white flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-sm hover:shadow flex-shrink-0"
-        :title="book.isSeed ? 'Request Book' : (activeFormat?.format === 'hardcopy' ? 'Add Hardcopy to Cart' : 'Add eBook to Cart')"
-        :aria-label="book.isSeed ? 'Request Book' : (activeFormat?.format === 'hardcopy' ? 'Add Hardcopy to Cart' : 'Add eBook to Cart')"
+        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase tracking-wider py-2.5 px-3 rounded-lg shadow-xs hover:shadow transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+        :title="book.isSeed ? 'Request Book' : 'Add to Cart'"
         @click="handleAddToCart"
       >
-        <ShoppingCart :size="14" class="transition-transform group-hover:scale-105" />
+        <ShoppingCart :size="13" />
+        <span>Add to Cart</span>
       </button>
     </div>
+
   </div>
 </template>

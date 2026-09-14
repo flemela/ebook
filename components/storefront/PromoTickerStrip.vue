@@ -1,7 +1,7 @@
 <!-- components/storefront/PromoTickerStrip.vue -->
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { ChevronLeft, ChevronRight, Zap, ArrowRight } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-vue-next';
 
 export interface PromoTickerMessage {
   id: string;
@@ -19,24 +19,25 @@ const props = withDefaults(defineProps<Props>(), {
   messages: () => [],
 });
 
+// Built-in resilient store defaults (Original)
 const fallbackMessages: PromoTickerMessage[] = [
   {
     id: 'default-1',
-    text: 'Get 50% OFF on all ebooks this weekend only!',
+    text: 'FREE DELIVERY across Nairobi on orders above KSh 2,500',
     link: '#catalog-results',
     is_active: true,
     sort_order: 0,
   },
   {
     id: 'default-2',
-    text: 'Instant PDF download delivered directly to your device upon payment',
-    link: '#catalog-results',
+    text: '⚡ Instant Cloudflare R2 Digital Downloads on all eBook editions',
+    link: '#flash-sale',
     is_active: true,
     sort_order: 1,
   },
   {
     id: 'default-3',
-    text: 'Need a specific title? Custom book requests fulfilled on WhatsApp',
+    text: '🇰🇪 Need a hard-to-find title? Sourcing Any Book in Kenya via WhatsApp',
     link: 'https://wa.me/254143304460',
     is_active: true,
     sort_order: 2,
@@ -55,26 +56,6 @@ const activeIndex = ref(0);
 const isPaused = ref(false);
 let rotationTimer: ReturnType<typeof setInterval> | undefined;
 
-// Weekend Flash Sale Countdown (visual reference: 2d 14h 32m 17s)
-const days = ref('02');
-const hours = ref('14');
-const minutes = ref('32');
-const seconds = ref('17');
-let countdownInterval: ReturnType<typeof setInterval> | undefined;
-
-function updateCountdown(): void {
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const daysUntilSunday = (7 - dayOfWeek) % 7 || 7;
-  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilSunday, 23, 59, 59);
-
-  const diff = Math.max(0, target.getTime() - now.getTime());
-  days.value = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
-  hours.value = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
-  minutes.value = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
-  seconds.value = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-}
-
 function nextMessage(): void {
   if (activeMessages.value.length <= 1) return;
   activeIndex.value = (activeIndex.value + 1) % activeMessages.value.length;
@@ -88,7 +69,7 @@ function prevMessage(): void {
 function startTimer(): void {
   stopTimer();
   if (activeMessages.value.length > 1 && !isPaused.value) {
-    rotationTimer = setInterval(nextMessage, 5000);
+    rotationTimer = setInterval(nextMessage, 4500);
   }
 }
 
@@ -99,21 +80,49 @@ function stopTimer(): void {
   }
 }
 
+function handleMouseEnter(): void {
+  isPaused.value = true;
+  stopTimer();
+}
+
+function handleMouseLeave(): void {
+  isPaused.value = false;
+  startTimer();
+}
+
+// Mobile swipe support
+const touchStartX = ref(0);
+
+function handleTouchStart(e: TouchEvent): void {
+  touchStartX.value = e.touches[0].clientX;
+  stopTimer();
+}
+
+function handleTouchEnd(e: TouchEvent): void {
+  const diff = e.changedTouches[0].clientX - touchStartX.value;
+  if (diff > 45) {
+    prevMessage();
+  } else if (diff < -45) {
+    nextMessage();
+  }
+  startTimer();
+}
+
 function handleMessageClick(msg: PromoTickerMessage): void {
   if (!msg.link) return;
   if (msg.link.startsWith('http')) {
     window.open(msg.link, '_blank', 'noopener,noreferrer');
   } else if (msg.link.startsWith('#')) {
     const target = document.querySelector(msg.link);
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
   } else {
     navigateTo(msg.link);
   }
 }
 
 onMounted(() => {
-  updateCountdown();
-  countdownInterval = setInterval(updateCountdown, 1000);
   if (process.client && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     startTimer();
   }
@@ -121,50 +130,35 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopTimer();
-  if (countdownInterval) clearInterval(countdownInterval);
 });
 </script>
 
 <template>
   <div
-    class="relative w-full overflow-hidden select-none bg-theme-accent text-theme-accent-text border-b border-black/10 shadow-xs z-30 transition-colors"
-    aria-label="Flash Sale Announcements"
-    @mouseenter="isPaused = true; stopTimer();"
-    @mouseleave="isPaused = false; startTimer();"
+    class="relative w-full overflow-hidden select-none border-b border-black/15 shadow-xs z-30 transition-all duration-300 bg-theme-accent text-white"
+    style="background: linear-gradient(90deg, var(--theme-accent-hover) 0%, var(--theme-accent) 50%, var(--theme-accent-hover) 100%);"
+    aria-label="Promotional announcements"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+    @touchstart.passive="handleTouchStart"
+    @touchend="handleTouchEnd"
   >
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-10 flex items-center justify-between gap-3 text-xs">
-      
-      <!-- Left: Flash Sale Tag & Carousel Navigation -->
-      <div class="flex items-center gap-2.5 flex-shrink-0">
-        <div class="inline-flex items-center gap-1 font-mono font-black uppercase tracking-wider text-[11px] text-white">
-          <Zap :size="13" class="fill-current" />
-          <span>FLASH SALE</span>
-        </div>
+    <!-- Subtle Ambient Top Sheen -->
+    <div class="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/10 pointer-events-none" />
 
-        <span class="hidden sm:inline text-white/40">|</span>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-9 sm:h-10 flex items-center justify-between gap-3 relative z-10">
+      <!-- Left Manual Chevron Button -->
+      <button
+        v-if="activeMessages.length > 1"
+        type="button"
+        class="w-6 h-6 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 active:scale-95"
+        aria-label="Previous announcement"
+        @click="prevMessage"
+      >
+        <ChevronLeft :size="14" />
+      </button>
 
-        <!-- Manual Chevrons -->
-        <div v-if="activeMessages.length > 1" class="hidden sm:flex items-center gap-1">
-          <button
-            type="button"
-            class="w-5 h-5 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Previous announcement"
-            @click="prevMessage"
-          >
-            <ChevronLeft :size="12" />
-          </button>
-          <button
-            type="button"
-            class="w-5 h-5 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Next announcement"
-            @click="nextMessage"
-          >
-            <ChevronRight :size="12" />
-          </button>
-        </div>
-      </div>
-
-      <!-- Center: Rotating Promo Copy -->
+      <!-- Center Rotating Message -->
       <div class="flex-1 min-w-0 text-center overflow-hidden py-0.5">
         <Transition name="ticker-slide" mode="out-in">
           <div
@@ -172,34 +166,45 @@ onUnmounted(() => {
             class="inline-flex items-center justify-center gap-2 cursor-pointer group px-2 max-w-full"
             @click="handleMessageClick(activeMessages[activeIndex])"
           >
-            <span class="font-sans font-semibold text-[11px] sm:text-xs text-white truncate">
+            <!-- Left Sparkle -->
+            <Sparkles :size="13" class="text-white flex-shrink-0 animate-pulse" />
+
+            <!-- Text Content: White font-bold on dynamic brand gradient -->
+            <span class="font-sans font-bold text-[11px] sm:text-xs tracking-wide text-white truncate drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
               {{ activeMessages[activeIndex]?.text }}
+            </span>
+
+            <!-- Action Tag if Linked -->
+            <span
+              v-if="activeMessages[activeIndex]?.link"
+              class="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-mono font-bold uppercase text-white/90 underline underline-offset-2 ml-1 group-hover:text-white group-hover:translate-x-0.5 transition-all"
+            >
+              <span>Explore</span>
+              <ArrowRight :size="11" />
             </span>
           </div>
         </Transition>
       </div>
 
-      <!-- Right: White CTA Pill & Live Timer -->
-      <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-        <a
-          href="#catalog-results"
-          class="hidden md:inline-flex items-center gap-1 bg-white hover:bg-white/90 text-theme-accent font-sans font-bold text-[11px] px-3 py-1 rounded-full shadow-xs transition-all duration-150 active:scale-95"
+      <!-- Right Chevron Button & Counter -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <span
+          v-if="activeMessages.length > 1"
+          class="hidden md:inline-block font-mono font-bold text-[9px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded"
         >
-          <span>Shop Now</span>
-          <ArrowRight :size="11" />
-        </a>
+          {{ activeIndex + 1 }}/{{ activeMessages.length }}
+        </span>
 
-        <!-- Live Countdown -->
-        <ClientOnly>
-          <div class="flex items-center gap-1 font-mono font-bold text-[11px] tracking-tight text-white/95 bg-black/20 px-2.5 py-0.5 rounded-full">
-            <span>{{ days }}d</span>
-            <span>{{ hours }}h</span>
-            <span>{{ minutes }}m</span>
-            <span>{{ seconds }}s</span>
-          </div>
-        </ClientOnly>
+        <button
+          v-if="activeMessages.length > 1"
+          type="button"
+          class="w-6 h-6 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 active:scale-95"
+          aria-label="Next announcement"
+          @click="nextMessage"
+        >
+          <ChevronRight :size="14" />
+        </button>
       </div>
-
     </div>
   </div>
 </template>
