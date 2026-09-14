@@ -1,0 +1,147 @@
+/* =============================================================================
+   flemela/assets/css/main.css
+   Full-Stack Editorial Design System & Unified Typography
+   ============================================================================= */
+
+/* 1. Unified Typography Imports */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600;1,9..144,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* 2. Tailwind Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Global CSS Custom Properties */
+:root {
+  /* Brand Chromatic Palette */
+  --theme-dark: #052219;
+  --theme-forest: #0C3A2B;
+  --theme-mint: #2EE59D;
+  --theme-turquoise: #2CD4BF;
+  --theme-orange: #FF8A00;
+  --theme-coral: #F05A36;
+  --theme-coral-hover: #D84315;
+  --theme-sage: #8FA89B;
+
+  /* Neutral & Canvas Layers */
+  --theme-sand: #F7F2E7;
+  --theme-canvas: #FFFFFF;
+  --theme-surface: #FFFFFF;
+  --theme-cream: #F4EFE6;
+
+  /* Typography Ink Tones */
+  --theme-ink: #141E1A;
+  --theme-ink-muted: #5F6964;
+  --theme-ink-subtle: #929B96;
+
+  /* Border Tints */
+  --theme-border: rgba(8, 37, 27, 0.08);
+  --theme-border-strong: rgba(8, 37, 27, 0.16);
+}
+
+/* 4. Base Element Rules */
+@layer base {
+  html {
+    background-color: var(--theme-canvas);
+    color: var(--theme-ink);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--theme-canvas);
+    color: var(--theme-ink);
+    overflow-x: hidden;
+  }
+
+  /* Canonical Typography Classes */
+  .font-poster {
+    font-family: 'Bebas Neue', 'Oswald', sans-serif;
+    letter-spacing: 0.015em;
+  }
+
+  .font-display {
+    font-family: 'Fraunces', Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-sans {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Selection Highlight */
+  ::selection {
+    background-color: rgba(240, 90, 54, 0.2);
+    color: var(--theme-dark);
+  }
+}
+
+/* 5. Custom 3D Book Cover Treatment */
+.book-cover-3d {
+  position: relative;
+  border-radius: 2px 8px 8px 2px;
+  box-shadow: -2px 0 6px -1px rgba(0, 0, 0, 0.08), 3px 6px 18px -2px rgba(8, 37, 27, 0.10);
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.book-cover-3d::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.16) 0%, rgba(255, 255, 255, 0.14) 50%, rgba(0, 0, 0, 0.05) 100%);
+  pointer-events: none;
+}
+
+.book-hover-lift {
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.book-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: -3px 0 10px -1px rgba(0, 0, 0, 0.10), 6px 16px 30px -3px rgba(8, 37, 27, 0.14);
+}
+
+/* 6. Hero Staggered Book Stack Top-Gradient Fade Mask */
+.hero-faded-stack {
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 15%, black 35%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 15%, black 35%, black 100%);
+}
+
+/* 7. Deep 50/50 Overlapping Pill Drop Shadow */
+.shadow-search-pill {
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+/* 8. Cross-Browser Invisible Scrollbar Utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 9. Prevent Form Autofill Color Shifts */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--theme-ink);
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
