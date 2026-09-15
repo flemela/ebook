@@ -8,9 +8,9 @@ const whatsappUrl = buildWhatsAppLink(
 </script>
 
 <template>
-  <footer class="bg-theme-dark text-white pt-14 pb-10 px-4 border-t border-white/10 mt-auto">
+  <footer class="bg-theme-dark-deep text-white pt-14 pb-10 px-4 border-t border-theme-dark-border mt-auto">
     <div class="max-w-6xl mx-auto space-y-10">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs text-white/70">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs text-theme-dark-muted">
         <!-- Column 1: Need Help? -->
         <div class="space-y-3">
           <h5 class="font-mono font-bold uppercase text-white tracking-wider text-[11px]">NEED HELP?</h5>
@@ -47,7 +47,7 @@ const whatsappUrl = buildWhatsAppLink(
         <!-- Column 4: Payments & Contact -->
         <div class="space-y-3">
           <h5 class="font-mono font-bold uppercase text-white tracking-wider text-[11px]">PAYMENTS &amp; CONTACT</h5>
-          <p class="text-[11px] text-white/70 font-medium">
+          <p class="text-[11px] text-theme-dark-muted font-medium">
             WhatsApp Line: <strong class="text-white font-bold">{{ FLEMELA_WHATSAPP_LOCAL }}</strong>
           </p>
 
@@ -61,7 +61,7 @@ const whatsappUrl = buildWhatsAppLink(
               :href="whatsappUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="hover:text-[#2EE59D] transition-colors font-bold text-white flex items-center gap-1"
+              class="hover:text-theme-accent transition-colors font-bold text-white flex items-center gap-1"
             >
               <span>WhatsApp Concierge</span>
             </a>
@@ -70,7 +70,7 @@ const whatsappUrl = buildWhatsAppLink(
       </div>
 
       <!-- Bottom Bar -->
-      <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-white/50 font-medium">
+      <div class="pt-8 border-t border-theme-dark-border flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-theme-dark-muted font-medium">
         <div class="flex gap-4">
           <a href="#" class="hover:text-white transition-colors">Terms of Use</a>
           <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>

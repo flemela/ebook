@@ -1,10 +1,10 @@
 <!-- components/storefront/FlashSaleStrip.vue -->
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { ChevronLeft, ChevronRight, ShoppingCart, Zap, Clock } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight, ShoppingCart, Zap, Clock, Download } from 'lucide-vue-next';
 import { useCart } from '~/composables/useCart';
 import { useToast } from '~/composables/useToast';
-import type { Book, ProductFormat, BookFormatType } from '~/types';
+import type { Book, ProductFormat } from '~/types';
 
 interface Props {
   books: Book[];
@@ -12,7 +12,7 @@ interface Props {
   badgeLabel?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   title: 'FLASH SALE DEALS',
   badgeLabel: 'LIMITED TIME',
 });
@@ -21,9 +21,7 @@ const { addItem, openDrawer } = useCart();
 const { push: pushToast } = useToast();
 
 const scrollContainer = ref<HTMLElement | null>(null);
-const selectedFormats = ref<Record<string, string>>({});
 
-// Live Flash Sale Countdown Timer (Hours, Minutes, Seconds until midnight)
 const hours = ref('08');
 const minutes = ref('24');
 const seconds = ref('36');
@@ -64,95 +62,40 @@ function formatCurrency(val: number): string {
   return `KSh ${val.toLocaleString('en-KE')}`;
 }
 
-// Filter to available digital formats with real files
-function getAvailableDigitalFormats(book: Book): ProductFormat[] {
-  if (!book.formats || book.formats.length === 0) return [];
-  return book.formats.filter((f) => {
-    const isDigital = f.format === 'pdf' || f.format === 'epub';
-    if (!isDigital) return false;
-    if (book.isSeed) return true;
-    return Boolean(
-      (f.file_url && f.file_url.trim().length > 0) ||
-      (f.file_public_id && f.file_public_id.trim().length > 0)
-    );
-  });
-}
+function getBookPdfFormat(book: Book): ProductFormat {
+  const pdf = book.formats?.find((f) => f.format === 'pdf');
+  if (pdf) return pdf;
 
-// Guaranteed Hardcopy Format
-function getHardcopyFormat(book: Book): ProductFormat {
-  const existing = book.formats?.find((f) => f.format === 'hardcopy');
-  if (existing) return existing;
+  const epub = book.formats?.find((f) => f.format === 'epub');
+  if (epub) return epub;
+
+  const defaultPrice = book.price && book.price < 500 ? book.price : 149;
   return {
-    id: `synthetic-hardcopy-${book.id}`,
+    id: `pdf-${book.id}`,
     product_id: book.id,
-    format: 'hardcopy' as BookFormatType,
-    price: book.price || 999,
+    format: 'pdf',
+    price: defaultPrice,
     compare_at_price: book.compare_at_price || null,
     file_url: null,
     file_public_id: null,
     file_size_bytes: null,
-    stock: book.stock ?? 10,
+    stock: null,
     created_at: book.created_at || '',
     updated_at: book.updated_at || '',
   };
 }
 
-// Ordered: Hardcopy first, then eBooks
-function getBookDisplayFormats(book: Book): ProductFormat[] {
-  const hardcopy = getHardcopyFormat(book);
-  const digitals = getAvailableDigitalFormats(book);
-  return [hardcopy, ...digitals];
-}
-
-function getSelectedFormat(book: Book): ProductFormat {
-  const fmts = getBookDisplayFormats(book);
-  const selectedId = selectedFormats.value[book.id];
-  if (selectedId) {
-    const found = fmts.find((f) => f.id === selectedId);
-    if (found) return found;
-  }
-  return fmts[0];
-}
-
-// Format-specific display label helper (type-safe exhaustive narrowing)
-function getFormatDisplayLabel(fmt: ProductFormat): string {
-  if (fmt.format === 'hardcopy') return 'Hardcopy';
-  if (fmt.format === 'pdf') return 'eBook (PDF)';
-  if (fmt.format === 'epub') return 'eBook (EPUB)';
-  return String(fmt.format || '').toUpperCase();
-}
-
 function getBookPricing(book: Book) {
-  const pBook = book.price ?? 0;
-  const cpBook = book.compare_at_price ?? null;
-  const hasParentSale = Boolean(cpBook && cpBook > pBook && pBook > 0);
-  const parentDiscountRatio = hasParentSale && cpBook ? (cpBook - pBook) / cpBook : 0;
+  const fmt = getBookPdfFormat(book);
+  const p = fmt.price;
+  const cp = fmt.compare_at_price ?? null;
 
-  const fmt = getSelectedFormat(book);
-  let p = fmt ? fmt.price : pBook;
-  let cp: number | null = null;
-
-  if (fmt) {
-    if (fmt.compare_at_price && fmt.compare_at_price > fmt.price) {
-      cp = fmt.compare_at_price;
-    } else if (fmt.format === 'hardcopy') {
-      cp = cpBook;
-    } else if (hasParentSale && parentDiscountRatio > 0 && parentDiscountRatio < 1) {
-      cp = Math.round(fmt.price / (1 - parentDiscountRatio));
-    }
-  } else {
-    cp = cpBook;
-  }
-
-  if (cp !== null && cp !== undefined && cp > 0 && p > 0 && cp !== p) {
-    const minP = Math.min(p, cp);
-    const maxP = Math.max(p, cp);
-    const diff = maxP - minP;
-    const percentDown = Math.round((diff / maxP) * 100);
-
+  if (cp !== null && cp !== undefined && cp > p && p > 0) {
+    const diff = cp - p;
+    const percentDown = Math.round((diff / cp) * 100);
     return {
-      currentPrice: minP,
-      originalPrice: maxP,
+      currentPrice: p,
+      originalPrice: cp,
       discountPercentage: percentDown > 0 ? percentDown : 0,
     };
   }
@@ -164,47 +107,30 @@ function getBookPricing(book: Book) {
   };
 }
 
-// Badge is always "flash" or the passed-in label here — icon instead of emoji
-function getBadgeLabel(badgeStr?: string | null): string {
-  if (!badgeStr) return 'FLASH';
-  if (badgeStr === 'LIMITED_TIME') return 'LIMITED';
-  if (badgeStr === 'FLASH_SALE') return 'FLASH';
-  return badgeStr.replace(/_/g, ' ');
-}
-
-function selectBookFormat(bookId: string, formatId: string, event: Event): void {
-  event.preventDefault();
-  event.stopPropagation();
-  selectedFormats.value[bookId] = formatId;
-}
-
 function handleQuickAdd(book: Book, event: Event): void {
   event.preventDefault();
   event.stopPropagation();
 
-  const fmt = getSelectedFormat(book);
+  const fmt = getBookPdfFormat(book);
   const pricing = getBookPricing(book);
-  const isPhysical = fmt?.format === 'hardcopy';
-  const formatType = fmt ? fmt.format : 'hardcopy';
-
-  const isSynthetic = !fmt || fmt.id.startsWith('synthetic-');
+  const isSynthetic = !fmt.id || fmt.id.startsWith('pdf-');
   const validFormatId = isSynthetic ? '' : fmt.id;
 
   addItem({
     productId: book.id,
     formatId: validFormatId,
     title: book.name,
-    format: formatType,
+    format: 'pdf',
     price: pricing.currentPrice,
     compare_at_price: pricing.originalPrice,
     quantity: 1,
-    deliveryMethod: isPhysical ? 'delivery' : 'digital',
+    deliveryMethod: 'digital',
     coverUrl: book.images?.[0]?.image_url || (book as any).cover_image_url || null,
     author: book.author,
   });
 
   pushToast({
-    message: `Added "${book.name}" (${formatType.toUpperCase()}) to cart!`,
+    message: `Added "${book.name}" (PDF eBook) to cart!`,
     variant: 'success',
   });
 
@@ -213,36 +139,16 @@ function handleQuickAdd(book: Book, event: Event): void {
 </script>
 
 <template>
-  <!--
-    Redesign notes (matches BookCard fixes):
-    - Strip background moved from raw #f50000 to theme-coral-hover — same
-      urgency red-orange, now sourced from the token system.
-    - Cards: type scale collapsed to the same 3 tiers as BookCard (10px
-      label / xs title / sm price), width widened 148/156px -> 160/168px.
-    - Discount + badge use coral/forest+turquoise the same way BookCard
-      does, so a card here and a card on the homepage grid read as the
-      same component, not two different systems.
-    - Strikethrough price moved off red onto slate for the same reason:
-      the discount badge already signals "on sale".
-  -->
   <section
     v-if="books.length > 0"
-    class="bg-theme-coral-hover text-white py-3 px-4 sm:px-6 relative overflow-hidden select-none rounded-2xl max-w-6xl mx-auto shadow-md"
+    class="bg-theme-dark text-white py-4 px-4 sm:px-6 relative overflow-hidden select-none rounded-2xl max-w-6xl mx-auto shadow-md border border-theme-dark-border"
   >
-    <!-- Background Texture -->
-    <svg class="absolute -left-16 -bottom-16 w-80 h-80 text-white/10 pointer-events-none" viewBox="0 0 200 200" fill="none">
-      <circle cx="100" cy="100" r="40" stroke="currentColor" stroke-width="1.5" />
-      <circle cx="100" cy="100" r="75" stroke="currentColor" stroke-width="1.5" />
-      <circle cx="100" cy="100" r="110" stroke="currentColor" stroke-width="1.5" />
-    </svg>
-
-    <!-- Controls on the Left, Shelf on the Right -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 sm:gap-8 relative z-10">
 
       <!-- CONTROLS CONTAINER -->
       <div class="w-full sm:w-72 sm:flex-shrink-0 space-y-2.5 text-left py-1">
         <div class="space-y-1">
-          <span class="inline-flex items-center gap-1 text-[10px] font-mono font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-theme-dark text-theme-turquoise shadow-2xs">
+          <span class="inline-flex items-center gap-1 text-[10px] font-mono font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-theme-accent text-white shadow-2xs">
             <Zap :size="10" />
             {{ badgeLabel }}
           </span>
@@ -251,24 +157,24 @@ function handleQuickAdd(book: Book, event: Event): void {
           </h2>
         </div>
 
-        <p class="text-xs text-white/90 leading-relaxed font-sans line-clamp-2">
-          Limited-quantity price cuts on reader favorites. Grab them before the daily countdown expires!
+        <p class="text-xs text-white/80 leading-relaxed font-sans line-clamp-2">
+          Instant Cloudflare R2 PDF eBook downloads with limited-time price drops.
         </p>
 
-        <!-- Live Countdown Timer -->
+        <!-- Countdown Timer -->
         <ClientOnly>
           <div class="flex items-center gap-2 pt-0.5">
-            <div class="bg-white text-theme-ink rounded-lg px-2.5 py-1 border border-white/20 text-center shadow-xs min-w-[42px]">
+            <div class="bg-white/10 text-white rounded-lg px-2.5 py-1 border border-white/20 text-center shadow-xs min-w-[42px]">
               <span class="font-mono text-sm font-bold block">{{ hours }}H</span>
             </div>
             <span class="font-bold text-white">:</span>
-            <div class="bg-white text-theme-ink rounded-lg px-2.5 py-1 border border-white/20 text-center shadow-xs min-w-[42px]">
+            <div class="bg-white/10 text-white rounded-lg px-2.5 py-1 border border-white/20 text-center shadow-xs min-w-[42px]">
               <span class="font-mono text-sm font-bold block">{{ minutes }}M</span>
             </div>
             <span class="font-bold text-white">:</span>
-            <div class="bg-white text-theme-ink rounded-lg px-2.5 py-1 border border-white/20 text-center shadow-xs min-w-[42px] flex items-center justify-center gap-1">
-              <Clock :size="10" class="text-theme-coral" />
-              <span class="font-mono text-sm font-bold text-theme-coral block">{{ seconds }}S</span>
+            <div class="bg-white/10 text-white rounded-lg px-2.5 py-1 border border-white/20 text-center shadow-xs min-w-[42px] flex items-center justify-center gap-1">
+              <Clock :size="10" class="text-theme-accent" />
+              <span class="font-mono text-sm font-bold text-theme-accent block">{{ seconds }}S</span>
             </div>
           </div>
         </ClientOnly>
@@ -277,7 +183,7 @@ function handleQuickAdd(book: Book, event: Event): void {
         <div class="hidden sm:flex items-center gap-2.5 pt-1">
           <button
             type="button"
-            class="w-8 h-8 rounded-full bg-theme-dark/30 hover:bg-theme-dark text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95 border border-white/20"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95 border border-white/20"
             aria-label="Previous deal"
             @click="scrollLeft"
           >
@@ -285,7 +191,7 @@ function handleQuickAdd(book: Book, event: Event): void {
           </button>
           <button
             type="button"
-            class="w-8 h-8 rounded-full bg-theme-dark text-theme-turquoise hover:bg-theme-forest flex items-center justify-center cursor-pointer shadow-xs active:scale-95 transition-all border border-theme-turquoise/30"
+            class="w-8 h-8 rounded-full bg-theme-accent hover:bg-theme-accent-hover text-white flex items-center justify-center cursor-pointer shadow-xs active:scale-95 transition-all border border-theme-accent-border/30"
             aria-label="Next deal"
             @click="scrollRight"
           >
@@ -303,13 +209,13 @@ function handleQuickAdd(book: Book, event: Event): void {
           <div
             v-for="book in books"
             :key="book.id"
-            class="w-[160px] sm:w-[168px] flex-shrink-0 bg-white text-theme-ink rounded-xl p-2.5 sm:p-3 shadow-card hover:shadow-medium transition-all snap-start flex flex-col justify-between group select-none text-left border border-theme-border"
+            class="w-[160px] sm:w-[168px] flex-shrink-0 bg-theme-surface text-theme-ink rounded-xl p-2.5 sm:p-3 shadow-card hover:shadow-medium transition-all snap-start flex flex-col justify-between group select-none text-left border border-theme-border"
           >
             <div>
               <!-- Book Cover -->
               <NuxtLink
                 :to="`/book/${book.slug}`"
-                class="block relative aspect-[1/1.37] rounded-book overflow-hidden bg-stone-100 book-cover-3d mb-2 sm:mb-2.5"
+                class="block relative aspect-[1/1.37] rounded-book overflow-hidden bg-theme-surface-subtle book-cover-3d mb-2 sm:mb-2.5"
               >
                 <img
                   :src="book.images?.[0]?.image_url || (book as any).cover_image_url || '/images/book-placeholder.svg'"
@@ -321,22 +227,22 @@ function handleQuickAdd(book: Book, event: Event): void {
 
                 <span
                   v-if="getBookPricing(book).discountPercentage > 0"
-                  class="absolute top-1.5 right-1.5 bg-theme-coral text-white font-mono font-extrabold text-[10px] px-1.5 py-0.5 rounded shadow-xs z-10"
+                  class="absolute top-1.5 right-1.5 bg-theme-accent text-white font-mono font-extrabold text-[10px] px-1.5 py-0.5 rounded shadow-xs z-10"
                 >
                   -{{ getBookPricing(book).discountPercentage }}%
                 </span>
 
                 <span
-                  class="absolute top-1.5 left-1.5 bg-theme-forest text-theme-turquoise font-mono font-bold text-[10px] px-1.5 py-0.5 rounded uppercase z-10 flex items-center gap-1"
+                  class="absolute top-1.5 left-1.5 bg-theme-dark text-theme-accent font-mono font-bold text-[10px] px-1.5 py-0.5 rounded uppercase z-10 flex items-center gap-1"
                 >
                   <Zap :size="9" />
-                  {{ getBadgeLabel(book.badge) }}
+                  FLASH
                 </span>
               </NuxtLink>
 
               <!-- Book Title -->
               <NuxtLink :to="`/book/${book.slug}`" class="block">
-                <h3 class="font-display text-xs font-bold text-theme-ink group-hover:text-theme-coral transition-colors line-clamp-1 leading-snug">
+                <h3 class="font-display text-xs font-bold text-theme-ink group-hover:text-theme-accent transition-colors line-clamp-1 leading-snug">
                   {{ book.name }}
                 </h3>
               </NuxtLink>
@@ -344,34 +250,15 @@ function handleQuickAdd(book: Book, event: Event): void {
                 {{ book.author ? (book.author.startsWith('By ') ? book.author : `By ${book.author}`) : 'Original Edition' }}
               </p>
 
-              <!-- Stacked Format Selector -->
-              <div class="mt-2 space-y-1">
-                <template v-if="getBookDisplayFormats(book).length > 1">
-                  <button
-                    v-for="fmt in getBookDisplayFormats(book)"
-                    :key="fmt.id"
-                    type="button"
-                    class="w-full flex items-center justify-between px-2 py-1 rounded-lg text-[10px] font-sans transition-all cursor-pointer select-none leading-none border"
-                    :class="
-                      getSelectedFormat(book)?.id === fmt.id
-                        ? 'bg-theme-coral/10 border-theme-coral text-theme-coral-hover font-extrabold shadow-2xs'
-                        : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold'
-                    "
-                    @click="selectBookFormat(book.id, fmt.id, $event)"
-                  >
-                    <span class="truncate pr-1">{{ getFormatDisplayLabel(fmt) }}</span>
-                    <span class="font-mono font-bold text-[10px] flex-shrink-0" :class="getSelectedFormat(book)?.id === fmt.id ? 'text-theme-coral-hover' : 'text-slate-600'">
-                      {{ formatCurrency(fmt.price) }}
-                    </span>
-                  </button>
-                </template>
-                <div
-                  v-else
-                  class="w-full flex items-center justify-between px-2 py-1 rounded-lg text-[10px] font-sans font-bold bg-theme-coral/10 border border-theme-coral/60 text-theme-coral-hover"
-                >
-                  <span class="truncate pr-1">{{ getFormatDisplayLabel(getSelectedFormat(book)) }}</span>
+              <!-- Pure Digital Badge -->
+              <div class="mt-2">
+                <div class="w-full flex items-center justify-between px-2 py-1 rounded-lg text-[10px] font-sans font-bold bg-theme-accent-soft border border-theme-accent-border text-theme-accent-hover">
+                  <span class="flex items-center gap-1 truncate">
+                    <Download :size="11" class="text-theme-accent flex-shrink-0" />
+                    <span>eBook (PDF)</span>
+                  </span>
                   <span class="font-mono font-bold text-[10px] flex-shrink-0">
-                    {{ formatCurrency(getSelectedFormat(book).price) }}
+                    {{ formatCurrency(getBookPricing(book).currentPrice) }}
                   </span>
                 </div>
               </div>
@@ -382,7 +269,7 @@ function handleQuickAdd(book: Book, event: Event): void {
               <div class="min-w-0 flex flex-col justify-center">
                 <span
                   v-if="getBookPricing(book).originalPrice && getBookPricing(book).originalPrice! > getBookPricing(book).currentPrice"
-                  class="text-[10px] text-slate-400 line-through decoration-slate-400 decoration-1 font-mono font-bold block leading-none mb-0.5"
+                  class="text-[10px] text-theme-muted line-through decoration-theme-muted decoration-1 font-mono font-bold block leading-none mb-0.5"
                 >
                   {{ formatCurrency(getBookPricing(book).originalPrice!) }}
                 </span>
@@ -393,9 +280,9 @@ function handleQuickAdd(book: Book, event: Event): void {
 
               <button
                 type="button"
-                class="w-8 h-8 rounded-lg bg-theme-forest hover:bg-theme-coral text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95 shadow-xs flex-shrink-0"
-                :title="getSelectedFormat(book)?.format === 'hardcopy' ? 'Add Hardcopy to Cart' : 'Add eBook to Cart'"
-                :aria-label="getSelectedFormat(book)?.format === 'hardcopy' ? 'Add Hardcopy to Cart' : 'Add eBook to Cart'"
+                class="w-8 h-8 rounded-lg bg-theme-dark hover:bg-theme-accent active:bg-theme-accent-active text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95 shadow-xs flex-shrink-0"
+                title="Add eBook (PDF) to Cart"
+                aria-label="Add eBook (PDF) to Cart"
                 @click="handleQuickAdd(book, $event)"
               >
                 <ShoppingCart :size="13" />

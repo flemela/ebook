@@ -17,7 +17,6 @@ const emit = defineEmits<{
   change: [page: number];
 }>();
 
-// Computes numbered pages with smart ellipsis (e.g. 1, ..., 4, 5, 6, ..., 12)
 const visiblePages = computed<(number | '...')[]>(() => {
   const total = props.totalPages;
   const current = props.page;
@@ -55,7 +54,7 @@ function handlePageClick(target: number): void {
     <button
       type="button"
       :disabled="disabled || page <= 1"
-      class="px-3.5 py-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center gap-1 bg-slate-50 border border-slate-200 text-slate-700 hover:bg-[#FFF7ED] hover:border-[#E8750D] hover:text-[#E8750D] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-50 disabled:hover:border-slate-200 disabled:hover:text-slate-700 cursor-pointer shadow-2xs"
+      class="px-3.5 py-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center gap-1 bg-theme-surface border border-theme-border text-theme-ink hover:bg-theme-accent-soft hover:border-theme-accent hover:text-theme-accent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-theme-surface disabled:hover:border-theme-border disabled:hover:text-theme-ink cursor-pointer shadow-2xs"
       aria-label="Previous page"
       @click="handlePageClick(page - 1)"
     >
@@ -67,7 +66,7 @@ function handlePageClick(target: number): void {
     <template v-for="(p, idx) in visiblePages" :key="`p-${idx}`">
       <span
         v-if="p === '...'"
-        class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-slate-400 font-mono text-xs select-none"
+        class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-theme-subtle font-mono text-xs select-none"
       >
         ...
       </span>
@@ -80,8 +79,8 @@ function handlePageClick(target: number): void {
         class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-xs font-mono font-bold transition-all flex items-center justify-center cursor-pointer shadow-2xs disabled:opacity-50"
         :class="
           page === p
-            ? 'bg-[#E8750D] text-white border border-[#E8750D] shadow-sm'
-            : 'bg-white text-slate-700 border border-slate-200 hover:bg-[#FFF7ED] hover:border-[#E8750D] hover:text-[#E8750D]'
+            ? 'bg-theme-accent text-white border border-theme-accent shadow-sm'
+            : 'bg-theme-surface text-theme-ink border border-theme-border hover:bg-theme-accent-soft hover:border-theme-accent hover:text-theme-accent'
         "
         @click="handlePageClick(p)"
       >
@@ -93,7 +92,7 @@ function handlePageClick(target: number): void {
     <button
       type="button"
       :disabled="disabled || page >= totalPages"
-      class="px-3.5 py-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center gap-1 bg-slate-50 border border-slate-200 text-slate-700 hover:bg-[#FFF7ED] hover:border-[#E8750D] hover:text-[#E8750D] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-50 disabled:hover:border-slate-200 disabled:hover:text-slate-700 cursor-pointer shadow-2xs"
+      class="px-3.5 py-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center gap-1 bg-theme-surface border border-theme-border text-theme-ink hover:bg-theme-accent-soft hover:border-theme-accent hover:text-theme-accent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-theme-surface disabled:hover:border-theme-border disabled:hover:text-theme-ink cursor-pointer shadow-2xs"
       aria-label="Next page"
       @click="handlePageClick(page + 1)"
     >

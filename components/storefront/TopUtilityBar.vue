@@ -21,21 +21,21 @@ const whatsappHelpUrl = buildWhatsAppLink(
 </script>
 
 <template>
-  <aside aria-label="Store utility notice" class="bg-forest-950 text-paper text-[11px] py-1.5 px-4 border-b border-forest-900/60 select-none">
+  <aside aria-label="Store utility notice" class="bg-theme-dark text-white text-[11px] py-1.5 px-4 border-b border-theme-dark-border select-none">
     <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
       <!-- Left: Free Delivery Accent -->
       <div class="flex items-center gap-1.5 truncate">
-        <Truck :size="13" class="text-gold-400 flex-shrink-0" />
-        <span class="font-medium text-paper/90 truncate">
-          <strong class="text-gold-300 font-semibold">FREE DELIVERY</strong> across Nairobi on orders above KSh 2,500
+        <Truck :size="13" class="text-theme-accent flex-shrink-0" />
+        <span class="font-medium text-white/90 truncate">
+          <strong class="text-theme-accent font-semibold">FREE DELIVERY</strong> across Nairobi on orders above KSh 2,500
         </span>
       </div>
 
       <!-- Right: Reader Concierge & Order Tracking -->
-      <div class="flex items-center gap-3.5 text-paper/80 font-sans flex-shrink-0 text-[11px]">
+      <div class="flex items-center gap-3.5 text-white/80 font-sans flex-shrink-0 text-[11px]">
         <button
           type="button"
-          class="hover:text-gold-300 transition-colors flex items-center gap-1 cursor-pointer"
+          class="hover:text-theme-accent transition-colors flex items-center gap-1 cursor-pointer"
           @click="handleTrackOrderClick"
         >
           <Search :size="11" />
@@ -48,15 +48,15 @@ const whatsappHelpUrl = buildWhatsAppLink(
           :href="whatsappHelpUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="hover:text-gold-300 transition-colors flex items-center gap-1 cursor-pointer"
+          class="hover:text-theme-accent transition-colors flex items-center gap-1 cursor-pointer"
         >
-          <MessageCircle :size="11" class="text-emerald-400" />
+          <MessageCircle :size="11" class="text-[#25D366]" />
           <span>Concierge (0143304460)</span>
         </a>
 
         <span class="hidden md:inline opacity-30">•</span>
 
-        <span class="text-gold-300 font-mono font-medium hidden md:inline text-[10px] tracking-wider uppercase">
+        <span class="text-theme-accent font-mono font-medium hidden md:inline text-[10px] tracking-wider uppercase">
           Nairobi, Kenya
         </span>
       </div>

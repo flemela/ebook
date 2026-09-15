@@ -1,6 +1,6 @@
 <!-- components/admin/AdminLayout.vue -->
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted, type Component } from 'vue';
 import {
   LayoutDashboard,
   Inbox,
@@ -10,7 +10,6 @@ import {
   Images,
   MapPin,
   Zap,
-  Mail,
   ExternalLink,
   LogOut,
   Menu,
@@ -56,7 +55,7 @@ onUnmounted(() => {
 interface NavItem {
   label: string;
   to: string;
-  icon: any;
+  icon: Component;
   exact?: boolean;
   activeMatch: (path: string) => boolean;
 }
@@ -128,26 +127,20 @@ const navSections: NavSection[] = [
         icon: Zap,
         activeMatch: (p) => p.includes('/admin/mpesa'),
       },
-      {
-        label: 'Email (SMTP)',
-        to: '/admin/smtp',
-        icon: Mail,
-        activeMatch: (p) => p.includes('/admin/smtp'),
-      },
     ],
   },
 ];
 </script>
 
 <template>
-  <div class="min-h-screen bg-paper-canvas text-ink flex flex-col lg:flex-row antialiased">
+  <div class="min-h-screen bg-theme-canvas text-theme-ink flex flex-col lg:flex-row antialiased">
     
     <!-- 1. MOBILE TOP BAR (< lg) -->
-    <header class="lg:hidden bg-forest-950 text-paper h-14 px-4 sticky top-0 z-40 border-b border-forest-900/80 flex items-center justify-between shadow-sm">
+    <header class="lg:hidden bg-theme-dark text-white h-14 px-4 sticky top-0 z-40 border-b border-theme-dark-border flex items-center justify-between shadow-sm">
       <div class="flex items-center gap-3">
         <button
           type="button"
-          class="p-1.5 text-paper/80 hover:text-paper hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+          class="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
           aria-label="Open navigation menu"
           @click="isMobileDrawerOpen = true"
         >
@@ -160,7 +153,7 @@ const navSections: NavSection[] = [
             alt="Logo"
             class="h-7 w-auto object-contain brightness-0 invert"
           />
-          <span class="text-[9px] uppercase tracking-widest text-gold-300 font-mono font-bold pl-2 border-l border-white/15">
+          <span class="text-[9px] uppercase tracking-widest text-theme-accent font-mono font-bold pl-2 border-l border-white/15">
             Admin
           </span>
         </NuxtLink>
@@ -170,7 +163,7 @@ const navSections: NavSection[] = [
         <NuxtLink
           to="/"
           target="_blank"
-          class="text-xs text-paper/70 hover:text-paper flex items-center gap-1 px-2 py-1 rounded hover:bg-white/5 transition-colors"
+          class="text-xs text-white/70 hover:text-white flex items-center gap-1 px-2 py-1 rounded hover:bg-white/5 transition-colors"
           title="Open live storefront"
         >
           <span>Store</span>
@@ -179,7 +172,7 @@ const navSections: NavSection[] = [
 
         <button
           type="button"
-          class="p-1.5 text-red-300 hover:text-white hover:bg-red-900/40 rounded-lg transition-colors cursor-pointer"
+          class="p-1.5 text-theme-accent-border hover:text-white hover:bg-theme-accent/20 rounded-lg transition-colors cursor-pointer"
           title="Sign out"
           @click="logout"
         >
@@ -202,23 +195,23 @@ const navSections: NavSection[] = [
         />
 
         <aside
-          class="relative w-72 max-w-[85vw] bg-forest-950 text-paper h-full shadow-2xl flex flex-col z-10 border-r border-forest-900/80 animate-in slide-in-from-left duration-200"
+          class="relative w-72 max-w-[85vw] bg-theme-dark text-white h-full shadow-2xl flex flex-col z-10 border-r border-theme-dark-border animate-in slide-in-from-left duration-200"
         >
-          <div class="h-14 px-4 flex items-center justify-between border-b border-forest-900/80">
+          <div class="h-14 px-4 flex items-center justify-between border-b border-theme-dark-border">
             <NuxtLink to="/admin" class="flex items-center gap-2" @click="closeMobileDrawer">
               <img
                 src="/images/logo.png"
                 alt="Logo"
                 class="h-7 w-auto object-contain brightness-0 invert"
               />
-              <span class="text-[9px] uppercase tracking-widest text-gold-300 font-mono font-bold pl-2 border-l border-white/15">
+              <span class="text-[9px] uppercase tracking-widest text-theme-accent font-mono font-bold pl-2 border-l border-white/15">
                 Admin Portal
               </span>
             </NuxtLink>
 
             <button
               type="button"
-              class="p-1.5 text-paper/70 hover:text-paper hover:bg-white/10 rounded-lg cursor-pointer"
+              class="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg cursor-pointer"
               aria-label="Close menu"
               @click="closeMobileDrawer"
             >
@@ -228,7 +221,7 @@ const navSections: NavSection[] = [
 
           <div class="flex-1 overflow-y-auto p-4 space-y-6">
             <div v-for="section in navSections" :key="section.title" class="space-y-1.5">
-              <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-paper/40 px-3 block">
+              <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-theme-dark-muted px-3 block">
                 {{ section.title }}
               </span>
 
@@ -240,34 +233,34 @@ const navSections: NavSection[] = [
                   class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
                   :class="
                     item.activeMatch(route.path)
-                      ? 'bg-white/15 text-paper font-bold shadow-xs border-l-2 border-gold-400'
-                      : 'text-paper/70 hover:text-paper hover:bg-white/5'
+                      ? 'bg-white/15 text-white font-bold shadow-xs border-l-2 border-theme-accent'
+                      : 'text-white/70 hover:text-white hover:bg-white/5'
                   "
                   @click="closeMobileDrawer"
                 >
-                  <component :is="item.icon" :size="16" :class="item.activeMatch(route.path) ? 'text-gold-300' : 'text-paper/60'" />
+                  <component :is="item.icon" :size="16" :class="item.activeMatch(route.path) ? 'text-theme-accent' : 'text-white/60'" />
                   <span>{{ item.label }}</span>
                 </NuxtLink>
               </nav>
             </div>
           </div>
 
-          <div class="p-4 border-t border-forest-900/80 space-y-2">
+          <div class="p-4 border-t border-theme-dark-border space-y-2">
             <NuxtLink
               to="/"
               target="_blank"
-              class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-paper/70 hover:text-paper hover:bg-white/5 rounded-xl transition-colors"
+              class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
             >
               <span class="flex items-center gap-2">
-                <ExternalLink :size="15" class="text-gold-300" />
+                <ExternalLink :size="15" class="text-theme-accent" />
                 <span>Live Storefront</span>
               </span>
-              <span class="text-[10px] font-mono text-paper/40">Open ↗</span>
+              <span class="text-[10px] font-mono text-white/40">Open ↗</span>
             </NuxtLink>
 
             <button
               type="button"
-              class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-red-300 hover:text-white hover:bg-red-900/40 rounded-xl transition-colors cursor-pointer"
+              class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-theme-accent-border hover:text-white hover:bg-theme-accent/20 rounded-xl transition-colors cursor-pointer"
               @click="logout"
             >
               <LogOut :size="15" />
@@ -280,17 +273,17 @@ const navSections: NavSection[] = [
 
     <!-- 3. DESKTOP VERTICAL SIDEBAR (lg: >= 1024px) -->
     <aside
-      class="hidden lg:flex flex-col w-64 fixed inset-y-0 left-0 bg-forest-950 text-paper z-30 border-r border-forest-900/80 shadow-medium"
+      class="hidden lg:flex flex-col w-64 fixed inset-y-0 left-0 bg-theme-dark text-white z-30 border-r border-theme-dark-border shadow-medium"
       aria-label="Admin Sidebar Navigation"
     >
-      <div class="h-16 px-6 flex items-center border-b border-forest-900/80">
+      <div class="h-16 px-6 flex items-center border-b border-theme-dark-border">
         <NuxtLink to="/admin" class="flex items-center gap-2.5 group">
           <img
             src="/images/logo.png"
             alt="Logo"
             class="h-8 w-auto object-contain brightness-0 invert transition-transform group-hover:scale-105"
           />
-          <span class="text-[9px] uppercase tracking-widest text-gold-300 font-mono font-bold pl-2.5 border-l border-white/15">
+          <span class="text-[9px] uppercase tracking-widest text-theme-accent font-mono font-bold pl-2.5 border-l border-white/15">
             Admin Portal
           </span>
         </NuxtLink>
@@ -298,7 +291,7 @@ const navSections: NavSection[] = [
 
       <div class="flex-1 overflow-y-auto px-4 py-6 space-y-6">
         <div v-for="section in navSections" :key="section.title" class="space-y-1.5">
-          <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-paper/40 px-3 block">
+          <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-theme-dark-muted px-3 block">
             {{ section.title }}
           </span>
 
@@ -310,14 +303,14 @@ const navSections: NavSection[] = [
               class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all group"
               :class="
                 item.activeMatch(route.path)
-                  ? 'bg-white/15 text-paper font-bold shadow-xs border-l-2 border-gold-400'
-                  : 'text-paper/70 hover:text-paper hover:bg-white/5'
+                  ? 'bg-white/15 text-white font-bold shadow-xs border-l-2 border-theme-accent'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
               "
             >
               <component
                 :is="item.icon"
                 :size="16"
-                :class="item.activeMatch(route.path) ? 'text-gold-300' : 'text-paper/60 group-hover:text-paper'"
+                :class="item.activeMatch(route.path) ? 'text-theme-accent' : 'text-white/60 group-hover:text-white'"
               />
               <span>{{ item.label }}</span>
             </NuxtLink>
@@ -325,22 +318,22 @@ const navSections: NavSection[] = [
         </div>
       </div>
 
-      <div class="p-4 border-t border-forest-900/80 space-y-1.5">
+      <div class="p-4 border-t border-theme-dark-border space-y-1.5">
         <NuxtLink
           to="/"
           target="_blank"
-          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-paper/70 hover:text-paper hover:bg-white/5 rounded-xl transition-colors"
+          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
         >
           <span class="flex items-center gap-2">
-            <ExternalLink :size="14" class="text-gold-300" />
+            <ExternalLink :size="14" class="text-theme-accent" />
             <span>Live Storefront</span>
           </span>
-          <span class="text-[10px] font-mono text-paper/40">↗</span>
+          <span class="text-[10px] font-mono text-white/40">↗</span>
         </NuxtLink>
 
         <button
           type="button"
-          class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-red-300 hover:text-white hover:bg-red-900/40 rounded-xl transition-colors cursor-pointer"
+          class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-theme-accent-border hover:text-white hover:bg-theme-accent/20 rounded-xl transition-colors cursor-pointer"
           title="Sign out of portal"
           @click="logout"
         >

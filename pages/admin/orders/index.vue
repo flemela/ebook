@@ -82,7 +82,7 @@ const { data: ordersData, refresh, status: fetchStatus } = await useFetch<{
   },
 });
 
-const orders = computed(() => ordersData.value?.data || []);
+const orders = computed<AdminOrder[]>(() => ordersData.value?.data || []);
 const updatingOrderId = ref<string | null>(null);
 const expandedOrderIds = ref<Set<string>>(new Set());
 
@@ -108,7 +108,6 @@ function formatDate(iso: string): string {
   });
 }
 
-// 1-Click Approve Manual M-Pesa Deposit
 async function handleApprovePayment(orderId: string): Promise<void> {
   updatingOrderId.value = orderId;
   try {
@@ -125,7 +124,6 @@ async function handleApprovePayment(orderId: string): Promise<void> {
   }
 }
 
-// Update Order Fulfillment Lifecycle (Confirmed -> Out for Delivery -> Delivered)
 async function handleUpdateStatus(orderId: string, newStatus: string): Promise<void> {
   updatingOrderId.value = orderId;
   try {
@@ -153,25 +151,25 @@ function handleResetFilters(): void {
 
 <template>
   <AdminLayout>
-    <div class="space-y-6 max-w-7xl mx-auto">
+    <div class="space-y-6 max-w-7xl mx-auto text-theme-ink">
       
       <!-- Top Title Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-paper-border">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-theme-border">
         <div>
-          <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-gold-600 font-bold block">
+          <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-theme-accent font-bold block">
             Fulfillment &amp; Verification
           </span>
-          <h1 class="font-display text-2xl sm:text-3xl font-bold text-forest-950">
+          <h1 class="font-display text-2xl sm:text-3xl font-bold text-theme-ink">
             Order Management Desk
           </h1>
-          <p class="text-xs text-ink-muted mt-0.5">
+          <p class="text-xs text-theme-muted mt-0.5">
             Verify manual M-Pesa deposits, monitor Cash on Delivery orders, and track fulfillment dispatch.
           </p>
         </div>
 
         <button
           type="button"
-          class="px-3.5 py-2 bg-paper-surface border border-paper-border rounded-xl text-forest-950 text-xs font-semibold flex items-center gap-1.5 hover:bg-paper-cream transition-colors cursor-pointer shadow-2xs"
+          class="px-3.5 py-2 bg-theme-surface border border-theme-border rounded-xl text-theme-ink text-xs font-semibold flex items-center gap-1.5 hover:bg-theme-surface-subtle transition-colors cursor-pointer shadow-2xs"
           @click="() => refresh()"
         >
           <RefreshCw :size="13" :class="{ 'animate-spin': fetchStatus === 'pending' }" />
@@ -180,24 +178,22 @@ function handleResetFilters(): void {
       </div>
 
       <!-- Filters & Search Toolbar -->
-      <div class="bg-paper-surface p-4 rounded-2xl border border-paper-border shadow-soft flex flex-wrap gap-3 items-center justify-between">
+      <div class="bg-theme-surface p-4 rounded-2xl border border-theme-border shadow-soft flex flex-wrap gap-3 items-center justify-between">
         
-        <!-- Search Input -->
         <div class="relative flex-1 min-w-[240px]">
-          <Search :size="14" class="absolute left-3.5 top-3 text-ink-subtle pointer-events-none" />
+          <Search :size="14" class="absolute left-3.5 top-3 text-theme-subtle pointer-events-none" />
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Search by customer, phone, M-Pesa ref, or order ID..."
-            class="w-full pl-9 pr-3 py-2 bg-paper-canvas/50 border border-paper-border rounded-xl text-xs outline-none focus:bg-white focus:border-forest-900 transition-all text-forest-950 placeholder:text-ink-subtle"
+            class="w-full pl-9 pr-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs outline-none focus:bg-white focus:border-theme-accent transition-all text-theme-ink placeholder:text-theme-muted"
             @keyup.enter="() => refresh()"
           />
         </div>
 
-        <!-- Payment Method Filter -->
         <select
           v-model="paymentMethodFilter"
-          class="px-3 py-2 bg-paper-canvas/50 border border-paper-border rounded-xl text-xs font-semibold text-forest-950 outline-none"
+          class="px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs font-semibold text-theme-ink outline-none"
           @change="() => { page = 1; refresh(); }"
         >
           <option value="all">All Payment Channels</option>
@@ -206,10 +202,9 @@ function handleResetFilters(): void {
           <option value="mpesa">Automated STK Push</option>
         </select>
 
-        <!-- Fulfillment Status Filter -->
         <select
           v-model="statusFilter"
-          class="px-3 py-2 bg-paper-canvas/50 border border-paper-border rounded-xl text-xs font-semibold text-forest-950 outline-none"
+          class="px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs font-semibold text-theme-ink outline-none"
           @change="() => { page = 1; refresh(); }"
         >
           <option value="all">All Fulfillment Statuses</option>
@@ -221,10 +216,9 @@ function handleResetFilters(): void {
           <option value="cancelled">Cancelled</option>
         </select>
 
-        <!-- Payment Status Filter -->
         <select
           v-model="paymentStatusFilter"
-          class="px-3 py-2 bg-paper-canvas/50 border border-paper-border rounded-xl text-xs font-semibold text-forest-950 outline-none"
+          class="px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs font-semibold text-theme-ink outline-none"
           @change="() => { page = 1; refresh(); }"
         >
           <option value="all">All Payment Statuses</option>
@@ -235,11 +229,11 @@ function handleResetFilters(): void {
       </div>
 
       <!-- Orders Feed Table -->
-      <div class="bg-paper-surface rounded-2xl border border-paper-border shadow-soft overflow-hidden">
+      <div class="bg-theme-surface rounded-2xl border border-theme-border shadow-soft overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="bg-paper-cream/40 border-b border-paper-border text-ink-subtle uppercase tracking-wider font-mono text-[9px]">
+              <tr class="bg-theme-surface-subtle border-b border-theme-border text-theme-muted uppercase tracking-wider font-mono text-[9px]">
                 <th class="py-3 px-4">Order ID &amp; Time</th>
                 <th class="py-3 px-4">Customer &amp; Destination</th>
                 <th class="py-3 px-4">Channel &amp; M-Pesa Ref</th>
@@ -248,20 +242,20 @@ function handleResetFilters(): void {
                 <th class="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-paper-border/60">
+            <tbody class="divide-y divide-theme-border">
               <tr v-if="fetchStatus === 'pending'">
-                <td colspan="6" class="py-12 text-center text-ink-muted text-xs">
+                <td colspan="6" class="py-12 text-center text-theme-muted text-xs">
                   Loading order desk...
                 </td>
               </tr>
 
               <tr v-else-if="!orders.length">
-                <td colspan="6" class="py-12 text-center text-ink-muted text-xs space-y-2">
-                  <Inbox :size="24" class="mx-auto text-ink-subtle opacity-50" />
+                <td colspan="6" class="py-12 text-center text-theme-muted text-xs space-y-2">
+                  <Inbox :size="24" class="mx-auto text-theme-subtle opacity-50" />
                   <p>No orders match the selected filters.</p>
                   <button
                     type="button"
-                    class="text-forest-900 font-bold underline cursor-pointer text-xs"
+                    class="text-theme-accent font-bold underline cursor-pointer text-xs"
                     @click="handleResetFilters"
                   >
                     Reset all filters
@@ -270,33 +264,31 @@ function handleResetFilters(): void {
               </tr>
 
               <template v-for="order in orders" :key="order.id">
-                <tr class="hover:bg-paper-cream/30 transition-colors">
-                  <!-- Order ID & Time -->
+                <tr class="hover:bg-theme-surface-subtle transition-colors">
                   <td class="py-3.5 px-4 align-top">
-                    <span class="font-mono font-bold text-forest-950 block">
+                    <span class="font-mono font-bold text-theme-ink block">
                       #{{ order.id.slice(0, 8).toUpperCase() }}
                     </span>
-                    <span class="text-[10px] text-ink-muted font-mono block mt-0.5">
+                    <span class="text-[10px] text-theme-muted font-mono block mt-0.5">
                       {{ formatDate(order.created_at) }}
                     </span>
                     <div class="mt-1 flex items-center gap-1.5">
                       <span
                         v-if="order.delivery_type === 'pickup'"
-                        class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-amber-800 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200"
+                        class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-theme-accent-hover bg-theme-accent-soft px-1.5 py-0.2 rounded border border-theme-accent-border"
                       >
                         <Store :size="10" /> Store Pickup
                       </span>
                       <span
                         v-else
-                        class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200"
+                        class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-theme-ink bg-theme-surface-subtle px-1.5 py-0.2 rounded border border-theme-border"
                       >
                         <Truck :size="10" /> Delivery
                       </span>
 
-                      <!-- Expand Line Items Toggle -->
                       <button
                         type="button"
-                        class="text-[10px] font-mono text-ink-muted hover:text-forest-950 flex items-center gap-0.5 cursor-pointer"
+                        class="text-[10px] font-mono text-theme-muted hover:text-theme-ink flex items-center gap-0.5 cursor-pointer"
                         @click="toggleExpand(order.id)"
                       >
                         <span>{{ order.items?.length || 0 }} item(s)</span>
@@ -305,111 +297,99 @@ function handleResetFilters(): void {
                     </div>
                   </td>
 
-                  <!-- Customer Details -->
                   <td class="py-3.5 px-4 align-top max-w-xs">
-                    <div class="font-bold text-forest-950 flex items-center gap-1">
-                      <User :size="12" class="text-ink-subtle" />
+                    <div class="font-bold text-theme-ink flex items-center gap-1">
+                      <User :size="12" class="text-theme-subtle" />
                       <span>{{ order.customer_name }}</span>
                     </div>
-                    <div class="font-mono text-[11px] text-ink-muted flex items-center gap-1 mt-0.5">
-                      <Phone :size="11" class="text-ink-subtle" />
+                    <div class="font-mono text-[11px] text-theme-muted flex items-center gap-1 mt-0.5">
+                      <Phone :size="11" class="text-theme-subtle" />
                       <span>{{ order.customer_phone }}</span>
                     </div>
-                    <div class="text-[11px] text-ink-subtle truncate mt-1 flex items-center gap-1" :title="order.delivery_location">
-                      <MapPin :size="11" class="flex-shrink-0 text-gold-600" />
+                    <div class="text-[11px] text-theme-subtle truncate mt-1 flex items-center gap-1" :title="order.delivery_location">
+                      <MapPin :size="11" class="flex-shrink-0 text-theme-accent" />
                       <span>{{ order.delivery_location }}</span>
                     </div>
                   </td>
 
-                  <!-- Payment Channel & Reference Code -->
                   <td class="py-3.5 px-4 align-top">
                     <div class="space-y-1">
-                      <!-- Payment Mode Tag -->
                       <span
                         class="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded"
                         :class="{
-                          'bg-amber-100 text-amber-950': order.payment_method === 'mpesa_manual',
-                          'bg-slate-100 text-slate-800': order.payment_method === 'mpesa_cash',
-                          'bg-emerald-100 text-emerald-950': order.payment_method === 'mpesa' || order.payment_method === 'mpesa_direct',
+                          'bg-theme-accent-soft text-theme-accent-hover': order.payment_method === 'mpesa_manual',
+                          'bg-theme-surface-muted text-theme-ink': order.payment_method === 'mpesa_cash',
+                          'bg-theme-dark text-white': order.payment_method === 'mpesa' || order.payment_method === 'mpesa_direct',
                         }"
                       >
                         <component :is="order.payment_method === 'mpesa_cash' ? CreditCard : Zap" :size="10" />
                         {{ order.payment_method === 'mpesa_manual' ? 'Direct Till' : (order.payment_method === 'mpesa_cash' ? 'Cash on Delivery' : 'STK Push') }}
                       </span>
 
-                      <!-- Customer-Submitted M-Pesa Code Badge -->
                       <div v-if="order.payment_reference" class="pt-0.5">
-                        <span class="font-mono text-xs font-bold text-forest-950 bg-white px-2 py-0.5 rounded border border-paper-border inline-block shadow-2xs">
+                        <span class="font-mono text-xs font-bold text-theme-ink bg-theme-surface px-2 py-0.5 rounded border border-theme-border inline-block shadow-2xs">
                           {{ order.payment_reference }}
                         </span>
                       </div>
                     </div>
                   </td>
 
-                  <!-- Total Amount -->
-                  <td class="py-3.5 px-4 align-top text-right font-mono font-bold text-forest-950 text-xs tabular-figure">
+                  <td class="py-3.5 px-4 align-top text-right font-mono font-bold text-theme-ink text-xs tabular-figure">
                     {{ formatCurrency(order.total) }}
-                    <span v-if="order.delivery_fee && parseFloat(order.delivery_fee) > 0" class="text-[10px] text-ink-subtle block font-normal">
+                    <span v-if="order.delivery_fee && parseFloat(order.delivery_fee) > 0" class="text-[10px] text-theme-subtle block font-normal">
                       Incl. {{ formatCurrency(order.delivery_fee) }} delivery
                     </span>
                   </td>
 
-                  <!-- Status Tags -->
                   <td class="py-3.5 px-4 align-top space-y-1">
-                    <!-- Payment Status -->
                     <span
                       class="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border block max-w-fit"
                       :class="{
-                        'bg-emerald-50 text-emerald-900 border-emerald-200': order.payment_status === 'paid',
-                        'bg-amber-50 text-amber-900 border-amber-200': order.payment_status === 'pending',
-                        'bg-red-50 text-red-900 border-red-200': order.payment_status === 'failed',
+                        'bg-theme-accent-soft text-theme-accent-hover border-theme-accent-border': order.payment_status === 'paid',
+                        'bg-theme-surface-subtle text-theme-ink border-theme-border': order.payment_status === 'pending',
+                        'bg-theme-surface-muted text-theme-muted border-theme-border': order.payment_status === 'failed',
                       }"
                     >
-                      <span class="w-1.5 h-1.5 rounded-full" :class="order.payment_status === 'paid' ? 'bg-emerald-600' : 'bg-amber-600'" />
+                      <span class="w-1.5 h-1.5 rounded-full" :class="order.payment_status === 'paid' ? 'bg-theme-accent' : 'bg-theme-muted'" />
                       {{ order.payment_status === 'paid' ? 'Payment Verified' : 'Payment Pending' }}
                     </span>
 
-                    <!-- Fulfillment Status -->
                     <span
                       class="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border block max-w-fit"
                       :class="{
-                        'bg-blue-50 text-blue-900 border-blue-200': order.status === 'out_for_delivery',
-                        'bg-emerald-50 text-emerald-900 border-emerald-200': order.status === 'confirmed' || order.status === 'delivered',
-                        'bg-slate-100 text-slate-800 border-slate-200': order.status === 'pending',
-                        'bg-red-50 text-red-900 border-red-200': order.status === 'cancelled',
+                        'bg-theme-surface-subtle text-theme-accent border-theme-border': order.status === 'out_for_delivery',
+                        'bg-theme-accent-soft text-theme-accent-hover border-theme-accent-border': order.status === 'confirmed' || order.status === 'delivered',
+                        'bg-theme-surface-subtle text-theme-ink border-theme-border': order.status === 'pending',
+                        'bg-theme-surface-muted text-theme-muted border-theme-border': order.status === 'cancelled',
                       }"
                     >
                       {{ order.status }}
                     </span>
 
-                    <!-- Courier Handover Code Badge -->
                     <div v-if="order.delivery_confirmation_code" class="pt-0.5">
-                      <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-ink-muted">
-                        <KeyRound :size="10" class="text-gold-600" />
+                      <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-theme-muted">
+                        <KeyRound :size="10" class="text-theme-accent" />
                         <span>Code: {{ order.delivery_confirmation_code }}</span>
                       </span>
                     </div>
                   </td>
 
-                  <!-- Admin Action Desk -->
                   <td class="py-3.5 px-4 align-top text-right space-y-1.5">
-                    <!-- Approve Manual M-Pesa Deposit -->
                     <button
                       v-if="order.payment_status === 'pending' && order.payment_method === 'mpesa_manual'"
                       type="button"
-                      class="bg-forest-950 hover:bg-forest-900 text-paper text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg transition-all inline-flex items-center gap-1.5 shadow-subtle cursor-pointer disabled:opacity-50"
+                      class="bg-theme-dark hover:bg-theme-dark-surface text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg transition-all inline-flex items-center gap-1.5 shadow-subtle cursor-pointer disabled:opacity-50"
                       :disabled="updatingOrderId === order.id"
                       @click="handleApprovePayment(order.id)"
                     >
-                      <CheckCircle2 :size="12" class="text-gold-300" />
+                      <CheckCircle2 :size="12" class="text-theme-accent" />
                       <span>{{ updatingOrderId === order.id ? 'Approving...' : 'Verify Deposit' }}</span>
                     </button>
 
-                    <!-- Dispatch Delivery -->
                     <button
                       v-if="order.status === 'confirmed' && order.delivery_type === 'delivery'"
                       type="button"
-                      class="bg-blue-700 hover:bg-blue-800 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
+                      class="bg-theme-dark hover:bg-theme-dark-surface text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
                       :disabled="updatingOrderId === order.id"
                       @click="handleUpdateStatus(order.id, 'out_for_delivery')"
                     >
@@ -417,11 +397,10 @@ function handleResetFilters(): void {
                       <span>Dispatch</span>
                     </button>
 
-                    <!-- Complete Delivery / Pickup -->
                     <button
                       v-if="order.status === 'out_for_delivery' || (order.status === 'confirmed' && order.delivery_type === 'pickup')"
                       type="button"
-                      class="bg-emerald-700 hover:bg-emerald-800 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
+                      class="bg-theme-accent hover:bg-theme-accent-hover text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
                       :disabled="updatingOrderId === order.id"
                       @click="handleUpdateStatus(order.id, 'delivered')"
                     >
@@ -432,25 +411,25 @@ function handleResetFilters(): void {
                 </tr>
 
                 <!-- Expandable Line Items Drawer -->
-                <tr v-if="expandedOrderIds.has(order.id)" class="bg-paper-cream/50">
-                  <td colspan="6" class="px-6 py-3 border-b border-paper-border">
+                <tr v-if="expandedOrderIds.has(order.id)" class="bg-theme-surface-subtle">
+                  <td colspan="6" class="px-6 py-3 border-b border-theme-border">
                     <div class="space-y-1.5">
-                      <span class="text-[10px] font-mono uppercase font-bold text-ink-muted block tracking-wider">
+                      <span class="text-[10px] font-mono uppercase font-bold text-theme-muted block tracking-wider">
                         Order Line Items:
                       </span>
                       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                         <div
                           v-for="item in order.items"
                           :key="item.id"
-                          class="bg-white p-2.5 rounded-lg border border-paper-border text-xs flex justify-between items-center shadow-2xs"
+                          class="bg-theme-surface p-2.5 rounded-lg border border-theme-border text-xs flex justify-between items-center shadow-2xs"
                         >
                           <div>
-                            <strong class="text-forest-950 font-bold block truncate max-w-[180px]">{{ item.product_name }}</strong>
-                            <span class="text-[10px] text-ink-muted font-mono">
+                            <strong class="text-theme-ink font-bold block truncate max-w-[180px]">{{ item.product_name }}</strong>
+                            <span class="text-[10px] text-theme-muted font-mono">
                               {{ item.variant_title || 'Hardcopy' }} â€¢ Qty: {{ item.quantity }}
                             </span>
                           </div>
-                          <span class="font-mono font-bold text-forest-950 text-xs">
+                          <span class="font-mono font-bold text-theme-ink text-xs">
                             {{ formatCurrency(item.subtotal) }}
                           </span>
                         </div>
@@ -463,7 +442,7 @@ function handleResetFilters(): void {
           </table>
         </div>
       </div>
-<!-- Pagination Controls for Orders Desk -->
+
       <Pagination
         :page="page"
         :total-pages="totalPages"
@@ -473,4 +452,3 @@ function handleResetFilters(): void {
     </div>
   </AdminLayout>
 </template>
-    

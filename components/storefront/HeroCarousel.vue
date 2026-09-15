@@ -21,7 +21,6 @@ const emit = defineEmits<{
 
 const { data: remoteBanners, status: bannersStatus } = await useFetch<PublicBanner[]>('/api/banners');
 
-// Clean visual fallback banners
 const defaultSlides: CarouselSlide[] = [
   {
     id: 'default-slide-1',
@@ -210,13 +209,13 @@ onUnmounted(() => {
     @focusin="handleMouseEnter"
     @focusout="handleMouseLeave"
   >
-    <!-- Shimmer Skeleton: Pre-locks aspect ratio to eliminate layout shift -->
+    <!-- Shimmer Skeleton -->
     <div
       v-if="bannersStatus === 'pending'"
-      class="w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[24/9] min-h-[220px] sm:min-h-[300px] md:min-h-[360px] max-h-[460px] bg-gradient-to-r from-forest-950 via-forest-900 to-forest-950 animate-pulse flex items-center justify-center"
+      class="w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[24/9] min-h-[220px] sm:min-h-[300px] md:min-h-[360px] max-h-[460px] bg-gradient-to-r from-theme-dark via-theme-dark-surface to-theme-dark animate-pulse flex items-center justify-center"
     >
-      <div class="flex items-center gap-2 text-white/30 font-mono text-xs uppercase tracking-widest">
-        <span class="w-2 h-2 rounded-full bg-gold-400/50 animate-ping" />
+      <div class="flex items-center gap-2 text-white/40 font-mono text-xs uppercase tracking-widest">
+        <span class="w-2 h-2 rounded-full bg-theme-accent animate-ping" />
         <span>Loading Announcements...</span>
       </div>
     </div>
@@ -300,7 +299,7 @@ onUnmounted(() => {
           :key="idx"
           type="button"
           class="h-1.5 rounded-full cursor-pointer transition-all duration-300"
-          :class="idx === activeIndex ? 'w-6 bg-[#E8750D]' : 'w-2 bg-white/50 hover:bg-white/80'"
+          :class="idx === activeIndex ? 'w-6 bg-theme-accent' : 'w-2 bg-white/50 hover:bg-white/80'"
           :aria-label="`Navigate to slide ${idx + 1}`"
           @click.stop="goToSlide(idx)"
         />

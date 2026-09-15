@@ -93,7 +93,6 @@ useHead({
 
 const tickerItems = computed(() => storeMetadata.value?.promo_ticker || []);
 
-// Full known catalog pool (used for fuzzy fallback when exact backend search has typos)
 const fullCatalogPool = computed<Book[]>(() => {
   const remoteList: Book[] = Array.isArray(showcaseBooks.value)
     ? showcaseBooks.value
@@ -101,7 +100,6 @@ const fullCatalogPool = computed<Book[]>(() => {
   return mergeWithSeeds(remoteList, [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS], 20);
 });
 
-// Final display books: uses backend query if found; otherwise runs fuzzy ranking on typos
 const isFuzzyFallbackActive = ref(false);
 
 const displayBooks = computed<Book[]>(() => {
@@ -113,13 +111,11 @@ const displayBooks = computed<Book[]>(() => {
     return backendResults;
   }
 
-  // If backend found exact/partial matches, use them
   if (backendResults.length > 0) {
     isFuzzyFallbackActive.value = false;
     return backendResults;
   }
 
-  // If backend returned 0 matches (e.g. "atmoic habts"), run fuzzy matching
   const fuzzyResults = fuzzySearchBooks(fullCatalogPool.value, rawQuery, 0.35, itemsPerPage.value);
   if (fuzzyResults.length > 0) {
     isFuzzyFallbackActive.value = true;
@@ -140,7 +136,6 @@ const totalPages = computed(() => {
   return catalogData.value?.totalPages ?? 1;
 });
 
-// Range status text
 const paginationRangeText = computed(() => {
   const total = totalBooksCount.value;
   if (total === 0) return '0 titles';
@@ -154,7 +149,6 @@ const isFilterActive = computed(() => {
   return (cat !== 'general' && cat !== 'all') || debouncedSearch.value.trim().length > 0;
 });
 
-// Flash Sale & Bestsellers Shelves
 const flashSaleBooks = computed<Book[]>(() => {
   const list: Book[] = Array.isArray(showcaseBooks.value)
     ? showcaseBooks.value
@@ -175,7 +169,6 @@ const bestsellersOfWeek = computed<Book[]>(() => {
   return mergeWithSeeds(tagged, combinedSeeds, 4);
 });
 
-// Dynamic Categories Dropdown list
 const catalogueCategories = computed<string[]>(() => {
   const set = new Set<string>();
   const allList: Book[] = Array.isArray(showcaseBooks.value)
@@ -278,7 +271,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-white text-[#141E1A] antialiased">
+  <div class="min-h-screen flex flex-col bg-theme-canvas text-theme-ink antialiased">
     <!-- Top Announcement Ribbon -->
     <PromoTickerStrip :messages="tickerItems" />
 
@@ -309,16 +302,16 @@ onUnmounted(() => {
     <!-- Categories Bento Grid -->
     <BentoCategories @select="handleCategorySelect" />
 
-    <!-- Visual Bridge Banner -->
+    <!-- Visual Bridge Banner (20% Charcoal Anchor & 10% Crimson Red) -->
     <div class="max-w-6xl mx-auto px-4 w-full">
-      <div class="rounded-2xl bg-gradient-to-r from-[#052219] via-[#0C3A2B] to-[#124E38] p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 text-white shadow-md border border-[#2EE59D]/30 relative overflow-hidden">
+      <div class="rounded-2xl bg-theme-dark p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 text-white shadow-md border border-theme-dark-border relative overflow-hidden">
         <div class="flex items-center gap-3 relative z-10">
-          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#2EE59D] flex-shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-theme-accent flex-shrink-0">
             <Sparkles :size="20" class="animate-pulse" />
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-[9.5px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#2EE59D] text-[#052219]">
+              <span class="text-[9.5px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full bg-theme-accent text-white">
                 Live Storefront Shelf
               </span>
               <span class="text-xs text-white/80 font-mono hidden sm:inline">• Free Nairobi Delivery above KSh 2,500</span>
@@ -331,7 +324,7 @@ onUnmounted(() => {
 
         <button
           type="button"
-          class="bg-[#E8750D] hover:bg-[#D45B05] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95"
+          class="bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95"
           @click="scrollToSection('catalog-results')"
         >
           <span>Explore All Books</span>
@@ -349,17 +342,17 @@ onUnmounted(() => {
       class="pt-12 sm:pt-16 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
     >
       <!-- Section Title & Dynamic Filter Row -->
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-theme-border">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
-            <span class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-[#E8750D] block">
+            <span class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-theme-accent block">
               CATALOGUE ARCHIVE
             </span>
-            <span class="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200">
+            <span class="text-xs font-mono font-bold text-theme-muted bg-theme-surface-subtle px-3 py-0.5 rounded-full border border-theme-border">
               {{ paginationRangeText }}
             </span>
           </div>
-          <h2 class="font-poster text-3xl sm:text-4xl lg:text-5xl font-extrabold uppercase text-[#141E1A] tracking-wide leading-none">
+          <h2 class="font-poster text-3xl sm:text-4xl lg:text-5xl font-extrabold uppercase text-theme-ink tracking-wide leading-none">
             {{ activeCategoryFilter.toLowerCase() === 'general' ? 'BROWSE ALL BOOKS' : activeCategoryFilter }}
           </h2>
         </div>
@@ -370,13 +363,13 @@ onUnmounted(() => {
             <button
               id="catalogue-category-trigger"
               type="button"
-              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-[#FFF7ED] border border-slate-300 hover:border-[#E8750D] text-xs font-bold text-slate-800 transition-all cursor-pointer shadow-2xs"
-              :class="{ 'border-[#E8750D] text-[#E8750D] bg-[#FFF7ED]': isCatalogueDropdownOpen }"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-theme-surface-subtle hover:bg-theme-accent-soft border border-theme-border hover:border-theme-accent text-xs font-bold text-theme-ink transition-all cursor-pointer shadow-2xs"
+              :class="{ 'border-theme-accent text-theme-accent bg-theme-accent-soft': isCatalogueDropdownOpen }"
               @click="isCatalogueDropdownOpen = !isCatalogueDropdownOpen"
             >
-              <Filter :size="14" class="text-[#E8750D]" />
+              <Filter :size="14" class="text-theme-accent" />
               <span>Category: <strong>{{ activeCategoryFilter.toLowerCase() === 'general' ? 'General (All Books)' : activeCategoryFilter }}</strong></span>
-              <ChevronDown :size="14" class="transition-transform duration-200 text-slate-500" :class="{ 'rotate-180 text-[#E8750D]': isCatalogueDropdownOpen }" />
+              <ChevronDown :size="14" class="transition-transform duration-200 text-theme-muted" :class="{ 'rotate-180 text-theme-accent': isCatalogueDropdownOpen }" />
             </button>
 
             <!-- Dropdown Menu -->
@@ -384,13 +377,13 @@ onUnmounted(() => {
               <div
                 v-if="isCatalogueDropdownOpen"
                 id="catalogue-category-dropdown"
-                class="absolute right-0 sm:left-0 sm:right-auto mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-2xl py-2 z-50 text-left"
+                class="absolute right-0 sm:left-0 sm:right-auto mt-2 w-64 bg-theme-surface border border-theme-border rounded-2xl shadow-2xl py-2 z-50 text-left"
               >
-                <div class="px-4 py-1.5 border-b border-slate-100 flex items-center justify-between">
-                  <span class="text-[10px] font-mono uppercase font-bold text-slate-400 tracking-wider">
+                <div class="px-4 py-1.5 border-b border-theme-border flex items-center justify-between">
+                  <span class="text-[10px] font-mono uppercase font-bold text-theme-muted tracking-wider">
                     Select Category
                   </span>
-                  <span class="text-[10px] font-mono text-[#E8750D] font-bold">
+                  <span class="text-[10px] font-mono text-theme-accent font-bold">
                     {{ catalogueCategories.length }} Categories
                   </span>
                 </div>
@@ -400,12 +393,12 @@ onUnmounted(() => {
                     v-for="cat in catalogueCategories"
                     :key="cat"
                     type="button"
-                    class="w-full text-left px-4 py-2 hover:bg-[#FFF7ED] hover:text-[#C25E00] text-xs transition-colors cursor-pointer flex items-center justify-between"
-                    :class="activeCategoryFilter === cat ? 'bg-[#FFF7ED] text-[#E8750D] font-extrabold' : 'text-slate-700 font-semibold'"
+                    class="w-full text-left px-4 py-2 hover:bg-theme-accent-soft hover:text-theme-accent-hover text-xs transition-colors cursor-pointer flex items-center justify-between"
+                    :class="activeCategoryFilter === cat ? 'bg-theme-accent-soft text-theme-accent font-extrabold' : 'text-theme-ink font-semibold'"
                     @click="selectCatalogueCategory(cat)"
                   >
                     <span>{{ cat === 'General' ? 'General (All Books)' : cat }}</span>
-                    <Check v-if="activeCategoryFilter === cat" :size="14" class="text-[#E8750D]" />
+                    <Check v-if="activeCategoryFilter === cat" :size="14" class="text-theme-accent" />
                   </button>
                 </div>
               </div>
@@ -416,7 +409,7 @@ onUnmounted(() => {
           <button
             v-if="isFilterActive"
             type="button"
-            class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+            class="px-3.5 py-2.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
             title="Reset Search and Category Filters"
             @click="clearAllFilters"
           >
@@ -429,15 +422,15 @@ onUnmounted(() => {
       <!-- FUZZY TYPO MATCH NOTICE BANNER -->
       <div
         v-if="isFuzzyFallbackActive"
-        class="p-3.5 bg-[#FFF7ED] border border-orange-200 rounded-2xl flex items-center justify-between gap-3 text-xs text-[#C25E00]"
+        class="p-3.5 bg-theme-accent-soft border border-theme-accent-border rounded-2xl flex items-center justify-between gap-3 text-xs text-theme-accent-hover"
       >
         <div class="flex items-center gap-2">
-          <Zap :size="16" class="text-[#E8750D] flex-shrink-0" />
+          <Zap :size="16" class="text-theme-accent flex-shrink-0" />
           <span>No exact title found for "<strong>{{ debouncedSearch }}</strong>". Displaying closest matching books below:</span>
         </div>
         <button
           type="button"
-          class="text-xs font-bold underline hover:text-[#E8750D] cursor-pointer flex-shrink-0"
+          class="text-xs font-bold underline hover:text-theme-accent cursor-pointer flex-shrink-0"
           @click="clearAllFilters"
         >
           View All Books
@@ -452,24 +445,24 @@ onUnmounted(() => {
         <div
           v-for="n in 8"
           :key="`skel-catalog-${n}`"
-          class="w-full max-w-[176px] bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200 shadow-card flex flex-col justify-between space-y-3"
+          class="w-full max-w-[176px] bg-theme-surface rounded-xl p-2.5 sm:p-3 border border-theme-border shadow-card flex flex-col justify-between space-y-3"
         >
-          <div class="aspect-[1/1.37] rounded-lg bg-slate-200 animate-pulse" />
+          <div class="aspect-[1/1.37] rounded-lg bg-theme-surface-muted animate-pulse" />
           <div class="space-y-1.5 pt-1">
-            <div class="h-3.5 bg-slate-200 rounded w-5/6 animate-pulse" />
-            <div class="h-2.5 bg-slate-100 rounded w-1/2 animate-pulse" />
+            <div class="h-3.5 bg-theme-surface-muted rounded w-5/6 animate-pulse" />
+            <div class="h-2.5 bg-theme-surface-subtle rounded w-1/2 animate-pulse" />
           </div>
           <div class="space-y-1 pt-1">
-            <div class="h-4 bg-slate-100 rounded-md w-full animate-pulse" />
+            <div class="h-4 bg-theme-surface-subtle rounded-md w-full animate-pulse" />
           </div>
-          <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-            <div class="h-4 bg-slate-200 rounded w-16 animate-pulse" />
-            <div class="w-8 h-8 bg-slate-200 rounded-lg animate-pulse" />
+          <div class="pt-2 border-t border-theme-border flex items-center justify-between">
+            <div class="h-4 bg-theme-surface-muted rounded w-16 animate-pulse" />
+            <div class="w-8 h-8 bg-theme-surface-muted rounded-lg animate-pulse" />
           </div>
         </div>
       </div>
 
-      <!-- REAL BOOKS 50-PER-PAGE / FUZZY FILTERED GRID -->
+      <!-- REAL BOOKS 50-PER-PAGE GRID -->
       <div
         v-else-if="displayBooks.length > 0"
         class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 lg:gap-6 w-full max-w-[720px] mx-auto px-2 sm:px-4 justify-items-center animate-in fade-in duration-300"
@@ -485,18 +478,18 @@ onUnmounted(() => {
       <!-- TRUE EMPTY STATE -->
       <div
         v-else
-        class="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3 shadow-sm animate-in fade-in duration-200"
+        class="bg-theme-surface rounded-2xl border border-theme-border p-12 text-center space-y-3 shadow-sm animate-in fade-in duration-200"
       >
-        <BookOpen :size="36" class="mx-auto text-slate-400 opacity-60" />
-        <h3 class="font-display font-bold text-base text-slate-800">
+        <BookOpen :size="36" class="mx-auto text-theme-muted opacity-60" />
+        <h3 class="font-display font-bold text-base text-theme-ink">
           No books found matching "{{ debouncedSearch }}"
         </h3>
-        <p class="text-xs text-slate-500 max-w-xs mx-auto">
+        <p class="text-xs text-theme-muted max-w-xs mx-auto">
           We can source any title in Kenya directly for you upon request via WhatsApp.
         </p>
         <button
           type="button"
-          class="bg-[#F05A36] hover:bg-[#D94827] text-white text-xs font-bold uppercase px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
+          class="bg-theme-accent hover:bg-theme-accent-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
           @click="handleRequestSeed(debouncedSearch)"
         >
           Request This Book on WhatsApp
@@ -541,4 +534,4 @@ onUnmounted(() => {
   opacity: 0;
   transform: translateY(-6px);
 }
-	</style>
+</style>

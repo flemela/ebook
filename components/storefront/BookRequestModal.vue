@@ -1,7 +1,7 @@
 <!-- components/storefront/BookRequestModal.vue -->
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { X, MessageSquare, Send } from 'lucide-vue-next';
+import { X, MessageSquare, Send, Download } from 'lucide-vue-next';
 import { useToast } from '~/composables/useToast';
 import { buildWhatsAppLink } from '~/utils/phone';
 
@@ -25,7 +25,6 @@ const { push: pushToast } = useToast();
 const title = ref(props.initialTitle);
 const author = ref(props.initialAuthor);
 const customerPhone = ref('');
-const preferredFormat = ref<'hardcopy' | 'ebook' | 'either'>('hardcopy');
 const isSubmitting = ref(false);
 
 watch(() => props.open, (isOpen) => {
@@ -41,10 +40,10 @@ function handleSubmit(): void {
   isSubmitting.value = true;
 
   const lines = [
-    `*📚 Flemela Bookstore — Custom Book Request*`,
+    `*📚 The Sunrise Bookstore — Custom eBook (PDF) Request*`,
     `Book Title: ${title.value.trim()}`,
     author.value.trim() ? `Author: ${author.value.trim()}` : null,
-    `Preferred Format: ${preferredFormat.value === 'hardcopy' ? 'PHYSICAL HARDCOPY' : (preferredFormat.value === 'ebook' ? 'EBOOK (PDF/EPUB)' : 'EITHER / ANY')}`,
+    `Requested Format: DIGITAL EBOOK (PDF)`,
     `Customer Contact: ${customerPhone.value.trim()}`,
   ].filter(Boolean);
 
@@ -65,23 +64,23 @@ function handleSubmit(): void {
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-theme-dark/70 backdrop-blur-xs"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
       @click.self="emit('close')"
     >
       <div
-        class="bg-theme-surface rounded-2xl shadow-2xl border border-theme-border w-full max-w-lg p-6 sm:p-7 space-y-5 animate-in fade-in zoom-in-95 duration-200"
+        class="bg-theme-surface rounded-2xl shadow-2xl border border-theme-border w-full max-w-lg p-6 sm:p-7 space-y-5 animate-in fade-in zoom-in-95 duration-200 text-theme-ink"
         role="dialog"
         aria-modal="true"
       >
         <!-- Header -->
         <div class="flex items-center justify-between pb-3 border-b border-theme-border">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-theme-coral/10 text-theme-coral flex items-center justify-center">
+            <div class="w-8 h-8 rounded-xl bg-theme-accent-soft text-theme-accent flex items-center justify-center">
               <MessageSquare :size="16" />
             </div>
             <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-theme-ink">Request / Special Order</h3>
-              <p class="text-[11px] text-theme-muted">Our team will source this title and notify you on WhatsApp.</p>
+              <h3 class="font-display font-bold text-base sm:text-lg text-theme-ink">Request eBook Title</h3>
+              <p class="text-[11px] text-theme-muted">Our team will source this digital PDF edition and notify you on WhatsApp.</p>
             </div>
           </div>
           <button
@@ -102,7 +101,7 @@ function handleSubmit(): void {
               v-model="title"
               type="text"
               placeholder="e.g. Atomic Habits or Thinking Fast & Slow"
-              class="w-full px-3.5 py-2.5 bg-theme-canvas border border-theme-border rounded-xl text-xs sm:text-sm outline-none focus:border-theme-forest transition-all"
+              class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-theme-accent transition-all text-theme-ink placeholder:text-theme-muted"
               required
             />
           </div>
@@ -114,7 +113,7 @@ function handleSubmit(): void {
                 v-model="author"
                 type="text"
                 placeholder="e.g. James Clear"
-                class="w-full px-3.5 py-2.5 bg-theme-canvas border border-theme-border rounded-xl text-xs sm:text-sm outline-none focus:border-theme-forest transition-all"
+                class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-theme-accent transition-all text-theme-ink placeholder:text-theme-muted"
               />
             </div>
 
@@ -124,37 +123,16 @@ function handleSubmit(): void {
                 v-model="customerPhone"
                 type="tel"
                 placeholder="07XXXXXXXX or 01XXXXXXXX"
-                class="w-full px-3.5 py-2.5 bg-theme-canvas border border-theme-border rounded-xl text-xs sm:text-sm font-mono outline-none focus:border-theme-forest transition-all"
+                class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs sm:text-sm font-mono outline-none focus:bg-white focus:border-theme-accent transition-all text-theme-ink placeholder:text-theme-muted"
                 required
               />
             </div>
           </div>
 
-          <div class="space-y-1.5">
-            <label class="text-xs font-semibold text-theme-ink">Preferred Format</label>
-            <div class="grid grid-cols-3 gap-2 text-xs font-medium">
-              <label
-                class="border rounded-xl p-2.5 text-center cursor-pointer transition-all"
-                :class="preferredFormat === 'hardcopy' ? 'border-theme-coral bg-orange-50/60 font-bold text-theme-coral' : 'border-theme-border hover:bg-slate-50'"
-              >
-                <input type="radio" value="hardcopy" v-model="preferredFormat" class="sr-only" />
-                Physical Hardcopy
-              </label>
-              <label
-                class="border rounded-xl p-2.5 text-center cursor-pointer transition-all"
-                :class="preferredFormat === 'ebook' ? 'border-theme-coral bg-orange-50/60 font-bold text-theme-coral' : 'border-theme-border hover:bg-slate-50'"
-              >
-                <input type="radio" value="ebook" v-model="preferredFormat" class="sr-only" />
-                eBook (PDF/EPUB)
-              </label>
-              <label
-                class="border rounded-xl p-2.5 text-center cursor-pointer transition-all"
-                :class="preferredFormat === 'either' ? 'border-theme-coral bg-orange-50/60 font-bold text-theme-coral' : 'border-theme-border hover:bg-slate-50'"
-              >
-                <input type="radio" value="either" v-model="preferredFormat" class="sr-only" />
-                Either / Any
-              </label>
-            </div>
+          <!-- Pure Digital Edition Notice -->
+          <div class="p-3.5 rounded-xl border border-theme-accent-border bg-theme-accent-soft text-xs text-theme-accent-hover flex items-center gap-2">
+            <Download :size="14" class="text-theme-accent flex-shrink-0" />
+            <span>Title will be prepared as an authentic digital PDF eBook with instant Cloudflare R2 download.</span>
           </div>
 
           <div class="pt-2 flex justify-end gap-2.5">
@@ -167,7 +145,7 @@ function handleSubmit(): void {
             </button>
             <button
               type="submit"
-              class="bg-theme-coral hover:bg-theme-coral-hover text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              class="bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               :disabled="isSubmitting"
             >
               <Send :size="13" />

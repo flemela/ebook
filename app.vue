@@ -8,7 +8,7 @@ const isAdminRoute = computed(() => route.path.startsWith('/admin'));
 </script>
 
 <template>
-  <div class="min-h-screen bg-brand-cream text-ink antialiased">
+  <div class="min-h-screen bg-theme-canvas text-theme-ink antialiased">
     <NuxtPage />
     <!-- Global Floating WhatsApp Concierge on all Storefront Views -->
     <FloatingWhatsappButton v-if="!isAdminRoute" />

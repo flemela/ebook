@@ -1,6 +1,6 @@
 // =============================================================================
 // composables/useCart.ts
-// Session-persisted cart state with multi-format item isolation & compare-at pricing.
+// Pure Digital eBook (PDF) Cart State with Single-Copy Licensing & Instant Delivery
 // =============================================================================
 
 import type { CartItem, BookFormatType, DeliveryMethodType } from '~/types';
@@ -9,33 +9,24 @@ export function useCart() {
   const items = useState<CartItem[]>('flemela_cart_items', () => []);
   const isDrawerOpen = useState<boolean>('flemela_cart_drawer_open', () => false);
 
-  const totalItems = computed(() => {
+  const totalItems = computed<number>(() => {
     return items.value.reduce((sum, item) => sum + item.quantity, 0);
   });
 
-  const subtotal = computed(() => {
+  const subtotal = computed<number>(() => {
     const total = items.value.reduce((sum, item) => sum + item.price * item.quantity, 0);
     return Math.round(total * 100) / 100;
   });
 
-  const hasDigitalItems = computed(() => {
-    return items.value.some(
-      (item) =>
-        item.deliveryMethod === 'digital' || item.format === 'pdf' || item.format === 'epub'
-    );
-  });
-
-  const hasPhysicalItems = computed(() => {
-    return items.value.some(
-      (item) => item.deliveryMethod !== 'digital' && item.format === 'hardcopy'
-    );
-  });
+  // Pure digital store: all valid items are digital downloads
+  const hasDigitalItems = computed<boolean>(() => items.value.length > 0);
+  const hasPhysicalItems = computed<boolean>(() => false);
 
   function addItem(item: {
     productId: string;
-    formatId: string;
+    formatId?: string | null;
     title: string;
-    format: BookFormatType;
+    format?: BookFormatType;
     price: number;
     compare_at_price?: number | null;
     quantity?: number;
@@ -43,26 +34,23 @@ export function useCart() {
     coverUrl?: string | null;
     author?: string | null;
   }): void {
-    const qty = item.quantity && item.quantity > 0 ? item.quantity : 1;
-    const method: DeliveryMethodType =
-      item.deliveryMethod || (item.format === 'hardcopy' ? 'delivery' : 'digital');
-
     const existingIndex = items.value.findIndex(
-      (i) => i.productId === item.productId && i.formatId === item.formatId
+      (i) => i.productId === item.productId
     );
 
+    // Digital licenses: ensure 1 copy per customer order to prevent redundant charges
     if (existingIndex > -1) {
-      items.value[existingIndex].quantity += qty;
+      items.value[existingIndex].quantity = 1;
     } else {
       items.value.push({
         productId: item.productId,
-        formatId: item.formatId,
+        formatId: item.formatId || '',
         title: item.title,
-        format: item.format,
+        format: item.format || 'pdf',
         price: item.price,
         compare_at_price: item.compare_at_price ?? null,
-        quantity: qty,
-        deliveryMethod: method,
+        quantity: 1,
+        deliveryMethod: 'digital',
         coverUrl: item.coverUrl ?? null,
         author: item.author ?? null,
       });
@@ -73,20 +61,20 @@ export function useCart() {
 
   function updateQuantity(productId: string, formatId: string, quantity: number): void {
     const index = items.value.findIndex(
-      (i) => i.productId === productId && i.formatId === formatId
+      (i) => i.productId === productId && (!formatId || i.formatId === formatId)
     );
     if (index > -1) {
       if (quantity <= 0) {
         items.value.splice(index, 1);
       } else {
-        items.value[index].quantity = quantity;
+        items.value[index].quantity = 1; // Strict single-license cap for digital files
       }
     }
   }
 
-  function removeItem(productId: string, formatId: string): void {
+  function removeItem(productId: string, formatId?: string): void {
     items.value = items.value.filter(
-      (i) => !(i.productId === productId && i.formatId === formatId)
+      (i) => !(i.productId === productId && (!formatId || i.formatId === formatId))
     );
   }
 
