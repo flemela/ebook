@@ -17,7 +17,7 @@ const emit = defineEmits<{
 }>();
 
 // Fetch live catalog books to dynamically calculate inventory counts
-const { data: catalogBooks } = await useFetch<Book[]>('/api/products');
+const { data: catalogResponse } = await useFetch<any>('/api/products');
 
 const CATEGORIES = [
   {
@@ -60,11 +60,13 @@ const CATEGORIES = [
 
 const countMap = computed(() => {
   const map = new Map<string, number>();
-  if (catalogBooks.value) {
-    for (const b of catalogBooks.value) {
-      const cat = (b.category_name || 'General').toLowerCase();
-      map.set(cat, (map.get(cat) || 0) + 1);
-    }
+  const list: Book[] = Array.isArray(catalogResponse.value)
+    ? catalogResponse.value
+    : catalogResponse.value?.products || [];
+
+  for (const b of list) {
+    const cat = (b?.category_name || 'General').toLowerCase();
+    map.set(cat, (map.get(cat) || 0) + 1);
   }
   return map;
 });
@@ -92,11 +94,11 @@ function handleCategoryClick(catQuery: string): void {
 </script>
 
 <template>
-  <section id="categories-grid" class="py-10 sm:py-14 px-4 max-w-7xl mx-auto w-full space-y-6 select-none">
+  <section id="categories-grid" class="py-8 sm:py-12 md:py-14 px-4 max-w-7xl mx-auto w-full space-y-4 sm:space-y-6 select-none">
     <!-- Header with 'View all ->' Link -->
     <div class="flex items-end justify-between border-b border-theme-border pb-3">
       <div>
-        <h2 class="font-sans font-extrabold text-2xl sm:text-3xl text-theme-ink tracking-tight">
+        <h2 class="font-sans font-extrabold text-xl sm:text-2xl md:text-3xl text-theme-ink tracking-tight">
           Shop by Category
         </h2>
       </div>
@@ -111,26 +113,26 @@ function handleCategoryClick(catQuery: string): void {
       </button>
     </div>
 
-    <!-- 6-Card Category Grid matching Visual Guide -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+    <!-- Category Grid: 3 Icons per Row on Mobile (<768px), 6 Items per Row on Tablet & Desktop (>=768px) -->
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
       <button
         v-for="cat in CATEGORIES"
         :key="cat.name"
         type="button"
-        class="bg-theme-surface hover:bg-theme-surface-subtle border border-theme-border hover:border-theme-accent rounded-xl p-4 sm:p-5 flex flex-col items-center justify-center text-center gap-2.5 transition-all duration-200 group cursor-pointer shadow-2xs hover:shadow-xs hover:-translate-y-0.5"
+        class="bg-theme-surface hover:bg-theme-surface-subtle border border-theme-border hover:border-theme-accent rounded-xl p-2.5 sm:p-4 md:p-5 flex flex-col items-center justify-center text-center gap-1.5 sm:gap-2.5 transition-all duration-200 group cursor-pointer shadow-2xs hover:shadow-xs hover:-translate-y-0.5 min-h-[92px] sm:min-h-[110px]"
         @click="handleCategoryClick(cat.query)"
       >
-        <!-- Category Icon -->
-        <div class="w-10 h-10 rounded-full bg-theme-surface-subtle group-hover:bg-theme-accent-soft text-theme-ink group-hover:text-theme-accent flex items-center justify-center transition-colors">
-          <component :is="cat.icon" :size="20" class="stroke-[1.75]" />
+        <!-- Category Line Icon -->
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-theme-surface-subtle group-hover:bg-theme-accent-soft text-theme-ink group-hover:text-theme-accent flex items-center justify-center transition-colors flex-shrink-0">
+          <component :is="cat.icon" :size="18" class="sm:w-5 sm:h-5 stroke-[1.75]" />
         </div>
 
-        <!-- Name and Title Count -->
-        <div class="space-y-0.5">
-          <h3 class="font-sans font-bold text-xs sm:text-sm text-theme-ink group-hover:text-theme-accent transition-colors leading-tight">
+        <!-- Category Title and Count -->
+        <div class="space-y-0.5 w-full min-w-0">
+          <h3 class="font-sans font-bold text-[11px] sm:text-xs md:text-sm text-theme-ink group-hover:text-theme-accent transition-colors leading-tight truncate">
             {{ cat.name }}
           </h3>
-          <p class="text-[11px] text-theme-ink-muted font-medium">
+          <p class="text-[9px] sm:text-[10px] md:text-[11px] text-theme-ink-muted font-medium truncate">
             {{ getDisplayCount(cat.query, cat.fallbackCount) }}
           </p>
         </div>

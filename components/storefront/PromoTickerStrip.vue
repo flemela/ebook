@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   messages: () => [],
 });
 
-// Built-in resilient store defaults (Original)
+// Built-in resilient store defaults
 const fallbackMessages: PromoTickerMessage[] = [
   {
     id: 'default-1',
@@ -135,8 +135,11 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="relative w-full overflow-hidden select-none border-b border-black/15 shadow-xs z-30 transition-all duration-300 bg-theme-accent text-white"
-    style="background: linear-gradient(90deg, var(--theme-accent-hover) 0%, var(--theme-accent) 50%, var(--theme-accent-hover) 100%);"
+    class="relative w-full overflow-hidden select-none border-b border-[#9E3E00]/40 shadow-xs z-30 transition-all duration-300"
+    :style="{
+      background: 'linear-gradient(90deg, #B84A00 0%, #D96108 35%, #E8750D 65%, #D45B05 100%)',
+      color: '#FFFFFF',
+    }"
     aria-label="Promotional announcements"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
@@ -169,7 +172,7 @@ onUnmounted(() => {
             <!-- Left Sparkle -->
             <Sparkles :size="13" class="text-white flex-shrink-0 animate-pulse" />
 
-            <!-- Text Content: White font-bold on dynamic brand gradient -->
+            <!-- Text Content: White font-bold on gradient -->
             <span class="font-sans font-bold text-[11px] sm:text-xs tracking-wide text-white truncate drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
               {{ activeMessages[activeIndex]?.text }}
             </span>
@@ -186,7 +189,7 @@ onUnmounted(() => {
         </Transition>
       </div>
 
-      <!-- Right Chevron Button & Counter -->
+      <!-- Right Chevron Button & Optional Counter -->
       <div class="flex items-center gap-2 flex-shrink-0">
         <span
           v-if="activeMessages.length > 1"

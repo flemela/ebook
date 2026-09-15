@@ -1,20 +1,66 @@
 <!-- components/storefront/HeroCarousel.vue -->
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ArrowRight,
-  Sparkles,
-} from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import type { PublicBanner } from '~/server/api/banners/index.get';
 
-// -----------------------------------------------------------------------------
-// Carousel Logic & State Machine (PRESERVED 100% UNTOUCHED)
-// -----------------------------------------------------------------------------
-const { data: remoteBanners } = await useFetch<PublicBanner[]>('/api/banners');
-const bannersList = computed(() => remoteBanners.value || []);
-const totalSlides = computed(() => bannersList.value.length);
+export interface CarouselSlide {
+  id: string;
+  coverImage: string;
+  mobileImage?: string | null;
+  ctaLink?: string;
+  title?: string;
+  isRemote?: boolean;
+}
+
+const emit = defineEmits<{
+  search: [query: string, category?: string];
+  selectCategory: [category: string];
+  navigateFlashSale: [];
+}>();
+
+const { data: remoteBanners, status: bannersStatus } = await useFetch<PublicBanner[]>('/api/banners');
+
+// Clean visual fallback banners
+const defaultSlides: CarouselSlide[] = [
+  {
+    id: 'default-slide-1',
+    coverImage: '/images/hero-cover.jpg',
+    ctaLink: '#catalog-results',
+    title: 'The Sunrise Bookstore Collection',
+    isRemote: false,
+  },
+  {
+    id: 'default-slide-2',
+    coverImage: 'https://images.unsplash.com/photo-1507842229451-9f01079ca4b5?w=1600&auto=format&fit=crop&q=80',
+    ctaLink: '#catalog-results',
+    title: 'Curated Literature & Bestsellers',
+    isRemote: false,
+  },
+  {
+    id: 'default-slide-3',
+    coverImage: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1600&auto=format&fit=crop&q=80',
+    ctaLink: '#catalog-results',
+    title: 'Instant Cloudflare R2 Digital Editions',
+    isRemote: false,
+  },
+];
+
+const activeSlides = computed<CarouselSlide[]>(() => {
+  if (remoteBanners.value && remoteBanners.value.length > 0) {
+    return remoteBanners.value.map((b) => ({
+      id: b.id,
+      coverImage: b.image_url,
+      mobileImage: b.mobile_image_url || null,
+      ctaLink: b.cta_link || '#catalog-results',
+      title: b.title || 'Store Banner',
+      isRemote: true,
+    }));
+  }
+  return defaultSlides;
+});
+
+const totalSlides = computed(() => activeSlides.value.length);
 
 const activeIndex = ref(0);
 const isPaused = ref(false);
@@ -30,7 +76,7 @@ function startAutoplay(): void {
   if (totalSlides.value > 1 && !isPaused.value) {
     autoplayTimer = setInterval(() => {
       nextSlide();
-    }, 6000);
+    }, 5000);
   }
 }
 
@@ -118,21 +164,28 @@ const trackTransformStyle = computed(() => {
   }
   return {
     transform: `translate3d(-${activeIndex.value * 100}%, 0, 0)`,
-    transition: 'transform 600ms cubic-bezier(0.22, 1, 0.36, 1)',
+    transition: 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1)',
   };
 });
 
-async function handleBannerClick(banner: PublicBanner): Promise<void> {
-  if (!banner.cta_link) return;
-  $fetch(`/api/banners/${banner.id}/click`, { method: 'POST' }).catch(() => {});
+function isExternalLink(link?: string | null): boolean {
+  if (!link) return false;
+  return link.startsWith('http://') || link.startsWith('https://');
+}
 
-  if (banner.cta_link.startsWith('http')) {
-    window.open(banner.cta_link, '_blank', 'noopener,noreferrer');
-  } else if (banner.cta_link.startsWith('#')) {
-    const el = document.querySelector(banner.cta_link);
+function handleSlideClick(slide: CarouselSlide): void {
+  if (!slide.ctaLink) return;
+  if (slide.isRemote && remoteBanners.value) {
+    $fetch(`/api/banners/${slide.id}/click`, { method: 'POST' }).catch(() => {});
+  }
+
+  if (slide.ctaLink.startsWith('http')) {
+    window.open(slide.ctaLink, '_blank', 'noopener,noreferrer');
+  } else if (slide.ctaLink.startsWith('#')) {
+    const el = document.querySelector(slide.ctaLink);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   } else {
-    navigateTo(banner.cta_link);
+    navigateTo(slide.ctaLink);
   }
 }
 
@@ -149,145 +202,67 @@ onUnmounted(() => {
 
 <template>
   <section
-    class="relative select-none bg-theme-dark text-white overflow-hidden"
+    class="relative select-none bg-theme-dark text-white overflow-hidden w-full"
     aria-roledescription="carousel"
-    aria-label="Ebook Highlights & Promotions"
+    aria-label="Promotions and Announcements"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
+    @focusin="handleMouseEnter"
+    @focusout="handleMouseLeave"
   >
-    <!-- Viewport with Responsive Height -->
+    <!-- Shimmer Skeleton: Pre-locks aspect ratio to eliminate layout shift -->
     <div
-      class="relative w-full overflow-hidden min-h-[380px] sm:min-h-[440px] lg:min-h-[480px] flex items-center"
+      v-if="bannersStatus === 'pending'"
+      class="w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[24/9] min-h-[220px] sm:min-h-[300px] md:min-h-[360px] max-h-[460px] bg-gradient-to-r from-forest-950 via-forest-900 to-forest-950 animate-pulse flex items-center justify-center"
+    >
+      <div class="flex items-center gap-2 text-white/30 font-mono text-xs uppercase tracking-widest">
+        <span class="w-2 h-2 rounded-full bg-gold-400/50 animate-ping" />
+        <span>Loading Announcements...</span>
+      </div>
+    </div>
+
+    <!-- Loaded Carousel Viewport -->
+    <div
+      v-else
+      class="relative w-full overflow-hidden aspect-[16/9] sm:aspect-[21/9] md:aspect-[24/9] min-h-[220px] sm:min-h-[300px] md:min-h-[360px] max-h-[460px]"
       @touchstart.passive="handleTouchStart"
       @touchmove.passive="handleTouchMove"
       @touchend="handleTouchEnd"
     >
-      <!-- 1. Hero Showcase matching Reference Visual -->
       <div
-        v-if="totalSlides === 0"
-        class="w-full h-full relative py-12 px-6 sm:px-10 lg:px-16 flex items-center"
-      >
-        <div class="max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-8 lg:gap-12 items-center">
-          
-          <!-- Left Content (7 Cols) -->
-          <div class="md:col-span-7 space-y-4 sm:space-y-6 text-left">
-            <span class="text-[11px] font-mono font-bold tracking-widest text-theme-accent uppercase block">
-              READ ANYTIME, ANYWHERE
-            </span>
-
-            <h1 class="font-sans font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white leading-[1.08] tracking-tight">
-              Discover Your Next <br />
-              <span class="text-theme-accent">Great Book</span>
-            </h1>
-
-            <p class="text-sm sm:text-base text-theme-dark-muted font-normal max-w-lg leading-relaxed">
-              Thousands of ebooks. Endless possibilities. Read, learn, and grow — all in one place.
-            </p>
-
-            <div class="pt-2">
-              <a
-                href="#catalog-results"
-                class="inline-flex items-center gap-2 bg-theme-accent hover:bg-theme-accent-hover text-white text-xs sm:text-sm font-bold uppercase tracking-wider px-6 py-3.5 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer"
-              >
-                <span>Browse Ebooks</span>
-                <ArrowRight :size="15" />
-              </a>
-            </div>
-          </div>
-
-          <!-- Right Showcase: 3D Book Cover & Circular Price Tag (5 Cols) -->
-          <div class="md:col-span-5 flex justify-center items-center relative">
-            <div class="relative w-48 sm:w-56 aspect-[1/1.45] rounded-md overflow-hidden book-cover-3d shadow-2xl z-10 border border-white/10">
-              <img
-                src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&auto=format&fit=crop&q=80"
-                alt="The Midnight Library Featured Ebook"
-                class="w-full h-full object-cover"
-              />
-            </div>
-
-            <!-- Red Circular Price Badge matching Visual Guide -->
-            <div class="absolute -top-3 right-4 sm:right-8 z-20 w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-theme-accent text-white flex flex-col items-center justify-center shadow-lg transform rotate-6 border-2 border-white">
-              <span class="font-mono text-xs sm:text-sm font-black leading-tight">KSh 499</span>
-              <span class="font-mono text-[9px] line-through text-white/75">KSh 999</span>
-              <span class="text-[8px] font-mono font-black uppercase bg-black/25 px-1 rounded mt-0.5">50% OFF</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- 2. Remote Carousel Track -->
-      <div
-        v-else
         class="flex w-full h-full will-change-transform"
         :style="trackTransformStyle"
       >
         <div
-          v-for="(banner, index) in bannersList"
-          :key="banner.id"
-          class="w-full flex-shrink-0 relative h-full flex items-center overflow-hidden"
-          :class="{ 'cursor-pointer': Boolean(banner.cta_link) }"
-          :style="{ backgroundColor: banner.bg_color || 'var(--theme-dark)' }"
+          v-for="(slide, index) in activeSlides"
+          :key="slide.id"
+          class="w-full flex-shrink-0 relative h-full flex items-center justify-center"
           role="group"
           aria-roledescription="slide"
           :aria-label="`${index + 1} of ${totalSlides}`"
-          @click="handleBannerClick(banner)"
         >
-          <picture class="absolute inset-0 w-full h-full">
-            <source
-              v-if="banner.mobile_image_url"
-              :srcset="banner.mobile_image_url"
-              media="(max-width: 640px)"
-            />
-            <img
-              :src="banner.image_url"
-              :alt="banner.title || 'Promotional Banner'"
-              class="w-full h-full object-cover object-center scale-100"
-              loading="lazy"
-              referrerpolicy="no-referrer"
-            />
-          </picture>
-
-          <!-- Typography Overlay -->
-          <div
-            v-if="banner.title || banner.subtitle || banner.badge || banner.cta_label"
-            class="absolute inset-0 z-10 flex items-center pointer-events-none px-6 sm:px-12"
+          <component
+            :is="slide.ctaLink ? 'a' : 'div'"
+            :href="slide.ctaLink || undefined"
+            :target="isExternalLink(slide.ctaLink) ? '_blank' : undefined"
+            :rel="isExternalLink(slide.ctaLink) ? 'noopener noreferrer' : undefined"
+            class="relative block w-full h-full overflow-hidden group cursor-pointer"
+            @click="handleSlideClick(slide)"
           >
-            <div class="max-w-xl space-y-2 pointer-events-auto">
-              <div
-                v-if="banner.badge"
-                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-theme-dark/90 border border-theme-accent text-[10px] font-mono font-bold text-theme-accent shadow-xs"
-              >
-                <Sparkles :size="10" />
-                <span>{{ banner.badge }}</span>
-              </div>
-
-              <h2
-                v-if="banner.title"
-                class="font-display text-2xl sm:text-4xl font-extrabold text-white leading-tight drop-shadow-md"
-              >
-                {{ banner.title }}
-              </h2>
-
-              <p
-                v-if="banner.subtitle"
-                class="text-xs sm:text-sm text-theme-dark-muted font-medium line-clamp-2"
-              >
-                {{ banner.subtitle }}
-              </p>
-
-              <div v-if="banner.cta_label" class="pt-2">
-                <button
-                  type="button"
-                  class="bg-theme-accent hover:bg-theme-accent-hover text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition-all flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
-                  @click.stop="handleBannerClick(banner)"
-                >
-                  <span>{{ banner.cta_label }}</span>
-                  <ArrowRight :size="13" />
-                </button>
-              </div>
-            </div>
-          </div>
+            <picture class="w-full h-full block">
+              <source
+                v-if="slide.mobileImage"
+                :srcset="slide.mobileImage"
+                media="(max-width: 640px)"
+              />
+              <img
+                :src="slide.coverImage"
+                :alt="slide.title || 'Store Banner'"
+                class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.01]"
+                loading="eager"
+              />
+            </picture>
+          </component>
         </div>
       </div>
 
@@ -298,36 +273,36 @@ onUnmounted(() => {
       >
         <button
           type="button"
-          class="w-9 h-9 rounded-full bg-theme-dark/80 hover:bg-theme-dark text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-xs active:scale-90 cursor-pointer border border-white/10"
-          aria-label="Previous slide"
-          @click="prevSlide"
+          class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-md active:scale-90 cursor-pointer border border-white/20"
+          aria-label="Previous banner"
+          @click.stop="prevSlide"
         >
-          <ChevronLeft :size="16" />
+          <ChevronLeft :size="20" />
         </button>
 
         <button
           type="button"
-          class="w-9 h-9 rounded-full bg-theme-dark/80 hover:bg-theme-dark text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-xs active:scale-90 cursor-pointer border border-white/10"
-          aria-label="Next slide"
-          @click="nextSlide"
+          class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center pointer-events-auto backdrop-blur-xs transition-all shadow-md active:scale-90 cursor-pointer border border-white/20"
+          aria-label="Next banner"
+          @click.stop="nextSlide"
         >
-          <ChevronRight :size="16" />
+          <ChevronRight :size="20" />
         </button>
       </div>
 
-      <!-- Pagination Dots -->
+      <!-- Pagination Indicators -->
       <div
         v-if="totalSlides > 1"
-        class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5"
+        class="absolute bottom-3.5 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-black/35 backdrop-blur-xs px-3 py-1.5 rounded-full border border-white/10 pointer-events-auto"
       >
         <button
           v-for="(_, idx) in totalSlides"
           :key="idx"
           type="button"
           class="h-1.5 rounded-full cursor-pointer transition-all duration-300"
-          :class="idx === activeIndex ? 'w-6 bg-theme-accent' : 'w-2 bg-white/40 hover:bg-white/70'"
+          :class="idx === activeIndex ? 'w-6 bg-[#E8750D]' : 'w-2 bg-white/50 hover:bg-white/80'"
           :aria-label="`Navigate to slide ${idx + 1}`"
-          @click="goToSlide(idx)"
+          @click.stop="goToSlide(idx)"
         />
       </div>
     </div>

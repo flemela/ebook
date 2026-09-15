@@ -1,30 +1,12 @@
-// =============================================================================
-// flemela/server/api/admin/books/upload-url.post.ts
-// Nuxt 3 BFF: Securely unpacks session cookie and negotiates Soko Presigned URL
-// =============================================================================
+// server/api/admin/books/upload-url.post.ts
 
 import { defineEventHandler, readBody, getCookie, getHeader, createError } from 'h3';
-
-interface SokoUploadUrlResponse {
-  success: boolean;
-  data?: {
-    uploadUrl: string;
-    key: string;
-    fileUrl: string;
-    expiresInSeconds: number;
-  };
-  error?: {
-    message: string;
-    code?: string;
-  };
-}
+import { ofetch } from 'ofetch';
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
 
-  // 1. Extract session token from HTTP-only cookie or incoming Authorization header
   let token = getCookie(event, 'flemela_admin_session');
-
   if (!token) {
     const authHeader = getHeader(event, 'authorization');
     if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
@@ -40,24 +22,31 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 2. Validate request payload
   const body = await readBody(event);
-  if (!body || !body.filename) {
+  if (!body?.filename) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Bad Request',
-      data: { message: 'Filename is required to generate an upload slot.' },
+      data: { message: 'Filename is required.' },
     });
   }
 
-  const sokoApiUrl = config.sokoApiBaseUrl || process.env.SOKO_API_BASE_URL || 'http://localhost:3000';
+  const sokoApiUrl = config.sokoApiBaseUrl || process.env.SOKO_API_BASE_URL || 'http://localhost:3000/api/v1';
 
-  // 3. Dispatch authenticated negotiation call to Soko backend
   try {
-    const response = await $fetch<SokoUploadUrlResponse>(`${sokoApiUrl}/api/v1/books/upload-url`, {
+    const res = await ofetch<{
+      success: boolean;
+      data?: {
+        uploadUrl: string;
+        key: string;
+        fileUrl: string;
+        expiresInSeconds: number;
+      };
+      error?: { message: string };
+    }>(`${sokoApiUrl}/books/upload-url`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token.trim()}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: {
@@ -67,23 +56,27 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    if (!response.success || !response.data) {
+    if (!res.success || !res.data) {
       throw createError({
         statusCode: 502,
         statusMessage: 'Storage Gateway Error',
-        data: { message: response.error?.message || 'Failed to acquire upload authorization.' },
+        data: { message: res.error?.message || 'Failed to acquire upload slot from Soko.' },
       });
     }
 
-    return response.data;
+    return res.data;
   } catch (err: any) {
-    const status = err.statusCode || err.response?.status || 500;
-    const errorDetails = err.data?.error?.message || err.message || 'Failed to communicate with API server.';
+    const backendMessage =
+      err.data?.error?.message ||
+      err.data?.message ||
+      err.response?._data?.error?.message ||
+      err.message ||
+      'Storage service unavailable.';
 
     throw createError({
-      statusCode: status,
-      statusMessage: 'API Gateway Error',
-      data: { message: errorDetails },
+      statusCode: err.statusCode || err.response?.status || 500,
+      statusMessage: backendMessage,
+      data: { message: backendMessage },
     });
   }
 });
