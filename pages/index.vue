@@ -19,7 +19,7 @@ import type { PaginatedProductsResponse } from '~/server/api/products/index.get'
 
 // Pagination & Search Reactive State
 const currentPage = ref(1);
-const itemsPerPage = ref(48); // Multiple of 2 and 3 for symmetrical grid rendering
+const itemsPerPage = ref(48); // Multiple of 2 and 4 for clean rows
 const activeCategoryFilter = ref<string>('General');
 const searchQuery = ref<string>('');
 const debouncedSearch = ref<string>('');
@@ -145,7 +145,7 @@ const bestsellersOfWeek = computed<Book[]>(() => {
   const list: Book[] = showcaseData.value?.products || [];
   const tagged = list.filter((b) => b.badge === 'BESTSELLER');
   const combinedSeeds = [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS];
-  return mergeWithSeeds(tagged, combinedSeeds, 6);
+  return mergeWithSeeds(tagged, combinedSeeds, 8);
 });
 
 const catalogueCategories = computed<string[]>(() => {
@@ -249,7 +249,7 @@ onUnmounted(() => {
 
 <template>
   <div class="min-h-screen flex flex-col bg-theme-canvas text-theme-ink antialiased">
-    <!-- Top Announcement Ribbon -->
+    <!-- Top Announcement Ribbon (Brand Crimson Red) -->
     <PromoTickerStrip :messages="tickerItems" />
 
     <!-- Sticky Store Navbar -->
@@ -265,16 +265,16 @@ onUnmounted(() => {
       @select-category="handleCategorySelect"
     />
 
-    <!-- 2. Bestsellers Section (Top Heading, No Timer) -->
+    <!-- 2. Bestsellers Section (On-Top Heading + 1-Row Scrollable Shelf) -->
     <DealsWeek
       :books="bestsellersOfWeek"
       @request-seed="handleRequestSeed"
     />
 
-    <!-- 3. Catalogue Section (2 cols mobile, 3 cols tablet & desktop) -->
+    <!-- 3. Catalogue Section (Strictly 2 per row mobile, 4 per row desktop & tablet) -->
     <section
       id="catalog-results"
-      class="pt-10 sm:pt-14 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
+      class="pt-8 sm:pt-12 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
     >
       <!-- Section Title & Dynamic Filter Row -->
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-theme-border">
@@ -372,29 +372,29 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <!-- SKELETON LOADING GRID (2 cols on mobile, 3 cols on tablet & desktop) -->
+      <!-- SKELETON LOADING GRID (2 cols on mobile, 4 cols on tablet & desktop) -->
       <div
         v-if="booksStatus === 'pending'"
-        class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 lg:gap-6 w-full"
+        class="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5 lg:gap-6 w-full"
       >
         <div
-          v-for="n in 6"
+          v-for="n in 8"
           :key="`skel-catalog-${n}`"
-          class="w-full bg-theme-surface rounded-xl p-3 sm:p-4 border border-theme-border shadow-card flex flex-col justify-between space-y-3"
+          class="w-full bg-theme-surface rounded-xl p-3 border border-theme-border shadow-card flex flex-col justify-between space-y-3"
         >
           <div class="aspect-[1/1.37] rounded-lg bg-theme-surface-muted animate-pulse" />
           <div class="space-y-1.5 pt-1">
             <div class="h-3.5 bg-theme-surface-muted rounded w-4/5 animate-pulse" />
             <div class="h-2.5 bg-theme-surface-subtle rounded w-1/2 animate-pulse" />
           </div>
-          <div class="h-8 bg-theme-surface-muted rounded-lg w-full animate-pulse" />
+          <div class="h-9 bg-theme-surface-muted rounded-xl w-full animate-pulse" />
         </div>
       </div>
 
-      <!-- REAL BOOKS GRID (2 cols on mobile, 3 cols on tablet & desktop) -->
+      <!-- REAL BOOKS GRID (2 cols on mobile, 4 cols on tablet & desktop) -->
       <div
         v-else-if="displayBooks.length > 0"
-        class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 lg:gap-6 w-full animate-in fade-in duration-300"
+        class="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5 lg:gap-6 w-full animate-in fade-in duration-300"
       >
         <BookCard
           v-for="book in displayBooks"

@@ -161,12 +161,12 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <div class="w-full bg-theme-surface text-theme-ink rounded-xl p-3 sm:p-4 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
+  <div class="w-full bg-theme-surface text-theme-ink rounded-xl p-3 sm:p-3.5 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
     <div>
       <!-- Book Cover Link -->
       <NuxtLink
         :to="book.isSeed ? '#' : `/book/${book.slug}`"
-        class="block relative aspect-[1/1.37] rounded-lg overflow-hidden bg-theme-surface-subtle book-cover-3d mb-2.5 sm:mb-3 cursor-pointer"
+        class="block relative aspect-[1/1.37] rounded-lg overflow-hidden bg-theme-surface-subtle book-cover-3d mb-2.5 cursor-pointer"
         @click="handleCardClick"
       >
         <div
@@ -192,8 +192,8 @@ function handleAddToCart(event: Event): void {
           :alt="book.name"
           class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          width="240"
-          height="328"
+          width="200"
+          height="274"
           referrerpolicy="no-referrer"
           @error="handleImageError"
         />
@@ -214,7 +214,7 @@ function handleAddToCart(event: Event): void {
         </span>
       </NuxtLink>
 
-      <!-- Meta Row: Simple Minimal Text (No Pill Container) -->
+      <!-- Format line: simple text, no pill box -->
       <div class="flex items-center justify-between gap-1 text-[11px] pb-1">
         <span class="font-bold text-theme-accent flex items-center gap-1">
           <FileText :size="11" />
@@ -225,7 +225,7 @@ function handleAddToCart(event: Event): void {
         </span>
       </div>
 
-      <!-- Book Title: Bold, Prominent & Strictly Single-Line -->
+      <!-- Book Title: Bold, Large & Strictly Single-Line -->
       <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
         <h3
           class="font-display font-bold text-sm sm:text-base text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-snug"
@@ -241,13 +241,13 @@ function handleAddToCart(event: Event): void {
       </p>
 
       <!-- Rating Line -->
-      <div class="flex items-center gap-1.5 pt-1.5 text-[10px]">
+      <div class="flex items-center gap-1.5 pt-1 text-[10px]">
         <span class="text-amber-500 font-bold">★★★★★</span>
         <span class="text-theme-muted font-mono">4.9</span>
       </div>
     </div>
 
-    <!-- Bottom Pricing & Wide Full-Width Download Button -->
+    <!-- Bottom Pricing & Bigger, Bolder Full-Width Download Button -->
     <div class="pt-2.5 mt-2.5 border-t border-theme-border space-y-2">
       <div class="flex items-baseline justify-between">
         <div class="flex items-baseline gap-1.5">
@@ -262,19 +262,19 @@ function handleAddToCart(event: Event): void {
           </span>
         </div>
         <span class="text-[9px] font-mono text-emerald-600 font-bold">
-          Instant Access
+          Instant
         </span>
       </div>
 
-      <!-- Full-Width Download CTA Button -->
+      <!-- Bigger, Bolder Download Button -->
       <button
         type="button"
-        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase tracking-wider py-2.5 px-3 rounded-lg transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]"
+        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-[13px] font-extrabold uppercase tracking-wider py-3 sm:py-3.5 px-3 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
         :title="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
         :aria-label="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
         @click="handleAddToCart"
       >
-        <Download :size="13" />
+        <Download :size="16" class="stroke-[2.5]" />
         <span>Download</span>
       </button>
     </div>
