@@ -161,27 +161,56 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <div class="w-full bg-theme-surface text-theme-ink rounded-xl p-3 sm:p-3.5 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
+  <!-- Relative container allows the zigzag discount seal to spill out beyond the border -->
+  <div class="relative w-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
+    
+    <!-- ZIGZAG CIRCULAR STARBURST DISCOUNT BADGE (Spilling over the top-right corner) -->
+    <div
+      v-if="discountPercentage > 0"
+      class="absolute -top-3.5 -right-3.5 sm:-top-4 sm:-right-4 z-20 w-13 h-13 sm:w-15 sm:h-15 flex items-center justify-center pointer-events-none drop-shadow-md transform rotate-12 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110"
+      aria-label="Discount badge"
+    >
+      <!-- 16-point Zig-Zag Starburst Medallion SVG -->
+      <svg
+        viewBox="0 0 100 100"
+        class="absolute inset-0 w-full h-full text-theme-accent fill-current"
+      >
+        <path
+          d="M50 0 L59 10 L73 7 L78 20 L92 23 L91 37 L100 45 L94 58 L99 71 L87 77 L85 91 L71 89 L63 100 L50 93 L37 100 L29 89 L15 91 L13 77 L1 71 L6 58 L0 45 L9 37 L8 23 L22 20 L27 7 L41 10 Z"
+        />
+      </svg>
+
+      <!-- Badge Inner Text -->
+      <div class="relative z-10 flex flex-col items-center justify-center text-white leading-none text-center">
+        <span class="font-black font-mono text-[13px] sm:text-sm tracking-tighter">
+          -{{ discountPercentage }}%
+        </span>
+        <span class="text-[7.5px] sm:text-[8.5px] font-mono font-extrabold uppercase tracking-widest mt-0.5">
+          OFF
+        </span>
+      </div>
+    </div>
+
     <div>
       <!-- Book Cover Link -->
       <NuxtLink
         :to="book.isSeed ? '#' : `/book/${book.slug}`"
-        class="block relative aspect-[1/1.37] rounded-lg overflow-hidden bg-theme-surface-subtle book-cover-3d mb-2.5 cursor-pointer"
+        class="block relative aspect-[1/1.37] rounded-xl overflow-hidden bg-theme-surface-subtle book-cover-3d mb-3 cursor-pointer"
         @click="handleCardClick"
       >
         <div
           v-if="imageFailed || !coverImage"
-          class="w-full h-full flex flex-col justify-between p-3 bg-theme-dark text-white text-left select-none"
+          class="w-full h-full flex flex-col justify-between p-3.5 bg-theme-dark text-white text-left select-none"
         >
-          <div class="space-y-0.5">
-            <span class="text-[9px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
               {{ book.category_name || 'eBook' }}
             </span>
-            <h4 class="font-display font-bold text-xs leading-snug line-clamp-3 text-white">
+            <h4 class="font-display font-bold text-sm leading-snug line-clamp-3 text-white">
               {{ book.name }}
             </h4>
           </div>
-          <span class="text-[10px] font-mono text-white/70 truncate block pt-0.5 border-t border-white/10">
+          <span class="text-xs font-mono text-white/70 truncate block pt-1 border-t border-white/10">
             {{ book.author || 'Edition' }}
           </span>
         </div>
@@ -192,89 +221,85 @@ function handleAddToCart(event: Event): void {
           :alt="book.name"
           class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          width="200"
-          height="274"
+          width="240"
+          height="328"
           referrerpolicy="no-referrer"
           @error="handleImageError"
         />
 
-        <span
-          v-if="discountPercentage > 0"
-          class="absolute top-2 right-2 bg-theme-accent text-white font-mono font-extrabold text-[10px] px-1.5 py-0.5 rounded shadow-xs z-10"
-        >
-          -{{ discountPercentage }}%
-        </span>
-
+        <!-- Top-Left Editorial/Curated Badge -->
         <span
           v-if="badgeInfo"
-          class="absolute top-2 left-2 bg-theme-dark/90 backdrop-blur-xs text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded uppercase z-10 flex items-center gap-1 shadow-xs"
+          class="absolute top-2.5 left-2.5 bg-theme-dark/90 backdrop-blur-xs text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded-md uppercase z-10 flex items-center gap-1 shadow-xs"
         >
-          <component :is="badgeInfo.icon" :size="9" class="text-theme-accent" />
+          <component :is="badgeInfo.icon" :size="10" class="text-theme-accent" />
           {{ badgeInfo.label }}
         </span>
       </NuxtLink>
 
-      <!-- Format line: simple text, no pill box -->
-      <div class="flex items-center justify-between gap-1 text-[11px] pb-1">
-        <span class="font-bold text-theme-accent flex items-center gap-1">
-          <FileText :size="11" />
+      <!-- Meta Row: Bigger eBook (PDF) Text + Category -->
+      <div class="flex items-center justify-between gap-1 text-xs sm:text-[13px] pb-1.5">
+        <span class="font-bold text-theme-accent flex items-center gap-1.5">
+          <FileText :size="13" class="stroke-[2.5]" />
           <span>eBook (PDF)</span>
         </span>
-        <span class="text-theme-muted truncate text-[10px]">
+        <span class="text-theme-muted truncate text-[11px] sm:text-xs">
           {{ book.category_name || 'General' }}
         </span>
       </div>
 
-      <!-- Book Title: Bold, Large & Strictly Single-Line -->
+      <!-- Book Title: Bigger, Bolder & Single-Line Ellipsis -->
       <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
         <h3
-          class="font-display font-bold text-sm sm:text-base text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-snug"
+          class="font-display font-extrabold text-base sm:text-lg lg:text-xl text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-tight tracking-tight"
           :title="book.name"
         >
           {{ book.name }}
         </h3>
       </NuxtLink>
 
-      <!-- Author -->
-      <p class="text-[11px] text-theme-muted italic truncate mt-0.5">
+      <!-- Author: Legible Size -->
+      <p class="text-xs sm:text-[13px] text-theme-muted italic truncate mt-0.5">
         {{ displayAuthor }}
       </p>
 
       <!-- Rating Line -->
-      <div class="flex items-center gap-1.5 pt-1 text-[10px]">
-        <span class="text-amber-500 font-bold">★★★★★</span>
-        <span class="text-theme-muted font-mono">4.9</span>
+      <div class="flex items-center gap-1.5 pt-1.5 text-xs">
+        <span class="text-amber-500 font-bold tracking-tight">★★★★★</span>
+        <span class="text-theme-ink font-mono font-bold text-xs">4.9</span>
       </div>
     </div>
 
-    <!-- Bottom Pricing & Bigger, Bolder Full-Width Download Button -->
-    <div class="pt-2.5 mt-2.5 border-t border-theme-border space-y-2">
+    <!-- Bottom Pricing & Bigger Bolder Download Button -->
+    <div class="pt-3 mt-3 border-t border-theme-border space-y-2.5">
       <div class="flex items-baseline justify-between">
-        <div class="flex items-baseline gap-1.5">
-          <span class="text-base sm:text-lg font-extrabold font-mono text-theme-ink tabular-figure">
+        <div class="flex items-baseline gap-2">
+          <!-- Large Price -->
+          <span class="text-xl sm:text-2xl font-black font-mono text-theme-ink tabular-figure tracking-tight">
             {{ formatCurrency(currentPrice) }}
           </span>
+          <!-- Strikethrough Price -->
           <span
             v-if="originalPrice && originalPrice > currentPrice"
-            class="text-[11px] text-theme-muted line-through font-mono"
+            class="text-xs sm:text-sm text-theme-muted line-through font-mono"
           >
             {{ formatCurrency(originalPrice) }}
           </span>
         </div>
-        <span class="text-[9px] font-mono text-emerald-600 font-bold">
+        <span class="text-[10px] sm:text-xs font-mono text-emerald-600 font-bold">
           Instant
         </span>
       </div>
 
-      <!-- Bigger, Bolder Download Button -->
+      <!-- Full-Width High-Impact Download Action Button -->
       <button
         type="button"
-        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-[13px] font-extrabold uppercase tracking-wider py-3 sm:py-3.5 px-3 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
         :title="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
         :aria-label="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
         @click="handleAddToCart"
       >
-        <Download :size="16" class="stroke-[2.5]" />
+        <Download :size="17" class="stroke-[2.5]" />
         <span>Download</span>
       </button>
     </div>

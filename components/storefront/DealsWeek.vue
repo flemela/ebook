@@ -32,8 +32,8 @@ function scrollRight(): void {
 </script>
 
 <template>
-  <section id="bestsellers-week" class="py-12 sm:py-14 px-4 max-w-6xl mx-auto w-full space-y-5 select-none">
-    <!-- Clean On-Top Heading (No Timer) with Desktop Carousel Buttons -->
+  <section id="bestsellers-week" class="py-12 sm:py-14 px-4 max-w-6xl mx-auto w-full space-y-5">
+    <!-- Clean On-Top Heading with Desktop Carousel Controls -->
     <div class="flex items-end justify-between border-b border-theme-border pb-3.5">
       <div class="space-y-1">
         <span class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-theme-accent block">
@@ -65,15 +65,15 @@ function scrollRight(): void {
       </div>
     </div>
 
-    <!-- 1-Row Smooth Scrollable Shelf -->
+    <!-- 1-Row Smooth Scrollable Shelf (Vertical Page Scrolling Fully Preserved) -->
     <div
       ref="carouselRef"
-      class="flex gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar py-2 px-1 snap-x snap-mandatory touch-pan-x"
+      class="flex gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar py-2 px-1"
     >
       <div
         v-for="book in bestsellerBooks"
         :key="book.id"
-        class="w-[185px] sm:w-[210px] md:w-[235px] flex-shrink-0 snap-start"
+        class="w-[185px] sm:w-[210px] md:w-[235px] flex-shrink-0"
       >
         <BookCard :book="book" @request-seed="(t, a) => emit('requestSeed', t, a)" />
       </div>
