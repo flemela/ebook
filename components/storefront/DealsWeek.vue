@@ -32,15 +32,15 @@ function scrollRight(): void {
 </script>
 
 <template>
-  <section id="bestsellers-week" class="py-12 sm:py-14 px-4 max-w-6xl mx-auto w-full space-y-5">
-    <!-- Clean On-Top Heading with Desktop Carousel Controls -->
+  <section id="bestsellers-week" class="py-12 sm:py-14 px-4 max-w-6xl mx-auto w-full space-y-5 select-none">
+    <!-- Clean On-Top Heading: Unified Bigger & Bolder Sans Font -->
     <div class="flex items-end justify-between border-b border-theme-border pb-3.5">
       <div class="space-y-1">
         <span class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-theme-accent block">
           TOP READER PICKS
         </span>
-        <h2 class="font-poster text-3xl sm:text-4xl font-extrabold uppercase text-theme-ink tracking-wide leading-none">
-          BESTSELLERS OF THE WEEK
+        <h2 class="font-sans font-black text-2xl sm:text-3xl md:text-4xl text-theme-ink tracking-tight uppercase leading-none">
+          Bestsellers of the Week
         </h2>
       </div>
 
@@ -65,7 +65,7 @@ function scrollRight(): void {
       </div>
     </div>
 
-    <!-- 1-Row Smooth Scrollable Shelf (Vertical Page Scrolling Fully Preserved) -->
+    <!-- 1-Row Smooth Scrollable Shelf -->
     <div
       ref="carouselRef"
       class="flex gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar py-2 px-1"

@@ -24,7 +24,6 @@ const emit = defineEmits<{
   select: [category: string];
 }>();
 
-// Fetch live catalog books to dynamically calculate inventory counts
 const { data: catalogResponse } = await useFetch<PaginatedProductsResponse>('/api/products', {
   query: { limit: 100 },
 });
@@ -103,20 +102,20 @@ function handleCategoryClick(catQuery: string): void {
 
 <template>
   <section id="categories-grid" class="py-8 sm:py-10 md:py-12 px-4 max-w-6xl mx-auto w-full space-y-4 sm:space-y-5 select-none">
-    <!-- Header with 'View all ->' Link -->
-    <div class="flex items-end justify-between border-b border-theme-border pb-3">
-      <div>
+    <!-- Header with Unified Bigger & Bolder Sans Font -->
+    <div class="flex items-end justify-between border-b border-theme-border pb-3.5">
+      <div class="space-y-1">
         <span class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-theme-accent block">
           eBook Catalog
         </span>
-        <h2 class="font-sans font-extrabold text-xl sm:text-2xl md:text-3xl text-theme-ink tracking-tight">
+        <h2 class="font-sans font-black text-2xl sm:text-3xl md:text-4xl text-theme-ink tracking-tight uppercase leading-none">
           Shop by Category
         </h2>
       </div>
 
       <button
         type="button"
-        class="text-xs sm:text-sm font-bold text-theme-accent hover:text-theme-accent-hover flex items-center gap-1 transition-colors cursor-pointer"
+        class="text-xs sm:text-sm font-extrabold text-theme-accent hover:text-theme-accent-hover flex items-center gap-1 transition-colors cursor-pointer"
         @click="handleCategoryClick('General')"
       >
         <span>View all</span>
@@ -124,7 +123,7 @@ function handleCategoryClick(catQuery: string): void {
       </button>
     </div>
 
-    <!-- Category Grid: 3 Icons on Mobile, 6 Icons on Tablet & Desktop -->
+    <!-- Category Grid: 3 on Mobile, 6 on Tablet & Desktop -->
     <div class="grid grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4">
       <button
         v-for="cat in CATEGORIES"
@@ -133,7 +132,6 @@ function handleCategoryClick(catQuery: string): void {
         class="bg-theme-surface hover:bg-theme-surface-subtle border border-theme-border hover:border-theme-border-strong rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center text-center gap-2 transition-all duration-200 group cursor-pointer shadow-2xs hover:shadow-xs hover:-translate-y-0.5 min-h-[96px] sm:min-h-[114px]"
         @click="handleCategoryClick(cat.query)"
       >
-        <!-- Icon Container: Red by default, Black on hover -->
         <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-theme-accent-soft group-hover:bg-theme-surface-muted flex items-center justify-center transition-colors duration-200 flex-shrink-0">
           <component
             :is="cat.icon"
@@ -142,7 +140,6 @@ function handleCategoryClick(catQuery: string): void {
           />
         </div>
 
-        <!-- Category Title and Count -->
         <div class="space-y-0.5 w-full min-w-0">
           <h3 class="font-sans font-bold text-xs sm:text-sm text-theme-ink group-hover:text-theme-accent transition-colors leading-tight truncate">
             {{ cat.name }}

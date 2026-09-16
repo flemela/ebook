@@ -266,7 +266,7 @@ onUnmounted(() => {
       @select-category="handleCategorySelect"
     />
 
-    <!-- 2. Bento Categories Grid (Directly below Hero) -->
+    <!-- 2. Bento Categories Grid -->
     <BentoCategories @select="handleCategorySelect" />
 
     <!-- 3. Bestsellers Section (1-Row Scrollable Shelf) -->
@@ -275,12 +275,12 @@ onUnmounted(() => {
       @request-seed="handleRequestSeed"
     />
 
-    <!-- 4. Catalogue Section (2 cols mobile, 4 cols tablet & desktop) -->
+    <!-- 4. Catalogue Section: Unified Bigger & Bolder Sans Font -->
     <section
       id="catalog-results"
-      class="pt-6 sm:pt-10 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
+      class="pt-8 sm:pt-12 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
     >
-      <!-- Section Title & Dynamic Filter Row -->
+      <!-- Section Title: Plus Jakarta Sans font-black tracking-tight -->
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-theme-border">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
@@ -291,8 +291,8 @@ onUnmounted(() => {
               {{ paginationRangeText }}
             </span>
           </div>
-          <h2 class="font-poster text-3xl sm:text-4xl lg:text-5xl font-extrabold uppercase text-theme-ink tracking-wide leading-none">
-            {{ activeCategoryFilter.toLowerCase() === 'general' ? 'BROWSE ALL BOOKS' : activeCategoryFilter }}
+          <h2 class="font-sans font-black text-2xl sm:text-4xl md:text-5xl text-theme-ink tracking-tight uppercase leading-none">
+            {{ activeCategoryFilter.toLowerCase() === 'general' ? 'Browse All Books' : activeCategoryFilter }}
           </h2>
         </div>
 
