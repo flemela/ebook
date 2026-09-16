@@ -22,21 +22,21 @@ const props = withDefaults(defineProps<Props>(), {
 const fallbackMessages: PromoTickerMessage[] = [
   {
     id: 'default-1',
-    text: 'FREE DELIVERY across Nairobi on orders above KSh 2,500',
+    text: '⚡ Instant Cloudflare R2 Digital Downloads on all eBook PDF editions',
     link: '#catalog-results',
     is_active: true,
     sort_order: 0,
   },
   {
     id: 'default-2',
-    text: '⚡ Instant Cloudflare R2 Digital Downloads on all eBook editions',
-    link: '#flash-sale',
+    text: '📖 100% Authentic Digital Publisher Releases — Read on Phone, Tablet & Kindle',
+    link: '#catalog-results',
     is_active: true,
     sort_order: 1,
   },
   {
     id: 'default-3',
-    text: '🇰🇪 Need a hard-to-find title? Sourcing Any Book in Kenya via WhatsApp',
+    text: '🇰🇪 Need a hard-to-find title? Sourcing any eBook in Kenya via WhatsApp',
     link: 'https://wa.me/254143304460',
     is_active: true,
     sort_order: 2,
@@ -133,19 +133,22 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="relative w-full overflow-hidden select-none bg-theme-dark text-white border-b border-theme-dark-border shadow-xs z-30 transition-all duration-300"
+    class="relative w-full overflow-hidden select-none bg-theme-accent text-white border-b border-theme-accent-hover shadow-xs z-30 transition-all duration-300"
     aria-label="Promotional announcements"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     @touchstart.passive="handleTouchStart"
     @touchend="handleTouchEnd"
   >
+    <!-- Subtle Ambient Sheen -->
+    <div class="absolute inset-0 bg-gradient-to-b from-white/15 via-transparent to-black/10 pointer-events-none" />
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-9 sm:h-10 flex items-center justify-between gap-3 relative z-10">
       <!-- Left Manual Chevron Button -->
       <button
         v-if="activeMessages.length > 1"
         type="button"
-        class="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 active:scale-95"
+        class="w-6 h-6 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 active:scale-95"
         aria-label="Previous announcement"
         @click="prevMessage"
       >
@@ -160,15 +163,15 @@ onUnmounted(() => {
             class="inline-flex items-center justify-center gap-2 cursor-pointer group px-2 max-w-full"
             @click="handleMessageClick(activeMessages[activeIndex])"
           >
-            <Sparkles :size="13" class="text-theme-accent flex-shrink-0 animate-pulse" />
+            <Sparkles :size="13" class="text-white flex-shrink-0 animate-pulse" />
 
-            <span class="font-sans font-bold text-[11px] sm:text-xs tracking-wide text-white truncate">
+            <span class="font-sans font-bold text-[11px] sm:text-xs tracking-wide text-white truncate drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">
               {{ activeMessages[activeIndex]?.text }}
             </span>
 
             <span
               v-if="activeMessages[activeIndex]?.link"
-              class="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-mono font-bold uppercase text-theme-accent hover:text-white underline underline-offset-2 ml-1 group-hover:translate-x-0.5 transition-all"
+              class="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-mono font-bold uppercase text-white/95 underline underline-offset-2 ml-1 group-hover:text-white group-hover:translate-x-0.5 transition-all"
             >
               <span>Explore</span>
               <ArrowRight :size="11" />
@@ -181,7 +184,7 @@ onUnmounted(() => {
       <div class="flex items-center gap-2 flex-shrink-0">
         <span
           v-if="activeMessages.length > 1"
-          class="hidden md:inline-block font-mono font-bold text-[9px] text-white/80 bg-white/10 px-1.5 py-0.5 rounded"
+          class="hidden md:inline-block font-mono font-bold text-[9px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded"
         >
           {{ activeIndex + 1 }}/{{ activeMessages.length }}
         </span>
@@ -189,7 +192,7 @@ onUnmounted(() => {
         <button
           v-if="activeMessages.length > 1"
           type="button"
-          class="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 active:scale-95"
+          class="w-6 h-6 rounded-full bg-black/15 hover:bg-black/30 text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 active:scale-95"
           aria-label="Next announcement"
           @click="nextMessage"
         >

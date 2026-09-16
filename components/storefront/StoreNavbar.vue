@@ -94,7 +94,7 @@ function getLowestPrice(book: Book): number {
     const prices = book.formats.map((f) => f.price).filter((p) => p > 0);
     if (prices.length > 0) return Math.min(...prices);
   }
-  return book.price || 999;
+  return book.price || 149;
 }
 
 function selectSuggestion(book: Book): void {
@@ -192,7 +192,7 @@ function handleOutsideClick(event: MouseEvent): void {
 }
 
 const helpWhatsAppUrl = buildWhatsAppLink(
-  'Hello The Sunrise Bookstore Help Desk, I need assistance with an order or book inquiry.'
+  'Hello The Sunrise Bookstore Help Desk, I need assistance with an order or eBook inquiry.'
 );
 
 onMounted(() => {
@@ -238,7 +238,7 @@ onUnmounted(() => {
         </NuxtLink>
       </div>
 
-      <!-- Center Desktop Navigation -->
+      <!-- Center Desktop Navigation (Cleaned to Home, Categories, Bestsellers, Catalogue, Help) -->
       <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-6 lg:gap-7 text-xs font-bold tracking-wide">
         <a href="/" class="nav-link-item text-theme-ink py-1 cursor-pointer">Home</a>
 
@@ -307,8 +307,8 @@ onUnmounted(() => {
           </Transition>
         </div>
 
-        <a href="#flash-sale" class="nav-link-item text-theme-ink py-1 cursor-pointer">Flash Sale</a>
         <a href="#bestsellers-week" class="nav-link-item text-theme-ink py-1 cursor-pointer">Bestsellers</a>
+        <a href="#catalog-results" class="nav-link-item text-theme-ink py-1 cursor-pointer">Catalogue</a>
         <a :href="helpWhatsAppUrl" target="_blank" rel="noopener noreferrer" class="nav-link-item text-theme-ink py-1 cursor-pointer">Help</a>
 
         <button
@@ -368,7 +368,7 @@ onUnmounted(() => {
           <input
             v-model="searchInput"
             type="text"
-            placeholder="Search books by title, author, or keyword (typo tolerant)..."
+            placeholder="Search eBooks by title, author, or keyword (typo tolerant)..."
             class="w-full bg-transparent text-xs sm:text-sm text-theme-ink placeholder:text-theme-muted outline-none font-sans font-medium"
             autocomplete="off"
             @focus="isSearchDropdownOpen = searchSuggestions.length > 0"
@@ -394,7 +394,7 @@ onUnmounted(() => {
           <span>Search</span>
         </button>
 
-        <!-- RECOMMENDATIONS DROPDOWN -->
+        <!-- Recommendations Dropdown -->
         <Transition name="dropdown-fade">
           <div
             v-if="isSearchDropdownOpen && searchSuggestions.length > 0"
@@ -408,7 +408,6 @@ onUnmounted(() => {
               <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider">Closest Match</span>
             </div>
 
-            <!-- List of Recommended Titles -->
             <div class="max-h-80 overflow-y-auto py-1">
               <button
                 v-for="(book, idx) in searchSuggestions"
@@ -418,7 +417,6 @@ onUnmounted(() => {
                 :class="selectedIndex === idx ? 'bg-theme-accent-soft text-theme-accent-hover' : 'hover:bg-theme-surface-subtle text-theme-ink'"
                 @click="selectSuggestion(book)"
               >
-                <!-- Cover & Info -->
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                   <div class="w-9 h-12 rounded bg-theme-surface-subtle border border-theme-border overflow-hidden flex-shrink-0 flex items-center justify-center shadow-2xs">
                     <img
@@ -441,14 +439,13 @@ onUnmounted(() => {
                   </div>
                 </div>
 
-                <!-- Price and Arrow -->
                 <div class="flex items-center gap-2 flex-shrink-0 text-right font-mono">
                   <div class="flex flex-col items-end">
                     <span class="text-xs font-bold text-theme-ink">
                       KSh {{ getLowestPrice(book).toLocaleString('en-KE') }}
                     </span>
                     <span class="text-[9px] text-theme-muted uppercase">
-                      {{ book.formats?.some(f => f.format === 'pdf') ? 'eBook / Print' : 'Hardcopy' }}
+                      eBook (PDF)
                     </span>
                   </div>
                   <ArrowRight :size="13" class="text-theme-muted" />
@@ -456,7 +453,6 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <!-- Footer: See all filtered matches -->
             <div class="p-2.5 bg-theme-surface-subtle text-center border-t border-theme-border">
               <button
                 type="button"
@@ -488,8 +484,8 @@ onUnmounted(() => {
         </button>
 
         <a href="/" class="py-2 text-theme-ink hover:text-theme-accent border-b border-theme-border transition-colors" @click="isMobileOpen = false">Home</a>
-        <a href="#flash-sale" class="py-2 text-theme-ink hover:text-theme-accent border-b border-theme-border transition-colors" @click="isMobileOpen = false">Flash Sale</a>
         <a href="#bestsellers-week" class="py-2 text-theme-ink hover:text-theme-accent border-b border-theme-border transition-colors" @click="isMobileOpen = false">Bestsellers</a>
+    <a href="#catalog-results" class="py-2 text-theme-ink hover:text-theme-accent border-b border-theme-border transition-colors" @click="isMobileOpen = false">Catalogue</a>
         <a :href="helpWhatsAppUrl" target="_blank" rel="noopener noreferrer" class="py-2 text-[#25D366] font-bold border-b border-theme-border flex items-center gap-2" @click="isMobileOpen = false">
           <WhatsAppIcon class="w-4 h-4 text-[#25D366]" />
           <span>Help & Support</span>

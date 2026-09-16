@@ -15,10 +15,11 @@ const emit = defineEmits<{
   seeMore: [];
 }>();
 
+// Ensure count aligns to 3 items per row for clean desktop presentation
 const bestsellerBooks = computed(() => {
   const combined = [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS];
-  const list = mergeWithSeeds(props.books, combined, 4);
-  return list.slice(0, 4);
+  const list = mergeWithSeeds(props.books, combined, 6);
+  return list.slice(0, 6);
 });
 </script>
 
@@ -36,7 +37,7 @@ const bestsellerBooks = computed(() => {
 
       <div class="flex items-center gap-3">
         <p class="text-xs text-theme-muted hidden sm:inline">
-          Explore the titles dominating bookshelves and changing perspectives right now.
+          Explore the digital editions dominating bookshelves and changing perspectives right now.
         </p>
         <button
           type="button"
@@ -48,7 +49,8 @@ const bestsellerBooks = computed(() => {
       </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 lg:gap-6 w-full max-w-[720px] mx-auto px-2 sm:px-4 justify-items-center">
+    <!-- 3-Column Responsive Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto w-full">
       <BookCard
         v-for="book in bestsellerBooks"
         :key="book.id"

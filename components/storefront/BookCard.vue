@@ -1,7 +1,7 @@
 <!-- components/storefront/BookCard.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { ShoppingCart, Zap, Flame, Star, Tag, Clock, Download } from 'lucide-vue-next';
+import { Download, Zap, Flame, Star, Tag, Clock, FileText, CheckCircle2 } from 'lucide-vue-next';
 import { useCart } from '~/composables/useCart';
 import { useToast } from '~/composables/useToast';
 import type { Book, ProductFormat } from '~/types';
@@ -20,7 +20,7 @@ const { push: pushToast } = useToast();
 
 const imageFailed = ref(false);
 
-// Strict PDF-First Format Resolver (Eradicating Synthetic Hardcopy)
+// Strict PDF format resolver
 const activePdfFormat = computed<ProductFormat>(() => {
   const formats = props.book?.formats || [];
   const pdf = formats.find((f) => f.format === 'pdf');
@@ -29,7 +29,6 @@ const activePdfFormat = computed<ProductFormat>(() => {
   const epub = formats.find((f) => f.format === 'epub');
   if (epub) return epub;
 
-  // Fallback eBook format if catalog record lacks explicit formats array
   const defaultEbookPrice = props.book.price && props.book.price < 500 ? props.book.price : 149;
   return {
     id: `pdf-${props.book.id}`,
@@ -72,7 +71,7 @@ const currentPrice = computed<number>(() => pricing.value.currentPrice);
 const originalPrice = computed<number | null>(() => pricing.value.originalPrice);
 const discountPercentage = computed<number>(() => pricing.value.discountPercentage);
 
-const coverImage = computed(() => {
+const coverImage = computed<string | null>(() => {
   if (!props.book) return null;
   const rawImg: unknown = props.book.images?.[0];
   if (typeof rawImg === 'string' && rawImg.trim().length > 5) return rawImg.trim();
@@ -163,27 +162,27 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <div class="w-full max-w-none sm:max-w-[176px] bg-theme-surface text-theme-ink rounded-xl p-2.5 sm:p-3 shadow-card hover:shadow-medium transition-all flex flex-col justify-between group select-none text-left border border-theme-border hover:border-theme-border-strong">
+  <div class="w-full bg-theme-surface text-theme-ink rounded-2xl p-4 sm:p-5 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
     <div>
-      <!-- Book Cover -->
+      <!-- Book Cover Link -->
       <NuxtLink
         :to="book.isSeed ? '#' : `/book/${book.slug}`"
-        class="block relative aspect-[1/1.37] rounded-book overflow-hidden bg-theme-surface-subtle book-cover-3d mb-2 sm:mb-2.5 cursor-pointer"
+        class="block relative aspect-[1/1.37] rounded-xl overflow-hidden bg-theme-surface-subtle book-cover-3d mb-3 sm:mb-4 cursor-pointer"
         @click="handleCardClick"
       >
         <div
           v-if="imageFailed || !coverImage"
-          class="w-full h-full flex flex-col justify-between p-2 bg-theme-dark text-white text-left select-none"
+          class="w-full h-full flex flex-col justify-between p-4 bg-theme-dark text-white text-left select-none"
         >
-          <div class="space-y-0.5">
-            <span class="text-[10px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
+          <div class="space-y-1">
+            <span class="text-[11px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
               {{ book.category_name || 'eBook' }}
             </span>
-            <h4 class="font-display font-bold text-xs leading-tight line-clamp-3 text-white">
+            <h4 class="font-display font-bold text-sm leading-snug line-clamp-3 text-white">
               {{ book.name }}
             </h4>
           </div>
-          <span class="text-[10px] font-mono text-white/70 truncate block pt-0.5 border-t border-white/10">
+          <span class="text-xs font-mono text-white/70 truncate block pt-1 border-t border-white/10">
             {{ book.author || 'Edition' }}
           </span>
         </div>
@@ -194,76 +193,99 @@ function handleAddToCart(event: Event): void {
           :alt="book.name"
           class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          width="144"
-          height="188"
+          width="280"
+          height="384"
           referrerpolicy="no-referrer"
           @error="handleImageError"
         />
 
+        <!-- Urgency Savings Badge -->
         <span
           v-if="discountPercentage > 0"
-          class="absolute top-1.5 right-1.5 bg-theme-accent text-white font-mono font-extrabold text-[10px] px-1.5 py-0.5 rounded shadow-xs z-10"
+          class="absolute top-2.5 right-2.5 bg-theme-accent text-white font-mono font-extrabold text-[11px] px-2 py-0.5 rounded-md shadow-sm z-10"
         >
-          -{{ discountPercentage }}%
+          -{{ discountPercentage }}% OFF
         </span>
 
+        <!-- Social Proof Editorial Badge -->
         <span
           v-if="badgeInfo"
-          class="absolute top-1.5 left-1.5 bg-theme-dark text-theme-accent font-mono font-bold text-[10px] px-1.5 py-0.5 rounded uppercase z-10 flex items-center gap-1"
+          class="absolute top-2.5 left-2.5 bg-theme-dark/90 backdrop-blur-xs text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded-md uppercase z-10 flex items-center gap-1.5 shadow-sm"
         >
-          <component :is="badgeInfo.icon" :size="10" />
+          <component :is="badgeInfo.icon" :size="11" class="text-theme-accent" />
           {{ badgeInfo.label }}
         </span>
       </NuxtLink>
 
-      <!-- Book Title -->
+      <!-- Meta Line: Simple Format Text + Category -->
+      <div class="flex items-center justify-between gap-2 text-[11px] font-sans pb-1.5">
+        <span class="font-bold text-theme-accent flex items-center gap-1">
+          <FileText :size="12" />
+          <span>eBook (PDF)</span>
+        </span>
+        <span class="font-medium text-theme-muted truncate">
+          {{ book.category_name || 'General' }}
+        </span>
+      </div>
+
+      <!-- Book Title: Bold, Large & Truncated Cleanly to One Line -->
       <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
-        <h3 class="font-display text-xs font-bold text-theme-ink group-hover:text-theme-accent transition-colors line-clamp-1 leading-snug">
+        <h3
+          class="font-display font-bold text-base sm:text-lg text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-snug"
+          :title="book.name"
+        >
           {{ book.name }}
         </h3>
       </NuxtLink>
 
       <!-- Author -->
-      <p class="text-[10px] text-theme-muted italic truncate mt-0.5">
+      <p class="text-xs text-theme-muted italic truncate mt-0.5">
         {{ displayAuthor }}
       </p>
 
-      <!-- Pure Digital Format Badge -->
-      <div class="mt-2.5">
-        <div class="w-full flex items-center justify-between px-2 py-1 rounded-lg text-[10px] font-sans font-bold bg-theme-accent-soft border border-theme-accent-border text-theme-accent-hover">
-          <span class="flex items-center gap-1 truncate">
-            <Download :size="11" class="text-theme-accent flex-shrink-0" />
-            <span>eBook (PDF)</span>
-          </span>
-          <span class="font-mono font-bold text-[10px] flex-shrink-0">
-            {{ formatCurrency(currentPrice) }}
-          </span>
+      <!-- Buyer's Psychology Rating & Instant Access Indicator -->
+      <div class="flex items-center gap-2 pt-2 text-[11px]">
+        <div class="flex items-center text-amber-500 font-bold gap-0.5">
+          <span>★★★★★</span>
+          <span class="text-theme-ink font-mono ml-1">4.9</span>
         </div>
+        <span class="text-theme-muted">•</span>
+        <span class="text-theme-muted flex items-center gap-1">
+          <CheckCircle2 :size="11" class="text-emerald-600" /> Instant Access
+        </span>
       </div>
     </div>
 
-    <!-- Bottom Bar: Price + Cart Button -->
-    <div class="pt-2 mt-2.5 border-t border-theme-border flex items-end justify-between gap-1.5">
-      <div class="min-w-0 flex flex-col justify-center">
-        <span
-          v-if="originalPrice && originalPrice > currentPrice"
-          class="text-[10px] text-theme-muted line-through decoration-theme-muted decoration-1 font-mono font-bold block leading-none mb-0.5"
-        >
-          {{ formatCurrency(originalPrice) }}
-        </span>
-        <span class="text-sm font-black font-mono leading-tight text-theme-ink tracking-tight">
-          {{ formatCurrency(currentPrice) }}
+    <!-- Bottom Bar: Pricing & Full-Width Download Action Button -->
+    <div class="pt-3.5 mt-3.5 border-t border-theme-border space-y-2.5">
+      <!-- Price Anchoring -->
+      <div class="flex items-baseline justify-between">
+        <div class="flex items-baseline gap-2">
+          <span class="text-lg sm:text-xl font-extrabold font-mono text-theme-ink tabular-figure">
+            {{ formatCurrency(currentPrice) }}
+          </span>
+          <span
+            v-if="originalPrice && originalPrice > currentPrice"
+            class="text-xs text-theme-muted line-through font-mono"
+          >
+            {{ formatCurrency(originalPrice) }}
+          </span>
+        </div>
+        <span class="text-[10px] font-mono text-theme-muted uppercase">
+          Cloudflare R2
         </span>
       </div>
 
+      <!-- High-Impact Full-Width Download Action Button -->
       <button
         type="button"
-        class="w-8 h-8 rounded-lg bg-theme-dark hover:bg-theme-accent active:bg-theme-accent-active text-white flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-sm hover:shadow flex-shrink-0"
-        :title="book.isSeed ? 'Request eBook' : 'Add eBook (PDF) to Cart'"
-        :aria-label="book.isSeed ? 'Request eBook' : 'Add eBook (PDF) to Cart'"
+        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase tracking-wider py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+        :title="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
+        :aria-label="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
         @click="handleAddToCart"
       >
-        <ShoppingCart :size="14" class="transition-transform group-hover:scale-105" />
+        <Download :size="15" />
+        <span>Download eBook</span>
       </button>
     </div>
   </div>

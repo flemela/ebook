@@ -1,40 +1,32 @@
 <!-- pages/index.vue -->
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import PromoTickerStrip from '~/components/storefront/PromoTickerStrip.vue';
+import PromoTickerStrip, { type PromoTickerMessage } from '~/components/storefront/PromoTickerStrip.vue';
 import StoreNavbar from '~/components/storefront/StoreNavbar.vue';
 import HeroCarousel from '~/components/storefront/HeroCarousel.vue';
-import FlashSaleStrip from '~/components/storefront/FlashSaleStrip.vue';
-import BentoCategories from '~/components/storefront/BentoCategories.vue';
 import DealsWeek from '~/components/storefront/DealsWeek.vue';
-import TrustStrip from '~/components/storefront/TrustStrip.vue';
 import StoreFooter from '~/components/storefront/StoreFooter.vue';
 import BookCard from '~/components/storefront/BookCard.vue';
 import CartDrawer from '~/components/storefront/CartDrawer.vue';
 import ToastContainer from '~/components/ui/ToastContainer.vue';
 import BookRequestModal from '~/components/storefront/BookRequestModal.vue';
 import Pagination from '~/components/ui/Pagination.vue';
-import { BookOpen, ChevronDown, Check, Sparkles, Filter, X, Zap } from 'lucide-vue-next';
+import { BookOpen, ChevronDown, Check, Filter, X, Zap } from 'lucide-vue-next';
 import { MONTHLY_TOP_SEEDS, DEALS_SEEDS, mergeWithSeeds } from '~/data/seeds';
 import { fuzzySearchBooks } from '~/utils/fuzzy';
 import type { Book } from '~/types';
+import type { PaginatedProductsResponse } from '~/server/api/products/index.get';
 
 // Pagination & Search Reactive State
 const currentPage = ref(1);
-const itemsPerPage = ref(50);
+const itemsPerPage = ref(48); // Multiple of 3 for symmetrical 3-column rows
 const activeCategoryFilter = ref<string>('General');
 const searchQuery = ref<string>('');
 const debouncedSearch = ref<string>('');
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-// Reactive Catalogue Query with clean computed query unwrapping for SSR
-const { data: catalogData, status: booksStatus } = await useFetch<{
-  products: Book[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}>('/api/products', {
+// Reactive Catalogue Query
+const { data: catalogData, status: booksStatus } = await useFetch<PaginatedProductsResponse>('/api/products', {
   query: computed(() => ({
     page: currentPage.value,
     limit: itemsPerPage.value,
@@ -44,8 +36,10 @@ const { data: catalogData, status: booksStatus } = await useFetch<{
   watch: [currentPage, activeCategoryFilter, debouncedSearch],
 });
 
-// Dedicated Showcase fetch for Flash Sale & Bestseller shelves
-const { data: showcaseBooks } = await useFetch<any>('/api/products?limit=50');
+// Dedicated Showcase fetch for Bestsellers shelf
+const { data: showcaseData } = await useFetch<PaginatedProductsResponse>('/api/products', {
+  query: { limit: 50 },
+});
 const { data: storeMetadata } = await useFetch<any>('/api/stores/current');
 
 useHead({
@@ -54,7 +48,7 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Shop bestsellers, finance, business, psychology, and African literature at The Sunrise Bookstore, Diamond Mall, Parklands, Nairobi. Fast delivery across Kenya and instant eBook downloads.',
+      content: 'Shop bestsellers, finance, business, psychology, and African literature at The Sunrise Bookstore, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads across Kenya.',
     },
     { property: 'og:title', content: 'The Sunrise Bookstore — Online Bookstore & eBooks in Nairobi, Kenya' },
     { property: 'og:description', content: 'Shop bestsellers, finance, business, psychology, and African literature at The Sunrise Bookstore, Diamond Mall, Parklands, Nairobi.' },
@@ -91,12 +85,10 @@ useHead({
   ],
 });
 
-const tickerItems = computed(() => storeMetadata.value?.promo_ticker || []);
+const tickerItems = computed<PromoTickerMessage[]>(() => storeMetadata.value?.promo_ticker || []);
 
 const fullCatalogPool = computed<Book[]>(() => {
-  const remoteList: Book[] = Array.isArray(showcaseBooks.value)
-    ? showcaseBooks.value
-    : showcaseBooks.value?.products || [];
+  const remoteList: Book[] = showcaseData.value?.products || [];
   return mergeWithSeeds(remoteList, [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS], 20);
 });
 
@@ -126,17 +118,17 @@ const displayBooks = computed<Book[]>(() => {
   return [];
 });
 
-const totalBooksCount = computed(() => {
+const totalBooksCount = computed<number>(() => {
   if (isFuzzyFallbackActive.value) return displayBooks.value.length;
   return catalogData.value?.total ?? displayBooks.value.length;
 });
 
-const totalPages = computed(() => {
+const totalPages = computed<number>(() => {
   if (isFuzzyFallbackActive.value) return Math.max(1, Math.ceil(displayBooks.value.length / itemsPerPage.value));
   return catalogData.value?.totalPages ?? 1;
 });
 
-const paginationRangeText = computed(() => {
+const paginationRangeText = computed<string>(() => {
   const total = totalBooksCount.value;
   if (total === 0) return '0 titles';
   const start = (currentPage.value - 1) * itemsPerPage.value + 1;
@@ -144,36 +136,21 @@ const paginationRangeText = computed(() => {
   return `Showing ${start}–${end} of ${total.toLocaleString('en-KE')} titles`;
 });
 
-const isFilterActive = computed(() => {
+const isFilterActive = computed<boolean>(() => {
   const cat = activeCategoryFilter.value.trim().toLowerCase();
   return (cat !== 'general' && cat !== 'all') || debouncedSearch.value.trim().length > 0;
 });
 
-const flashSaleBooks = computed<Book[]>(() => {
-  const list: Book[] = Array.isArray(showcaseBooks.value)
-    ? showcaseBooks.value
-    : showcaseBooks.value?.products || [];
-  return list.filter((b) => {
-    if (b.badge === 'FLASH_SALE' || b.badge === 'LIMITED_TIME') return true;
-    if (!b.badge && b.compare_at_price && b.compare_at_price > b.price) return true;
-    return false;
-  });
-});
-
 const bestsellersOfWeek = computed<Book[]>(() => {
-  const list: Book[] = Array.isArray(showcaseBooks.value)
-    ? showcaseBooks.value
-    : showcaseBooks.value?.products || [];
+  const list: Book[] = showcaseData.value?.products || [];
   const tagged = list.filter((b) => b.badge === 'BESTSELLER');
   const combinedSeeds = [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS];
-  return mergeWithSeeds(tagged, combinedSeeds, 4);
+  return mergeWithSeeds(tagged, combinedSeeds, 6); // Set to 6 to fit 3-column rows
 });
 
 const catalogueCategories = computed<string[]>(() => {
   const set = new Set<string>();
-  const allList: Book[] = Array.isArray(showcaseBooks.value)
-    ? showcaseBooks.value
-    : showcaseBooks.value?.products || [];
+  const allList: Book[] = showcaseData.value?.products || [];
   for (const b of allList) {
     if (b?.category_name && b.category_name.trim() && b.category_name.toLowerCase() !== 'general') {
       set.add(b.category_name.trim());
@@ -275,68 +252,26 @@ onUnmounted(() => {
     <!-- Top Announcement Ribbon -->
     <PromoTickerStrip :messages="tickerItems" />
 
-    <!-- Sticky Navbar -->
+    <!-- Sticky Store Navbar -->
     <StoreNavbar
       @search="handleSearch"
       @select-category="handleCategorySelect"
       @request-book="() => handleRequestSeed()"
     />
 
-    <!-- Hero Carousel -->
+    <!-- 1. The Hero Section -->
     <HeroCarousel
       @search="handleSearch"
       @select-category="handleCategorySelect"
-      @navigate-flash-sale="scrollToSection('flash-sale')"
     />
 
-    <!-- Flash Sale Shelf -->
-    <div id="flash-sale" class="mt-0">
-      <FlashSaleStrip
-        v-if="flashSaleBooks.length > 0"
-        :books="flashSaleBooks"
-        title="FLASH SALE DEALS"
-        badge-label="LIMITED TIME"
-      />
-    </div>
+    <!-- 2. Bestsellers Section -->
+    <DealsWeek
+      :books="bestsellersOfWeek"
+      @request-seed="handleRequestSeed"
+    />
 
-    <!-- Categories Bento Grid -->
-    <BentoCategories @select="handleCategorySelect" />
-
-    <!-- Visual Bridge Banner (20% Charcoal Anchor & 10% Crimson Red) -->
-    <div class="max-w-6xl mx-auto px-4 w-full">
-      <div class="rounded-2xl bg-theme-dark p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 text-white shadow-md border border-theme-dark-border relative overflow-hidden">
-        <div class="flex items-center gap-3 relative z-10">
-          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-theme-accent flex-shrink-0">
-            <Sparkles :size="20" class="animate-pulse" />
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-[9.5px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full bg-theme-accent text-white">
-                Live Storefront Shelf
-              </span>
-              <span class="text-xs text-white/80 font-mono hidden sm:inline">• Free Nairobi Delivery above KSh 2,500</span>
-            </div>
-            <h3 class="font-display font-bold text-sm sm:text-base text-white mt-0.5">
-              Original Print Editions &amp; Instant Cloudflare R2 eBooks
-            </h3>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          class="bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0 active:scale-95"
-          @click="scrollToSection('catalog-results')"
-        >
-          <span>Explore All Books</span>
-          <span>↓</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Bestsellers of the Week -->
-    <DealsWeek :books="bestsellersOfWeek" @request-seed="handleRequestSeed" />
-
-    <!-- Complete Bookstore Catalogue Archive -->
+    <!-- 3. Catalogue Section (3-Column Layout) -->
     <section
       id="catalog-results"
       class="pt-12 sm:pt-16 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
@@ -437,35 +372,32 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <!-- SKELETON LOADING GRID -->
+      <!-- SKELETON LOADING GRID (3 Columns) -->
       <div
         v-if="booksStatus === 'pending'"
-        class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 lg:gap-6 w-full max-w-[720px] mx-auto px-2 sm:px-4 justify-items-center"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto w-full"
       >
         <div
-          v-for="n in 8"
+          v-for="n in 6"
           :key="`skel-catalog-${n}`"
-          class="w-full max-w-[176px] bg-theme-surface rounded-xl p-2.5 sm:p-3 border border-theme-border shadow-card flex flex-col justify-between space-y-3"
+          class="w-full bg-theme-surface rounded-2xl p-4 sm:p-5 border border-theme-border shadow-card flex flex-col justify-between space-y-4"
         >
-          <div class="aspect-[1/1.37] rounded-lg bg-theme-surface-muted animate-pulse" />
-          <div class="space-y-1.5 pt-1">
-            <div class="h-3.5 bg-theme-surface-muted rounded w-5/6 animate-pulse" />
-            <div class="h-2.5 bg-theme-surface-subtle rounded w-1/2 animate-pulse" />
+          <div class="aspect-[1/1.37] rounded-xl bg-theme-surface-muted animate-pulse" />
+          <div class="space-y-2 pt-1">
+            <div class="h-4 bg-theme-surface-muted rounded w-4/5 animate-pulse" />
+            <div class="h-3 bg-theme-surface-subtle rounded w-1/2 animate-pulse" />
           </div>
-          <div class="space-y-1 pt-1">
-            <div class="h-4 bg-theme-surface-subtle rounded-md w-full animate-pulse" />
+          <div class="pt-3 border-t border-theme-border flex items-center justify-between">
+            <div class="h-5 bg-theme-surface-muted rounded w-24 animate-pulse" />
           </div>
-          <div class="pt-2 border-t border-theme-border flex items-center justify-between">
-            <div class="h-4 bg-theme-surface-muted rounded w-16 animate-pulse" />
-            <div class="w-8 h-8 bg-theme-surface-muted rounded-lg animate-pulse" />
-          </div>
+          <div class="h-10 bg-theme-surface-muted rounded-xl w-full animate-pulse" />
         </div>
       </div>
 
-      <!-- REAL BOOKS 50-PER-PAGE GRID -->
+      <!-- REAL BOOKS 3-COLUMN GRID -->
       <div
         v-else-if="displayBooks.length > 0"
-        class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 lg:gap-6 w-full max-w-[720px] mx-auto px-2 sm:px-4 justify-items-center animate-in fade-in duration-300"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto w-full animate-in fade-in duration-300"
       >
         <BookCard
           v-for="book in displayBooks"
@@ -475,7 +407,7 @@ onUnmounted(() => {
         />
       </div>
 
-      <!-- TRUE EMPTY STATE -->
+      <!-- EMPTY STATE -->
       <div
         v-else
         class="bg-theme-surface rounded-2xl border border-theme-border p-12 text-center space-y-3 shadow-sm animate-in fade-in duration-200"
@@ -504,9 +436,6 @@ onUnmounted(() => {
         @change="handlePageChange"
       />
     </section>
-
-    <!-- Trust & Delivery Benefits -->
-    <TrustStrip />
 
     <!-- Footer -->
     <StoreFooter />

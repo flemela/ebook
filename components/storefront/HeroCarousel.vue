@@ -16,7 +16,6 @@ export interface CarouselSlide {
 const emit = defineEmits<{
   search: [query: string, category?: string];
   selectCategory: [category: string];
-  navigateFlashSale: [];
 }>();
 
 const { data: remoteBanners, status: bannersStatus } = await useFetch<PublicBanner[]>('/api/banners');
