@@ -163,7 +163,7 @@ function handleAddToCart(event: Event): void {
 <template>
   <div class="relative w-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
     <div>
-      <!-- Book Cover Wrapper (Hosts corner-centered discount starburst) -->
+      <!-- Book Cover Wrapper -->
       <div class="relative mb-3">
         <NuxtLink
           :to="book.isSeed ? '#' : `/book/${book.slug}`"
@@ -199,7 +199,7 @@ function handleAddToCart(event: Event): void {
             @error="handleImageError"
           />
 
-          <!-- Top-Left Editorial Badge -->
+          <!-- Top-Left Curated Badge -->
           <span
             v-if="badgeInfo"
             class="absolute top-2.5 left-2.5 bg-theme-dark/90 backdrop-blur-xs text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded-md uppercase z-10 flex items-center gap-1 shadow-xs"
@@ -209,10 +209,10 @@ function handleAddToCart(event: Event): void {
           </span>
         </NuxtLink>
 
-        <!-- ZIGZAG STARBURST DISCOUNT BADGE: Centered directly over the cover art's top-right corner -->
+        <!-- UPRIGHT ZIGZAG STARBURST DISCOUNT BADGE (Centered on cover's top-right corner, No Tilt, No 'OFF' text) -->
         <div
           v-if="discountPercentage > 0"
-          class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 z-20 w-16 h-16 sm:w-[70px] sm:h-[70px] flex items-center justify-center pointer-events-none drop-shadow-md transform rotate-12 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105"
+          class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 z-20 w-16 h-16 sm:w-[70px] sm:h-[70px] flex items-center justify-center pointer-events-none drop-shadow-md transition-transform duration-300 group-hover:scale-105"
           aria-label="Discount badge"
         >
           <!-- 16-point Zigzag Starburst Medallion SVG -->
@@ -225,19 +225,14 @@ function handleAddToCart(event: Event): void {
             />
           </svg>
 
-          <!-- Large High-Contrast Inner Text -->
-          <div class="relative z-10 flex flex-col items-center justify-center text-white leading-none text-center">
-            <span class="font-black font-mono text-[14px] sm:text-base tracking-tight">
-              -{{ discountPercentage }}%
-            </span>
-            <span class="text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-widest mt-0.5">
-              OFF
-            </span>
-          </div>
+          <!-- Bigger, Bolder -#% (Upright) -->
+          <span class="relative z-10 font-black font-mono text-[16px] sm:text-[18px] text-white tracking-tight leading-none">
+            -{{ discountPercentage }}%
+          </span>
         </div>
       </div>
 
-      <!-- Meta Row: Clean Minimal Text (No Pill Box) -->
+      <!-- Format Line: Simple Minimal Text -->
       <div class="flex items-center justify-between gap-1 text-xs sm:text-[13px] pb-1.5">
         <span class="font-bold text-theme-accent flex items-center gap-1.5">
           <FileText :size="13" class="stroke-[2.5]" />
@@ -272,7 +267,7 @@ function handleAddToCart(event: Event): void {
 
     <!-- Bottom Pricing & Full-Width Download Action Button -->
     <div class="pt-3 mt-3 border-t border-theme-border space-y-2.5">
-      <!-- Price Row with Red Strikethrough & No Cramping -->
+      <!-- Price Row with Red Strikethrough -->
       <div class="flex items-baseline gap-2.5">
         <span class="text-lg sm:text-xl font-extrabold font-mono text-theme-ink tabular-figure tracking-tight">
           {{ formatCurrency(currentPrice) }}
@@ -285,7 +280,7 @@ function handleAddToCart(event: Event): void {
         </span>
       </div>
 
-      <!-- Full-Width High-Impact Download Button -->
+      <!-- Full-Width Download Action Button -->
       <button
         type="button"
         class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
