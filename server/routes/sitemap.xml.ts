@@ -9,8 +9,8 @@ import type { Book } from '~/types';
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const baseUrl = 'https://www.thesunrisebookstore.com';
-  const storeSlug = config.public.storeSlug || 'flemela';
+  const baseUrl = 'https://www.ebookreads.com';
+  const storeSlug = config.public.storeSlug || 'ebookreads';
 
   let books: Book[] = [];
   try {

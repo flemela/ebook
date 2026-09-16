@@ -1,65 +1,77 @@
 <!-- components/storefront/TopUtilityBar.vue -->
 <script setup lang="ts">
-import { Truck, MessageCircle, Search } from 'lucide-vue-next';
-import { buildWhatsAppLink } from '~/utils/phone';
+import { Truck, MessageCircle, Search } from "lucide-vue-next";
+import { buildWhatsAppLink } from "~/utils/phone";
 
 const router = useRouter();
 
 function handleTrackOrderClick(): void {
-  const orderRef = prompt('Enter your Order Reference or UUID (e.g. 7K9M or full order ID):');
-  if (orderRef && orderRef.trim()) {
-    router.push({
-      path: '/checkout/confirm',
-      query: { orderId: orderRef.trim() },
-    });
-  }
+	const orderRef = prompt(
+		"Enter your Order Reference or UUID (e.g. 7K9M or full order ID):",
+	);
+	if (orderRef && orderRef.trim()) {
+		router.push({
+			path: "/checkout/confirm",
+			query: { orderId: orderRef.trim() },
+		});
+	}
 }
 
 const whatsappHelpUrl = buildWhatsAppLink(
-  'Hello Flemela Bookstore Concierge, I need assistance with my book order.'
+	"Hello Ebook-Reads Bookstore Concierge, I need assistance with my book order.",
 );
 </script>
 
 <template>
-  <aside aria-label="Store utility notice" class="bg-theme-dark text-white text-[11px] py-1.5 px-4 border-b border-theme-dark-border select-none">
-    <div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
-      <!-- Left: Free Delivery Accent -->
-      <div class="flex items-center gap-1.5 truncate">
-        <Truck :size="13" class="text-theme-accent flex-shrink-0" />
-        <span class="font-medium text-white/90 truncate">
-          <strong class="text-theme-accent font-semibold">FREE DELIVERY</strong> across Nairobi on orders above KSh 2,500
-        </span>
-      </div>
+	<aside
+		aria-label="Store utility notice"
+		class="bg-theme-dark text-white text-[11px] py-1.5 px-4 border-b border-theme-dark-border select-none"
+	>
+		<div class="max-w-7xl mx-auto flex justify-between items-center gap-2">
+			<!-- Left: Free Delivery Accent -->
+			<div class="flex items-center gap-1.5 truncate">
+				<Truck :size="13" class="text-theme-accent flex-shrink-0" />
+				<span class="font-medium text-white/90 truncate">
+					<strong class="text-theme-accent font-semibold"
+						>FREE DELIVERY</strong
+					>
+					across Nairobi on orders above KSh 2,500
+				</span>
+			</div>
 
-      <!-- Right: Reader Concierge & Order Tracking -->
-      <div class="flex items-center gap-3.5 text-white/80 font-sans flex-shrink-0 text-[11px]">
-        <button
-          type="button"
-          class="hover:text-theme-accent transition-colors flex items-center gap-1 cursor-pointer"
-          @click="handleTrackOrderClick"
-        >
-          <Search :size="11" />
-          <span class="hidden sm:inline">Track Order</span>
-        </button>
+			<!-- Right: Reader Concierge & Order Tracking -->
+			<div
+				class="flex items-center gap-3.5 text-white/80 font-sans flex-shrink-0 text-[11px]"
+			>
+				<button
+					type="button"
+					class="hover:text-theme-accent transition-colors flex items-center gap-1 cursor-pointer"
+					@click="handleTrackOrderClick"
+				>
+					<Search :size="11" />
+					<span class="hidden sm:inline">Track Order</span>
+				</button>
 
-        <span class="opacity-30">•</span>
+				<span class="opacity-30">•</span>
 
-        <a
-          :href="whatsappHelpUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="hover:text-theme-accent transition-colors flex items-center gap-1 cursor-pointer"
-        >
-          <MessageCircle :size="11" class="text-[#25D366]" />
-          <span>Concierge (0143304460)</span>
-        </a>
+				<a
+					:href="whatsappHelpUrl"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="hover:text-theme-accent transition-colors flex items-center gap-1 cursor-pointer"
+				>
+					<MessageCircle :size="11" class="text-[#25D366]" />
+					<span>Concierge (0143304460)</span>
+				</a>
 
-        <span class="hidden md:inline opacity-30">•</span>
+				<span class="hidden md:inline opacity-30">•</span>
 
-        <span class="text-theme-accent font-mono font-medium hidden md:inline text-[10px] tracking-wider uppercase">
-          Nairobi, Kenya
-        </span>
-      </div>
-    </div>
-  </aside>
+				<span
+					class="text-theme-accent font-mono font-medium hidden md:inline text-[10px] tracking-wider uppercase"
+				>
+					Nairobi, Kenya
+				</span>
+			</div>
+		</div>
+	</aside>
 </template>

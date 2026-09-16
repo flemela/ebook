@@ -3,7 +3,7 @@
 import { buildWhatsAppLink, FLEMELA_WHATSAPP_LOCAL } from '~/utils/phone';
 
 const whatsappUrl = buildWhatsAppLink(
-  'Hello The Sunrise Bookstore, I am reaching out from your website footer.'
+  'Hello Ebook-Reads, I am reaching out from your website footer.'
 );
 </script>
 
@@ -76,7 +76,7 @@ const whatsappUrl = buildWhatsAppLink(
           <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
           <a href="#" class="hover:text-white transition-colors">Copyright</a>
         </div>
-        <p>&copy; 2026 The Sunrise Bookstore • Sarit Centre, Westlands, Nairobi.</p>
+        <p>&copy; 2026 Ebook-Reads • Sarit Centre, Westlands, Nairobi.</p>
       </div>
     </div>
   </footer>
