@@ -19,7 +19,7 @@ import type { PaginatedProductsResponse } from '~/server/api/products/index.get'
 
 // Pagination & Search Reactive State
 const currentPage = ref(1);
-const itemsPerPage = ref(48); // Multiple of 3 for symmetrical 3-column rows
+const itemsPerPage = ref(48); // Multiple of 2 and 3 for symmetrical grid rendering
 const activeCategoryFilter = ref<string>('General');
 const searchQuery = ref<string>('');
 const debouncedSearch = ref<string>('');
@@ -145,7 +145,7 @@ const bestsellersOfWeek = computed<Book[]>(() => {
   const list: Book[] = showcaseData.value?.products || [];
   const tagged = list.filter((b) => b.badge === 'BESTSELLER');
   const combinedSeeds = [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS];
-  return mergeWithSeeds(tagged, combinedSeeds, 6); // Set to 6 to fit 3-column rows
+  return mergeWithSeeds(tagged, combinedSeeds, 6);
 });
 
 const catalogueCategories = computed<string[]>(() => {
@@ -265,16 +265,16 @@ onUnmounted(() => {
       @select-category="handleCategorySelect"
     />
 
-    <!-- 2. Bestsellers Section -->
+    <!-- 2. Bestsellers Section (Top Heading, No Timer) -->
     <DealsWeek
       :books="bestsellersOfWeek"
       @request-seed="handleRequestSeed"
     />
 
-    <!-- 3. Catalogue Section (3-Column Layout) -->
+    <!-- 3. Catalogue Section (2 cols mobile, 3 cols tablet & desktop) -->
     <section
       id="catalog-results"
-      class="pt-12 sm:pt-16 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
+      class="pt-10 sm:pt-14 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
     >
       <!-- Section Title & Dynamic Filter Row -->
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-theme-border">
@@ -292,13 +292,13 @@ onUnmounted(() => {
           </h2>
         </div>
 
-        <!-- Filter Dropdown & Search Status Indicator -->
+        <!-- Filter Dropdown & Reset Action -->
         <div class="flex items-center gap-2.5 flex-wrap">
           <div class="relative">
             <button
               id="catalogue-category-trigger"
               type="button"
-              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-theme-surface-subtle hover:bg-theme-accent-soft border border-theme-border hover:border-theme-accent text-xs font-bold text-theme-ink transition-all cursor-pointer shadow-2xs"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-surface-subtle hover:bg-theme-accent-soft border border-theme-border hover:border-theme-accent text-xs font-bold text-theme-ink transition-all cursor-pointer shadow-2xs"
               :class="{ 'border-theme-accent text-theme-accent bg-theme-accent-soft': isCatalogueDropdownOpen }"
               @click="isCatalogueDropdownOpen = !isCatalogueDropdownOpen"
             >
@@ -344,7 +344,7 @@ onUnmounted(() => {
           <button
             v-if="isFilterActive"
             type="button"
-            class="px-3.5 py-2.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+            class="px-3.5 py-2 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 border border-theme-border"
             title="Reset Search and Category Filters"
             @click="clearAllFilters"
           >
@@ -354,14 +354,14 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- FUZZY TYPO MATCH NOTICE BANNER -->
+      <!-- Typo Match Notice Banner -->
       <div
         v-if="isFuzzyFallbackActive"
         class="p-3.5 bg-theme-accent-soft border border-theme-accent-border rounded-2xl flex items-center justify-between gap-3 text-xs text-theme-accent-hover"
       >
         <div class="flex items-center gap-2">
           <Zap :size="16" class="text-theme-accent flex-shrink-0" />
-          <span>No exact title found for "<strong>{{ debouncedSearch }}</strong>". Displaying closest matching books below:</span>
+          <span>No exact title found for "<strong>{{ debouncedSearch }}</strong>". Displaying closest matching eBooks below:</span>
         </div>
         <button
           type="button"
@@ -372,32 +372,29 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <!-- SKELETON LOADING GRID (3 Columns) -->
+      <!-- SKELETON LOADING GRID (2 cols on mobile, 3 cols on tablet & desktop) -->
       <div
         v-if="booksStatus === 'pending'"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto w-full"
+        class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 lg:gap-6 w-full"
       >
         <div
           v-for="n in 6"
           :key="`skel-catalog-${n}`"
-          class="w-full bg-theme-surface rounded-2xl p-4 sm:p-5 border border-theme-border shadow-card flex flex-col justify-between space-y-4"
+          class="w-full bg-theme-surface rounded-xl p-3 sm:p-4 border border-theme-border shadow-card flex flex-col justify-between space-y-3"
         >
-          <div class="aspect-[1/1.37] rounded-xl bg-theme-surface-muted animate-pulse" />
-          <div class="space-y-2 pt-1">
-            <div class="h-4 bg-theme-surface-muted rounded w-4/5 animate-pulse" />
-            <div class="h-3 bg-theme-surface-subtle rounded w-1/2 animate-pulse" />
+          <div class="aspect-[1/1.37] rounded-lg bg-theme-surface-muted animate-pulse" />
+          <div class="space-y-1.5 pt-1">
+            <div class="h-3.5 bg-theme-surface-muted rounded w-4/5 animate-pulse" />
+            <div class="h-2.5 bg-theme-surface-subtle rounded w-1/2 animate-pulse" />
           </div>
-          <div class="pt-3 border-t border-theme-border flex items-center justify-between">
-            <div class="h-5 bg-theme-surface-muted rounded w-24 animate-pulse" />
-          </div>
-          <div class="h-10 bg-theme-surface-muted rounded-xl w-full animate-pulse" />
+          <div class="h-8 bg-theme-surface-muted rounded-lg w-full animate-pulse" />
         </div>
       </div>
 
-      <!-- REAL BOOKS 3-COLUMN GRID -->
+      <!-- REAL BOOKS GRID (2 cols on mobile, 3 cols on tablet & desktop) -->
       <div
         v-else-if="displayBooks.length > 0"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto w-full animate-in fade-in duration-300"
+        class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 lg:gap-6 w-full animate-in fade-in duration-300"
       >
         <BookCard
           v-for="book in displayBooks"
@@ -417,7 +414,7 @@ onUnmounted(() => {
           No books found matching "{{ debouncedSearch }}"
         </h3>
         <p class="text-xs text-theme-muted max-w-xs mx-auto">
-          We can source any title in Kenya directly for you upon request via WhatsApp.
+          We can source any eBook in Kenya directly for you upon request via WhatsApp.
         </p>
         <button
           type="button"
