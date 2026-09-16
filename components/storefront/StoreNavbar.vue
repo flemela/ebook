@@ -192,7 +192,7 @@ function handleOutsideClick(event: MouseEvent): void {
 }
 
 const helpWhatsAppUrl = buildWhatsAppLink(
-  'Hello The Sunrise Bookstore Help Desk, I need assistance with an order or eBook inquiry.'
+  'Hello E-Book Reads Help Desk, I need assistance with an order or eBook inquiry.'
 );
 
 onMounted(() => {
@@ -211,38 +211,38 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- Opaque, solid high-contrast background (non-glassmorphic) -->
   <header
-    class="bg-theme-surface/95 backdrop-blur-md border-b border-theme-border sticky top-0 z-40 shadow-subtle select-none"
+    class="bg-theme-surface border-b border-theme-border sticky top-0 z-40 shadow-xs select-none"
   >
     <!-- Top Row: Brand & Navigation -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3 sm:gap-6">
+      <!-- Left: Mobile Menu Trigger & Brand Logo -->
+      <div class="flex items-center gap-2.5 sm:gap-3.5 flex-shrink-0">
         <button
           type="button"
-          class="md:hidden p-1.5 text-theme-ink hover:bg-theme-surface-subtle rounded-lg transition-colors cursor-pointer"
+          class="md:hidden p-1.5 text-theme-ink hover:bg-theme-surface-subtle rounded-lg transition-colors cursor-pointer flex-shrink-0"
           aria-label="Toggle navigation menu"
           @click="isMobileOpen = !isMobileOpen"
         >
           <component :is="isMobileOpen ? X : Menu" :size="20" />
         </button>
 
-        <NuxtLink to="/" class="flex items-center group py-1" aria-label="The Sunrise Bookstore Home">
+        <NuxtLink to="/" class="flex items-center flex-shrink-0 py-0.5 group" aria-label="E-Book Reads Home">
           <img
             src="/images/logo.png"
-            alt="The Sunrise Bookstore"
-            class="h-8 sm:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            alt="E-Book Reads"
+            class="h-9 sm:h-11 md:h-12 w-auto max-w-[190px] sm:max-w-[240px] md:max-w-[280px] object-contain transition-transform duration-300 group-hover:scale-102"
             loading="eager"
-            width="120"
-            height="40"
           />
         </NuxtLink>
       </div>
 
-      <!-- Center Desktop Navigation (Cleaned to Home, Categories, Bestsellers, Catalogue, Help) -->
-      <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-6 lg:gap-7 text-xs font-bold tracking-wide">
+      <!-- Center Desktop Navigation: Bigger, Bolder Items -->
+      <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-6 lg:gap-8 text-[13.5px] sm:text-sm font-extrabold tracking-normal">
         <a href="/" class="nav-link-item text-theme-ink py-1 cursor-pointer">Home</a>
 
-        <!-- Category Dropdown -->
+        <!-- Category Dropdown Pill Trigger -->
         <div
           class="relative"
           @mouseenter="onCategoryMouseEnter"
@@ -251,14 +251,14 @@ onUnmounted(() => {
           <button
             id="nav-category-trigger"
             type="button"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-theme-border hover:border-theme-accent text-theme-ink hover:text-theme-accent bg-theme-surface-subtle hover:bg-theme-accent-soft transition-all cursor-pointer font-bold select-none text-xs"
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-theme-border hover:border-theme-accent text-theme-ink hover:text-theme-accent bg-theme-surface-subtle hover:bg-theme-accent-soft transition-all cursor-pointer font-extrabold select-none text-[13px]"
             :class="{ 'border-theme-accent text-theme-accent bg-theme-accent-soft shadow-2xs': isCategoryDropdownOpen }"
             @click.stop="toggleCategoryDropdown"
           >
-            <LayoutGrid :size="13" class="text-theme-accent flex-shrink-0" />
+            <LayoutGrid :size="14" class="text-theme-accent flex-shrink-0" />
             <span>Categories</span>
             <ChevronDown
-              :size="12"
+              :size="13"
               class="transition-transform duration-200 text-theme-muted flex-shrink-0"
               :class="{ 'rotate-180 text-theme-accent': isCategoryDropdownOpen }"
             />
@@ -282,25 +282,25 @@ onUnmounted(() => {
               <div class="max-h-72 overflow-y-auto py-1">
                 <button
                   type="button"
-                  class="w-full text-left px-4 py-2 hover:bg-theme-accent-soft hover:text-theme-accent-hover text-xs font-bold transition-colors text-theme-ink cursor-pointer flex items-center justify-between group"
+                  class="w-full text-left px-4 py-2.5 hover:bg-theme-accent-soft hover:text-theme-accent-hover text-[13px] font-extrabold transition-colors text-theme-ink cursor-pointer flex items-center justify-between group"
                   @click="chooseCategory('General')"
                 >
-                  <span class="flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-theme-accent"></span>
+                  <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-theme-accent"></span>
                     General (All Books)
                   </span>
-                  <span class="text-[10px] font-mono text-theme-muted group-hover:text-theme-accent">↗</span>
+                  <span class="text-[11px] font-mono text-theme-muted group-hover:text-theme-accent">↗</span>
                 </button>
 
                 <button
                   v-for="cat in categories"
                   :key="cat"
                   type="button"
-                  class="w-full text-left px-4 py-2 hover:bg-theme-accent-soft hover:text-theme-accent-hover text-xs font-semibold transition-colors text-theme-ink cursor-pointer flex items-center justify-between group"
+                  class="w-full text-left px-4 py-2.5 hover:bg-theme-accent-soft hover:text-theme-accent-hover text-[13px] font-bold transition-colors text-theme-ink cursor-pointer flex items-center justify-between group"
                   @click="chooseCategory(cat)"
                 >
                   <span class="truncate pr-2">{{ cat }}</span>
-                  <span class="text-[10px] font-mono text-theme-muted group-hover:text-theme-accent">↗</span>
+                  <span class="text-[11px] font-mono text-theme-muted group-hover:text-theme-accent">↗</span>
                 </button>
               </div>
             </div>
@@ -308,28 +308,28 @@ onUnmounted(() => {
         </div>
 
         <a href="#bestsellers-week" class="nav-link-item text-theme-ink py-1 cursor-pointer">Bestsellers</a>
-        <a href="#catalog-results" class="nav-link-item text-theme-ink py-1 cursor-pointer">Catalogue</a>
         <a :href="helpWhatsAppUrl" target="_blank" rel="noopener noreferrer" class="nav-link-item text-theme-ink py-1 cursor-pointer">Help</a>
 
+        <!-- Bigger, Bolder Request Book CTA -->
         <button
           type="button"
-          class="bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-[11px] font-extrabold uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-xs hover:shadow transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5 flex-shrink-0"
+          class="bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full shadow-xs hover:shadow transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5 flex-shrink-0"
           title="Request any title you can't find in stock"
           @click="handleRequestBookClick"
         >
-          <Sparkles :size="12" class="text-white" />
+          <Sparkles :size="13" class="text-white" />
           <span>Request Book!</span>
         </button>
       </nav>
 
       <!-- Right Action Icons -->
-      <div class="flex items-center gap-3 sm:gap-4 text-theme-ink">
+      <div class="flex items-center gap-3 sm:gap-4 text-theme-ink flex-shrink-0">
         <a
           :href="helpWhatsAppUrl"
           target="_blank"
           rel="noopener noreferrer"
           class="p-1.5 text-[#25D366] hover:text-[#1eb855] hover:bg-theme-surface-subtle rounded-lg transition-all cursor-pointer flex items-center justify-center"
-          title="Chat with The Sunrise Bookstore on WhatsApp"
+          title="Chat with E-Book Reads on WhatsApp"
         >
           <WhatsAppIcon class="w-5 h-5 transition-transform hover:scale-110" />
         </a>
@@ -340,7 +340,7 @@ onUnmounted(() => {
           aria-label="Open Shopping Cart"
           @click="openDrawer"
         >
-          <ShoppingCart :size="19" class="transition-transform hover:scale-105" />
+          <ShoppingCart :size="20" class="transition-transform hover:scale-105" />
           <span
             v-if="totalItems > 0"
             class="absolute -top-1 -right-1 bg-theme-accent text-white font-mono text-[9px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center shadow-xs"
@@ -351,7 +351,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Row 2: Search Bar Strip with Instant Recommendations Dropdown -->
+    <!-- Row 2: Search Bar Strip (Solid Sub-Canvas Background) -->
     <div
       ref="searchContainerRef"
       class="w-full px-4 sm:px-6 py-2.5 sm:py-3 transition-all relative overflow-visible bg-theme-surface-subtle border-t border-theme-border"
@@ -468,15 +468,15 @@ onUnmounted(() => {
       </form>
     </div>
 
-    <!-- Mobile Drawer Menu -->
+    <!-- Mobile Drawer Menu: Bold & Crisp -->
     <div
       v-if="isMobileOpen"
       class="md:hidden bg-theme-surface border-t border-theme-border px-6 py-4 space-y-4 shadow-xl max-h-[85vh] overflow-y-auto"
     >
-      <div class="flex flex-col gap-2.5 text-xs font-bold tracking-wide">
+      <div class="flex flex-col gap-3 text-sm font-extrabold tracking-normal">
         <button
           type="button"
-          class="w-full text-center bg-theme-accent hover:bg-theme-accent-hover text-white font-extrabold text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer mb-1"
+          class="w-full text-center bg-theme-accent hover:bg-theme-accent-hover text-white font-black text-xs uppercase tracking-wider py-3 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer mb-1"
           @click="handleRequestBookClick"
         >
           <Sparkles :size="14" />
@@ -485,8 +485,7 @@ onUnmounted(() => {
 
         <a href="/" class="py-2 text-theme-ink hover:text-theme-accent border-b border-theme-border transition-colors" @click="isMobileOpen = false">Home</a>
         <a href="#bestsellers-week" class="py-2 text-theme-ink hover:text-theme-accent border-b border-theme-border transition-colors" @click="isMobileOpen = false">Bestsellers</a>
-    <a href="#catalog-results" class="py-2 text-theme-ink hover:text-theme-accent border-b border-theme-border transition-colors" @click="isMobileOpen = false">Catalogue</a>
-        <a :href="helpWhatsAppUrl" target="_blank" rel="noopener noreferrer" class="py-2 text-[#25D366] font-bold border-b border-theme-border flex items-center gap-2" @click="isMobileOpen = false">
+        <a :href="helpWhatsAppUrl" target="_blank" rel="noopener noreferrer" class="py-2 text-[#25D366] font-extrabold border-b border-theme-border flex items-center gap-2" @click="isMobileOpen = false">
           <WhatsAppIcon class="w-4 h-4 text-[#25D366]" />
           <span>Help & Support</span>
         </a>
@@ -523,7 +522,7 @@ onUnmounted(() => {
 .nav-link-item {
   position: relative;
   display: inline-block;
-  transition: color 0.25s ease;
+  transition: color 0.2s ease;
 }
 
 .nav-link-item:hover {
@@ -536,11 +535,11 @@ onUnmounted(() => {
   bottom: -4px;
   left: 50%;
   width: 100%;
-  height: 2px;
+  height: 2.5px;
   background-color: var(--theme-accent);
   transform: translateX(-50%) scaleX(0);
   transform-origin: center;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 9999px;
 }
 

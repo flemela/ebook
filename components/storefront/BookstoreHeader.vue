@@ -96,26 +96,25 @@ onUnmounted(() => {
 
 <template>
   <header class="bg-theme-surface/95 backdrop-blur-md border-b border-theme-border sticky top-0 z-40 transition-all select-none">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 sm:gap-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-6">
       
-      <!-- Left: Mobile Menu Trigger & Brand Logo -->
-      <div class="flex items-center gap-3 flex-shrink-0">
+      <!-- Left: Mobile Menu Trigger & Free-Width Brand Logo -->
+      <div class="flex items-center gap-2.5 sm:gap-3.5 flex-shrink-0">
         <button
           type="button"
-          class="md:hidden p-1.5 text-theme-ink hover:bg-theme-surface-subtle rounded-lg transition-colors cursor-pointer"
+          class="md:hidden p-1.5 text-theme-ink hover:bg-theme-surface-subtle rounded-lg transition-colors cursor-pointer flex-shrink-0"
           aria-label="Toggle navigation menu"
           @click="isMobileMenuOpen = !isMobileMenuOpen"
         >
           <component :is="isMobileMenuOpen ? X : Menu" :size="20" />
         </button>
 
-        <NuxtLink to="/" class="flex items-center gap-2 group">
+        <NuxtLink to="/" class="flex items-center flex-shrink-0 py-0.5 group" aria-label="E-Book Reads Home">
           <img
             src="/images/logo.png"
-            alt="The Sunrise Bookstore Logo"
-            class="h-9 sm:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-            width="120"
-            height="44"
+            alt="E-Book Reads Logo"
+            class="h-9 sm:h-11 md:h-12 w-auto max-w-[190px] sm:max-w-[240px] md:max-w-[280px] object-contain transition-transform duration-300 group-hover:scale-102"
+            loading="eager"
           />
         </NuxtLink>
       </div>
@@ -259,7 +258,7 @@ onUnmounted(() => {
 
       <div class="pt-3 border-t border-theme-border flex justify-between items-center text-xs">
         <NuxtLink to="/admin/login" class="text-theme-ink font-bold hover:underline">Merchant Portal</NuxtLink>
-        <span class="text-[10px] text-theme-muted font-mono">The Sunrise Bookstore</span>
+        <span class="text-[10px] text-theme-muted font-mono">E-Book Reads</span>
       </div>
     </div>
   </header>

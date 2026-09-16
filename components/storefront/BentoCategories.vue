@@ -1,6 +1,6 @@
 <!-- components/storefront/BentoCategories.vue -->
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, type Component } from 'vue';
 import {
   BookOpen,
   GraduationCap,
@@ -11,15 +11,25 @@ import {
   ArrowRight,
 } from 'lucide-vue-next';
 import type { Book } from '~/types';
+import type { PaginatedProductsResponse } from '~/server/api/products/index.get';
+
+interface CategoryItem {
+  name: string;
+  icon: Component;
+  fallbackCount: string;
+  query: string;
+}
 
 const emit = defineEmits<{
   select: [category: string];
 }>();
 
 // Fetch live catalog books to dynamically calculate inventory counts
-const { data: catalogResponse } = await useFetch<any>('/api/products');
+const { data: catalogResponse } = await useFetch<PaginatedProductsResponse>('/api/products', {
+  query: { limit: 100 },
+});
 
-const CATEGORIES = [
+const CATEGORIES: CategoryItem[] = [
   {
     name: 'Fiction',
     icon: BookOpen,
@@ -60,9 +70,7 @@ const CATEGORIES = [
 
 const countMap = computed(() => {
   const map = new Map<string, number>();
-  const list: Book[] = Array.isArray(catalogResponse.value)
-    ? catalogResponse.value
-    : catalogResponse.value?.products || [];
+  const list: Book[] = catalogResponse.value?.products || [];
 
   for (const b of list) {
     const cat = (b?.category_name || 'General').toLowerCase();
@@ -79,7 +87,7 @@ function getDisplayCount(query: string, fallback: string): string {
       total += count;
     }
   }
-  return total > 0 ? `${total} titles` : `${fallback} titles`;
+  return total > 0 ? `${total} eBooks` : `${fallback} eBooks`;
 }
 
 function handleCategoryClick(catQuery: string): void {
@@ -94,10 +102,13 @@ function handleCategoryClick(catQuery: string): void {
 </script>
 
 <template>
-  <section id="categories-grid" class="py-8 sm:py-12 md:py-14 px-4 max-w-7xl mx-auto w-full space-y-4 sm:space-y-6 select-none">
+  <section id="categories-grid" class="py-8 sm:py-10 md:py-12 px-4 max-w-6xl mx-auto w-full space-y-4 sm:space-y-5 select-none">
     <!-- Header with 'View all ->' Link -->
     <div class="flex items-end justify-between border-b border-theme-border pb-3">
       <div>
+        <span class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-theme-accent block">
+          eBook Catalog
+        </span>
         <h2 class="font-sans font-extrabold text-xl sm:text-2xl md:text-3xl text-theme-ink tracking-tight">
           Shop by Category
         </h2>
@@ -113,26 +124,30 @@ function handleCategoryClick(catQuery: string): void {
       </button>
     </div>
 
-    <!-- Category Grid: 3 Icons per Row on Mobile (<768px), 6 Items per Row on Tablet & Desktop (>=768px) -->
-    <div class="grid grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
+    <!-- Category Grid: 3 Icons on Mobile, 6 Icons on Tablet & Desktop -->
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4">
       <button
         v-for="cat in CATEGORIES"
         :key="cat.name"
         type="button"
-        class="bg-theme-surface hover:bg-theme-surface-subtle border border-theme-border hover:border-theme-accent rounded-xl p-2.5 sm:p-4 md:p-5 flex flex-col items-center justify-center text-center gap-1.5 sm:gap-2.5 transition-all duration-200 group cursor-pointer shadow-2xs hover:shadow-xs hover:-translate-y-0.5 min-h-[92px] sm:min-h-[110px]"
+        class="bg-theme-surface hover:bg-theme-surface-subtle border border-theme-border hover:border-theme-border-strong rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center text-center gap-2 transition-all duration-200 group cursor-pointer shadow-2xs hover:shadow-xs hover:-translate-y-0.5 min-h-[96px] sm:min-h-[114px]"
         @click="handleCategoryClick(cat.query)"
       >
-        <!-- Category Line Icon -->
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-theme-surface-subtle group-hover:bg-theme-accent-soft text-theme-ink group-hover:text-theme-accent flex items-center justify-center transition-colors flex-shrink-0">
-          <component :is="cat.icon" :size="18" class="sm:w-5 sm:h-5 stroke-[1.75]" />
+        <!-- Icon Container: Red by default, Black on hover -->
+        <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-theme-accent-soft group-hover:bg-theme-surface-muted flex items-center justify-center transition-colors duration-200 flex-shrink-0">
+          <component
+            :is="cat.icon"
+            :size="19"
+            class="sm:w-5 sm:h-5 stroke-[1.75] text-theme-accent fill-theme-accent group-hover:text-black group-hover:fill-black transition-colors duration-200"
+          />
         </div>
 
         <!-- Category Title and Count -->
         <div class="space-y-0.5 w-full min-w-0">
-          <h3 class="font-sans font-bold text-[11px] sm:text-xs md:text-sm text-theme-ink group-hover:text-theme-accent transition-colors leading-tight truncate">
+          <h3 class="font-sans font-bold text-xs sm:text-sm text-theme-ink group-hover:text-theme-accent transition-colors leading-tight truncate">
             {{ cat.name }}
           </h3>
-          <p class="text-[9px] sm:text-[10px] md:text-[11px] text-theme-ink-muted font-medium truncate">
+          <p class="text-[10px] sm:text-[11px] text-theme-muted font-medium truncate">
             {{ getDisplayCount(cat.query, cat.fallbackCount) }}
           </p>
         </div>

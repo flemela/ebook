@@ -4,6 +4,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import PromoTickerStrip, { type PromoTickerMessage } from '~/components/storefront/PromoTickerStrip.vue';
 import StoreNavbar from '~/components/storefront/StoreNavbar.vue';
 import HeroCarousel from '~/components/storefront/HeroCarousel.vue';
+import BentoCategories from '~/components/storefront/BentoCategories.vue';
 import DealsWeek from '~/components/storefront/DealsWeek.vue';
 import StoreFooter from '~/components/storefront/StoreFooter.vue';
 import BookCard from '~/components/storefront/BookCard.vue';
@@ -19,7 +20,7 @@ import type { PaginatedProductsResponse } from '~/server/api/products/index.get'
 
 // Pagination & Search Reactive State
 const currentPage = ref(1);
-const itemsPerPage = ref(48); // Multiple of 2 and 4 for clean rows
+const itemsPerPage = ref(48);
 const activeCategoryFilter = ref<string>('General');
 const searchQuery = ref<string>('');
 const debouncedSearch = ref<string>('');
@@ -265,16 +266,19 @@ onUnmounted(() => {
       @select-category="handleCategorySelect"
     />
 
-    <!-- 2. Bestsellers Section (On-Top Heading + 1-Row Scrollable Shelf) -->
+    <!-- 2. Bento Categories Grid (Directly below Hero) -->
+    <BentoCategories @select="handleCategorySelect" />
+
+    <!-- 3. Bestsellers Section (1-Row Scrollable Shelf) -->
     <DealsWeek
       :books="bestsellersOfWeek"
       @request-seed="handleRequestSeed"
     />
 
-    <!-- 3. Catalogue Section (Strictly 2 per row mobile, 4 per row desktop & tablet) -->
+    <!-- 4. Catalogue Section (2 cols mobile, 4 cols tablet & desktop) -->
     <section
       id="catalog-results"
-      class="pt-8 sm:pt-12 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
+      class="pt-6 sm:pt-10 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
     >
       <!-- Section Title & Dynamic Filter Row -->
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-theme-border">
