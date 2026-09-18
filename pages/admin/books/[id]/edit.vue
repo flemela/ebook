@@ -59,7 +59,7 @@
               </svg>
               <p class="text-xs font-bold text-theme-accent-hover">{{ successToast }}</p>
             </div>
-            <button type="button" @click="successToast = ''" class="text-xs text-theme-accent font-bold">Dismiss</button>
+            <button type="button" @click="successToast = ''" class="text-xs text-theme-accent font-bold cursor-pointer">Dismiss</button>
           </div>
 
           <!-- Error Alert -->
@@ -233,7 +233,7 @@
             </div>
           </div>
 
-          <!-- Section 3: Pure Digital Edition Management -->
+          <!-- Section 3: Pure Digital Edition Management (No Hardcopy Logic) -->
           <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between border-b border-theme-border pb-3">
               <div class="flex items-center space-x-2.5">
@@ -263,7 +263,7 @@
                     v-model.number="form.compareAtPrice"
                     type="number"
                     min="0"
-                    placeholder="Leave empty if no sale"
+                    placeholder="Leave empty if no discount"
                     class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono"
                   />
                 </div>
@@ -486,17 +486,29 @@ function handlePdfRemoved() {
 async function handleUpdate() {
   formError.value = '';
   successToast.value = '';
+
+  if (!form.name.trim()) {
+    formError.value = 'Book title is required.';
+    return;
+  }
+
+  if (!form.category_id) {
+    formError.value = 'Please select a category.';
+    return;
+  }
+
   isSubmitting.value = true;
 
   try {
+    // 1. Update Base Product, Price, Discount, Badge & Cover Image
     await ofetch(`/api/admin/books/${productId}`, {
       method: 'PATCH',
       body: {
         name: form.name.trim(),
         category_id: form.category_id,
+        price: Math.max(0, Number(form.pdfPrice) || 0),
+        compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
         sku: form.sku.trim() || null,
-        price: form.pdfPrice,
-        compare_at_price: form.compareAtPrice || null,
         badge: form.badge || null,
         description: form.author ? `By ${form.author.trim()}. ${form.description}` : form.description,
         images: form.cover_image_url
@@ -505,15 +517,16 @@ async function handleUpdate() {
       },
     });
 
+    // 2. Update or Create Pure Digital PDF Format (Zero Hardcopy Operations)
     if (pdfFormatId.value) {
       await ofetch(`/api/admin/products/${productId}/formats/${pdfFormatId.value}`, {
         method: 'PATCH',
         body: {
-          price: form.pdfPrice,
-          compare_at_price: form.compareAtPrice || null,
+          price: Math.max(0, Number(form.pdfPrice) || 0),
+          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
           file_url: form.pdfFileUrl || form.pdfKey,
           file_public_id: form.pdfKey,
-          file_size_bytes: form.pdfFileSize || null,
+          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
         },
       });
     } else if (form.pdfKey) {
@@ -521,22 +534,27 @@ async function handleUpdate() {
         method: 'POST',
         body: {
           format: 'pdf',
-          price: form.pdfPrice,
-          compare_at_price: form.compareAtPrice || null,
+          price: Math.max(0, Number(form.pdfPrice) || 0),
+          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
           file_url: form.pdfFileUrl || form.pdfKey,
           file_public_id: form.pdfKey,
-          file_size_bytes: form.pdfFileSize,
+          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
         },
       });
       pdfFormatId.value = createdFormat?.id || createdFormat?.data?.id;
     }
 
     isPdfDirty.value = false;
-    successToast.value = 'eBook details, pricing, and PDF download stream saved successfully!';
+    successToast.value = 'eBook details, digital pricing, cover art, and PDF file saved successfully!';
     pushToast({ message: successToast.value, variant: 'success' });
   } catch (err: any) {
     formError.value =
-      err.data?.data?.message || err.data?.message || err.message || 'Failed to save changes.';
+      err.data?.message ||
+      err.data?.error?.message ||
+      err.statusMessage ||
+      err.message ||
+      'Failed to save changes.';
+    pushToast({ message: formError.value, variant: 'error' });
   } finally {
     isSubmitting.value = false;
   }

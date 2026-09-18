@@ -16,19 +16,20 @@ import BookRequestModal from "~/components/storefront/BookRequestModal.vue";
 import Pagination from "~/components/ui/Pagination.vue";
 import { BookOpen, ChevronDown, Check, Filter, X, Zap } from "lucide-vue-next";
 import { MONTHLY_TOP_SEEDS, DEALS_SEEDS, mergeWithSeeds } from "~/data/seeds";
-import { fuzzySearchBooks } from "~/utils/fuzzy";
 import type { Book } from "~/types";
 import type { PaginatedProductsResponse } from "~/server/api/products/index.get";
+
+const route = useRoute();
 
 // Pagination & Search Reactive State
 const currentPage = ref(1);
 const itemsPerPage = ref(48);
 const activeCategoryFilter = ref<string>("General");
-const searchQuery = ref<string>("");
+const searchQuery = ref<string>("" );
 const debouncedSearch = ref<string>("");
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-// Reactive Catalogue Query
+// Reactive Catalogue Query (Powered natively by backend PostgreSQL pg_trgm fuzzy matching)
 const { data: catalogData, status: booksStatus } =
 	await useFetch<PaginatedProductsResponse>("/api/products", {
 		query: computed(() => ({
@@ -54,30 +55,44 @@ const { data: showcaseData } = await useFetch<PaginatedProductsResponse>(
 );
 const { data: storeMetadata } = await useFetch<any>("/api/stores/current");
 
+// Server-Authoritative SEO & Schema.org JSON-LD Metadata (Targeting www.ebookreads.com)
 useHead({
-	title: "Ebook-Reads — Online Bookstore & eBooks in Nairobi, Kenya",
-	link: [{ rel: "canonical", href: "https://www.thesunrisebookstore.com" }],
+	title: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
+	link: [{ rel: "canonical", href: "https://www.ebookreads.com" }],
 	meta: [
 		{
 			name: "description",
 			content:
-				"Shop bestsellers, finance, business, psychology, and African literature at Ebook-Reads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads across Kenya.",
+				"Shop bestsellers, finance, business, psychology, and African literature at EbookReads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads across Kenya.",
 		},
 		{
 			property: "og:title",
-			content:
-				"Ebook-Reads — Online Bookstore & eBooks in Nairobi, Kenya",
+			content: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
 		},
 		{
 			property: "og:description",
 			content:
-				"Shop bestsellers, finance, business, psychology, and African literature at Ebook-Reads, Diamond Mall, Parklands, Nairobi.",
+				"Shop bestsellers, finance, business, psychology, and African literature at EbookReads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads.",
 		},
-		{ property: "og:url", content: "https://www.thesunrisebookstore.com" },
+		{ property: "og:url", content: "https://www.ebookreads.com" },
 		{
 			property: "og:image",
+			content: "https://www.ebookreads.com/images/hero-cover.jpg",
+		},
+		{ property: "og:type", content: "website" },
+		{ name: "twitter:card", content: "summary_large_image" },
+		{
+			name: "twitter:title",
+			content: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
+		},
+		{
+			name: "twitter:description",
 			content:
-				"https://www.thesunrisebookstore.com/images/hero-cover.jpg",
+				"Shop bestsellers, finance, business, and literature at EbookReads. Instant eBook downloads.",
+		},
+		{
+			name: "twitter:image",
+			content: "https://www.ebookreads.com/images/hero-cover.jpg",
 		},
 	],
 	script: [
@@ -88,12 +103,12 @@ useHead({
 				"@graph": [
 					{
 						"@type": "BookStore",
-						"@id": "https://www.thesunrisebookstore.com/#bookstore",
-						name: "Ebook-Reads",
-						url: "https://www.thesunrisebookstore.com",
-						logo: "https://www.thesunrisebookstore.com/images/logo.png",
-						image: "https://www.thesunrisebookstore.com/images/hero-cover.jpg",
-						email: "admin@thesunrisebookstore.com",
+						"@id": "https://www.ebookreads.com/#bookstore",
+						name: "EbookReads",
+						url: "https://www.ebookreads.com",
+						logo: "https://www.ebookreads.com/images/logo.png",
+						image: "https://www.ebookreads.com/images/hero-cover.jpg",
+						email: "admin@ebookreads.com",
 						telephone: "+254143304460",
 						priceRange: "KSh 149 - KSh 4500",
 						currenciesAccepted: "KES",
@@ -115,58 +130,31 @@ const tickerItems = computed<PromoTickerMessage[]>(
 	() => storeMetadata.value?.promo_ticker || [],
 );
 
-const fullCatalogPool = computed<Book[]>(() => {
-	const remoteList: Book[] = showcaseData.value?.products || [];
-	return mergeWithSeeds(
-		remoteList,
-		[...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS],
-		20,
-	);
-});
-
-const isFuzzyFallbackActive = ref(false);
-
+// Server-authoritative catalogue list directly resolved from database
 const displayBooks = computed<Book[]>(() => {
-	const rawQuery = debouncedSearch.value.trim();
-	const backendResults = catalogData.value?.products || [];
-
-	if (!rawQuery) {
-		isFuzzyFallbackActive.value = false;
-		return backendResults;
-	}
-
-	if (backendResults.length > 0) {
-		isFuzzyFallbackActive.value = false;
-		return backendResults;
-	}
-
-	const fuzzyResults = fuzzySearchBooks(
-		fullCatalogPool.value,
-		rawQuery,
-		0.35,
-		itemsPerPage.value,
-	);
-	if (fuzzyResults.length > 0) {
-		isFuzzyFallbackActive.value = true;
-		return fuzzyResults.map((r) => r.book);
-	}
-
-	isFuzzyFallbackActive.value = false;
-	return [];
+	return catalogData.value?.products || [];
 });
 
 const totalBooksCount = computed<number>(() => {
-	if (isFuzzyFallbackActive.value) return displayBooks.value.length;
 	return catalogData.value?.total ?? displayBooks.value.length;
 });
 
 const totalPages = computed<number>(() => {
-	if (isFuzzyFallbackActive.value)
-		return Math.max(
-			1,
-			Math.ceil(displayBooks.value.length / itemsPerPage.value),
-		);
 	return catalogData.value?.totalPages ?? 1;
+});
+
+// Detects whether a typo correction/fuzzy hit was served by PostgreSQL pg_trgm
+const isTypoCorrectionActive = computed<boolean>(() => {
+	const q = debouncedSearch.value.trim().toLowerCase();
+	if (!q || displayBooks.value.length === 0) return false;
+
+	// If none of the top 3 books literally contain the query string in title, author, or SKU, it is a fuzzy hit
+	return !displayBooks.value.slice(0, 3).some((b) => {
+		const nameMatch = b.name?.toLowerCase().includes(q);
+		const authorMatch = b.author?.toLowerCase().includes(q);
+		const skuMatch = b.sku?.toLowerCase().includes(q);
+		return Boolean(nameMatch || authorMatch || skuMatch);
+	});
 });
 
 const paginationRangeText = computed<string>(() => {
@@ -185,13 +173,13 @@ const isFilterActive = computed<boolean>(() => {
 	);
 });
 
+
 const bestsellersOfWeek = computed<Book[]>(() => {
 	const list: Book[] = showcaseData.value?.products || [];
-	const tagged = list.filter((b) => b.badge === "BESTSELLER");
+	const tagged = list.filter((b) => b.badge === "BESTSELLER" || b.badge === "DEAL_OF_WEEK");
 	const combinedSeeds = [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS];
-	return mergeWithSeeds(tagged, combinedSeeds, 8);
+	return mergeWithSeeds(tagged, combinedSeeds, 8, list);
 });
-
 const catalogueCategories = computed<string[]>(() => {
 	const set = new Set<string>();
 	const allList: Book[] = showcaseData.value?.products || [];
@@ -286,6 +274,14 @@ function handleOutsideClickCatalogue(event: MouseEvent): void {
 }
 
 onMounted(() => {
+	// Deep-link query param hydration (e.g. /?q=mindset or /?category=business)
+	if (route.query.q && typeof route.query.q === "string") {
+		searchQuery.value = route.query.q;
+		debouncedSearch.value = route.query.q.trim();
+	}
+	if (route.query.category && typeof route.query.category === "string") {
+		activeCategoryFilter.value = route.query.category;
+	}
 	if (process.client) {
 		window.addEventListener("click", handleOutsideClickCatalogue);
 	}
@@ -303,7 +299,7 @@ onUnmounted(() => {
 	<div
 		class="min-h-screen flex flex-col bg-theme-canvas text-theme-ink antialiased"
 	>
-		<!-- Top Announcement Ribbon -->
+		<!-- Top Rotating Announcement Ribbon -->
 		<PromoTickerStrip :messages="tickerItems" />
 
 		<!-- Sticky Store Navbar -->
@@ -313,7 +309,7 @@ onUnmounted(() => {
 			@request-book="() => handleRequestSeed()"
 		/>
 
-		<!-- 1. The Hero Section -->
+		<!-- 1. Hero Carousel -->
 		<HeroCarousel
 			@search="handleSearch"
 			@select-category="handleCategorySelect"
@@ -322,13 +318,13 @@ onUnmounted(() => {
 		<!-- 2. Bento Categories Grid -->
 		<BentoCategories @select="handleCategorySelect" />
 
-		<!-- 3. Bestsellers Section (1-Row Scrollable Shelf) -->
+		<!-- 3. Bestsellers of the Week (1-Row Scrollable Shelf) -->
 		<DealsWeek
 			:books="bestsellersOfWeek"
 			@request-seed="handleRequestSeed"
 		/>
 
-		<!-- 4. Catalogue Section: Standardized to font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl -->
+		<!-- 4. Catalogue Section with Server-Authoritative Fuzzy Search -->
 		<section
 			id="catalog-results"
 			class="pt-8 sm:pt-12 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
@@ -463,23 +459,23 @@ onUnmounted(() => {
 				</div>
 			</div>
 
-			<!-- Typo Match Notice Banner -->
+			<!-- Typo-Tolerant Match Notice Banner -->
 			<div
-				v-if="isFuzzyFallbackActive"
+				v-if="isTypoCorrectionActive"
 				class="p-3.5 bg-theme-accent-soft border border-theme-accent-border rounded-2xl flex items-center justify-between gap-3 text-xs text-theme-accent-hover"
 			>
 				<div class="flex items-center gap-2">
 					<Zap :size="16" class="text-theme-accent flex-shrink-0" />
 					<span
-						>No exact title found for "<strong>{{
+						>Showing closest matching eBooks for "<strong>{{
 							debouncedSearch
 						}}</strong
-						>". Displaying closest matching eBooks below:</span
+						>":</span
 					>
 				</div>
 				<button
 					type="button"
-					class="text-xs font-bold underline hover:text-theme-accent cursor-pointer flex-shrink-0"
+					class="text-xs font-bold underline hover:text-theme-accent-active cursor-pointer flex-shrink-0"
 					@click="clearAllFilters"
 				>
 					View All Books
@@ -526,7 +522,7 @@ onUnmounted(() => {
 				/>
 			</div>
 
-			<!-- EMPTY STATE -->
+			<!-- EMPTY STATE (With Zero-Dead-End Recovery Actions) -->
 			<div
 				v-else
 				class="bg-theme-surface rounded-2xl border border-theme-border p-12 text-center space-y-3 shadow-sm animate-in fade-in duration-200"
@@ -536,19 +532,27 @@ onUnmounted(() => {
 					class="mx-auto text-theme-muted opacity-60"
 				/>
 				<h3 class="font-sans font-bold text-base text-theme-ink">
-					No books found matching "{{ debouncedSearch }}"
+					No eBooks found matching "{{ debouncedSearch }}"
 				</h3>
 				<p class="text-xs text-theme-muted max-w-xs mx-auto">
-					We can source any eBook in Kenya directly for you upon
-					request via WhatsApp.
+					We can source any eBook in Kenya directly for you upon request via WhatsApp.
 				</p>
-				<button
-					type="button"
-					class="bg-theme-accent hover:bg-theme-accent-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
-					@click="handleRequestSeed(debouncedSearch)"
-				>
-					Request This Book on WhatsApp
-				</button>
+				<div class="flex items-center justify-center gap-3 pt-2">
+					<button
+						type="button"
+						class="bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold uppercase px-4 py-2.5 rounded-xl border border-theme-border cursor-pointer transition-all active:scale-95"
+						@click="clearAllFilters"
+					>
+						Clear Search
+					</button>
+					<button
+						type="button"
+						class="bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
+						@click="handleRequestSeed(debouncedSearch)"
+					>
+						Request This eBook on WhatsApp
+					</button>
+				</div>
 			</div>
 
 			<!-- NUMBERED PAGINATION CONTROLS -->
