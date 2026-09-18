@@ -161,14 +161,14 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <!-- Unified card: The entire card scales and elevates together on hover -->
+  <!-- Unified Card: The whole card elevates & scales as a single solid unit on hover -->
   <div class="relative w-full h-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-xl hover:-translate-y-1.5 hover:scale-[1.01] hover:border-theme-accent/60 transition-all duration-200 flex flex-col justify-between group select-none text-left border border-theme-border">
     <div class="flex flex-col flex-1">
       
-      <!-- Studio Display Stage (Exact bounding dimension preserved: aspect-[1/1.37], mb-3) -->
-      <div class="ebookreads-book-stage relative mb-3 w-full aspect-[1/1.37] rounded-xl flex items-center justify-center p-4 sm:p-5 overflow-hidden">
+      <!-- Studio Display Stage (Exact bounding dimension preserved: aspect-[1/1.37], mb-3; NO overflow: hidden) -->
+      <div class="ebookreads-book-stage relative mb-3 w-full aspect-[1/1.37] rounded-xl flex items-center justify-center p-4 sm:p-5">
         
-        <!-- Multi-Planar 3D Physical Book Assembly (~68% scaled with generous negative space) -->
+        <!-- Multi-Planar 3D Physical Book Assembly (Rotated -24° with 14px thickness) -->
         <NuxtLink
           :to="book.isSeed ? '#' : `/book/${book.slug}`"
           class="ebookreads-3d-book-assembly block cursor-pointer"
@@ -178,16 +178,13 @@ function handleAddToCart(event: Event): void {
           <!-- 1. Directional Ground Cast Shadow -->
           <div class="ebookreads-3d-cast-shadow" aria-hidden="true" />
 
-          <!-- 2. Exposed Back Cover Board Lip -->
+          <!-- 2. Back Cover Board (translateZ(-7px)) -->
           <div class="ebookreads-3d-back-board" aria-hidden="true" />
 
-          <!-- 3. Bottom Page Trim Facet -->
-          <div class="ebookreads-3d-pages-bottom" aria-hidden="true" />
-
-          <!-- 4. Fore-Edge Page Block (Right 3D white paper depth facet) -->
+          <!-- 3. Fore-Edge Page Block (Natural white paper block, rotateY(90deg)) -->
           <div class="ebookreads-3d-pages-side" aria-hidden="true" />
 
-          <!-- 5. Front Cover Board (Jacket artwork, spine apex roll & laminate sheen) -->
+          <!-- 4. Front Cover Board (translateZ(7px) with board bevel & overhang shadow) -->
           <div class="ebookreads-3d-front bg-theme-surface-subtle">
             <!-- Missing Cover Fallback -->
             <div
@@ -214,8 +211,8 @@ function handleAddToCart(event: Event): void {
               :alt="`Cover for ${book.name}`"
               class="w-full h-full object-cover"
               loading="lazy"
-              width="135"
-              height="195"
+              width="128"
+              height="186"
               referrerpolicy="no-referrer"
               @error="handleImageError"
             />
@@ -223,7 +220,7 @@ function handleAddToCart(event: Event): void {
             <!-- Spine Roll & Debossed Joint Hinge Crease -->
             <div class="ebookreads-3d-spine-crease" aria-hidden="true" />
 
-            <!-- Laminate Sheen Reflection & Board Bevel -->
+            <!-- Laminate Sheen Reflection -->
             <div class="ebookreads-3d-sheen" aria-hidden="true" />
           </div>
 
@@ -237,7 +234,7 @@ function handleAddToCart(event: Event): void {
           </span>
         </NuxtLink>
 
-        <!-- Upright Crimson Red Starburst Discount Badge (Anchored to Stage Corner) -->
+        <!-- Upright Crimson Red Starburst Discount Badge (Anchored cleanly to Stage Top-Right) -->
         <div
           v-if="discountPercentage > 0"
           class="absolute top-2.5 right-2.5 z-20 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center pointer-events-none drop-shadow-[0_3px_8px_rgba(229,9,20,0.40)]"
