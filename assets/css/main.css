@@ -145,3 +145,134 @@ textarea:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
   transition: background-color 5000s ease-in-out 0s;
 }
+.ebookreads-book-stage {
+  position: relative;
+  background: radial-gradient(circle at 50% 25%, #FFFFFF 0%, #F4F5F7 100%);
+  border: 1px solid var(--theme-border);
+  box-shadow: inset 0 1px 3px rgba(20, 23, 26, 0.03), inset 0 -1px 2px rgba(20, 23, 26, 0.02);
+  perspective: 900px;
+}
+
+/* 2. Physical 3D Book Shell: Micro-perspective yaw with smooth lift on hover */
+.ebookreads-book-physical {
+  position: relative;
+  border-radius: 2px 5px 5px 2px;
+  transform: rotateY(-3.5deg) rotateX(1.5deg);
+  transform-origin: left center;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), filter 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.group:hover .ebookreads-book-physical {
+  transform: translateY(-5px) rotateY(-1deg) rotateX(0deg);
+}
+
+/* 3. Book Jacket Board: Asymmetric corners and board edge bevel */
+.ebookreads-book-jacket {
+  position: relative;
+  border-radius: 2px 5px 5px 2px;
+  box-shadow: 
+    -1px 0 2px rgba(17, 19, 21, 0.32),
+    1px 1px 3px rgba(17, 19, 21, 0.12);
+}
+
+/* 4. Cylindrical Spine Roll & Debossed Joint Hinge Crease */
+.ebookreads-book-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 22px;
+  pointer-events: none;
+  z-index: 15;
+  background: 
+    /* Cylindrical spine roll highlight on bound apex */
+    linear-gradient(to right, 
+      rgba(17, 19, 21, 0.35) 0%, 
+      rgba(255, 255, 255, 0.40) 6%, 
+      rgba(255, 255, 255, 0.14) 16%, 
+      rgba(17, 19, 21, 0.16) 36%, 
+      transparent 50%
+    ),
+    /* Debossed joint channel groove where the cover board flexes */
+    linear-gradient(to right, 
+      transparent 0px, 
+      transparent 12px, 
+      rgba(17, 19, 21, 0.28) 13px, 
+      rgba(255, 255, 255, 0.42) 14px, 
+      rgba(17, 19, 21, 0.12) 15px, 
+      transparent 18px
+    );
+}
+
+/* 5. Laminate Sheen Reflection & Board Overhang ("Squares") */
+.ebookreads-book-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 16;
+  border-radius: 2px 5px 5px 2px;
+  background: linear-gradient(118deg, 
+    rgba(255, 255, 255, 0.25) 0%, 
+    rgba(255, 255, 255, 0.08) 26%, 
+    transparent 45%, 
+    rgba(17, 19, 21, 0.05) 100%
+  );
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.40),
+    inset -1px 0 1px rgba(17, 19, 21, 0.15),
+    inset 0 -1px 1px rgba(17, 19, 21, 0.20);
+}
+
+/* 6. Crisp White Fore-Edge Page Block Depth */
+.ebookreads-book-pages {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  right: -5px;
+  width: 6px;
+  border-radius: 0 2px 2px 0;
+  background: 
+    repeating-linear-gradient(
+      to bottom,
+      #FFFFFF 0px,
+      #FFFFFF 1.5px,
+      #E5E7EB 2px
+    );
+  box-shadow: 
+    inset 1px 0 2px rgba(17, 19, 21, 0.16),
+    1px 0 2px rgba(17, 19, 21, 0.10);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ebookreads-book-pages::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 2px;
+  right: 0;
+  height: 4px;
+  background: #E8EAED;
+  border-radius: 0 0 2px 1px;
+  box-shadow: inset 0 1px 1px rgba(17, 19, 21, 0.20);
+}
+
+/* 7. Deep Neutral Charcoal Ground Contact Shadow */
+.ebookreads-book-shadow {
+  position: absolute;
+  bottom: -9px;
+  left: 4%;
+  width: 96%;
+  height: 14px;
+  background: radial-gradient(ellipse at center, rgba(17, 19, 21, 0.35) 0%, rgba(17, 19, 21, 0.10) 50%, transparent 75%);
+  filter: blur(4px);
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .ebookreads-book-shadow {
+  transform: translateY(3px) scale(0.96);
+  opacity: 0.70;
+}

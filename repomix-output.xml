@@ -1794,263 +1794,6 @@ export function useToast() {
 }
 </file>
 
-<file path="data/seeds.ts">
-// data/seeds.ts
-// =============================================================================
-// Permanent Seed Collection with Proportional Digital Strikethrough Pricing
-// =============================================================================
-
-import type { Book } from '~/types';
-
-export interface SeedBook extends Book {
-  isSeed: true;
-}
-
-export const MONTHLY_TOP_SEEDS: SeedBook[] = [
-  {
-    id: 'seed-atomic-habits',
-    org_id: 'seed-flemela',
-    category_id: 'cat-self-help',
-    category_name: 'Psychology & Self-Help',
-    name: 'Atomic Habits',
-    slug: 'atomic-habits',
-    author: 'James Clear',
-    description: 'An Easy & Proven Way to Build Good Habits & Break Bad Ones.',
-    price: 1250,
-    compare_at_price: 1800,
-    status: 'published',
-    badge: 'NO1_PICK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg', 
-      image_public_id: 'seed_atomic_habits', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-1', product_id: 'seed-atomic-habits', format: 'hardcopy', price: 1250, compare_at_price: 1800, file_url: null, file_public_id: null, file_size_bytes: null, stock: 25, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-2', product_id: 'seed-atomic-habits', format: 'pdf', price: 199, compare_at_price: 290, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-2b', product_id: 'seed-atomic-habits', format: 'epub', price: 199, compare_at_price: 290, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-  {
-    id: 'seed-dont-make-me-think',
-    org_id: 'seed-flemela',
-    category_id: 'cat-business',
-    category_name: 'Business & Finance',
-    name: "Don't Make Me Think",
-    slug: 'dont-make-me-think',
-    author: 'Steve Krug',
-    description: 'A Common Sense Approach to Web Usability.',
-    price: 1100,
-    compare_at_price: 1550,
-    status: 'published',
-    badge: 'NO1_PICK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9780321965516-L.jpg', 
-      image_public_id: 'seed_dont_make_me_think', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-3', product_id: 'seed-dont-make-me-think', format: 'hardcopy', price: 1100, compare_at_price: 1550, file_url: null, file_public_id: null, file_size_bytes: null, stock: 18, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-4', product_id: 'seed-dont-make-me-think', format: 'pdf', price: 149, compare_at_price: 210, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-4b', product_id: 'seed-dont-make-me-think', format: 'epub', price: 149, compare_at_price: 210, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-  {
-    id: 'seed-psychology-of-money',
-    org_id: 'seed-flemela',
-    category_id: 'cat-finance',
-    category_name: 'Business & Finance',
-    name: 'The Psychology of Money',
-    slug: 'psychology-of-money',
-    author: 'Morgan Housel',
-    description: 'Timeless lessons on wealth, greed, and happiness.',
-    price: 1150,
-    compare_at_price: 1650,
-    status: 'published',
-    badge: 'NO1_PICK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9780857197689-L.jpg', 
-      image_public_id: 'seed_psych_money', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-5', product_id: 'seed-psychology-of-money', format: 'hardcopy', price: 1150, compare_at_price: 1650, file_url: null, file_public_id: null, file_size_bytes: null, stock: 20, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-6', product_id: 'seed-psychology-of-money', format: 'pdf', price: 149, compare_at_price: 215, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-6b', product_id: 'seed-psychology-of-money', format: 'epub', price: 149, compare_at_price: 215, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-  {
-    id: 'seed-deep-work',
-    org_id: 'seed-flemela',
-    category_id: 'cat-self-help',
-    category_name: 'Psychology & Self-Help',
-    name: 'Deep Work',
-    slug: 'deep-work',
-    author: 'Cal Newport',
-    description: 'Rules for Focused Success in a Distracted World.',
-    price: 1100,
-    compare_at_price: 1500,
-    status: 'published',
-    badge: 'NO1_PICK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9781455586691-L.jpg', 
-      image_public_id: 'seed_deep_work', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-7', product_id: 'seed-deep-work', format: 'hardcopy', price: 1100, compare_at_price: 1500, file_url: null, file_public_id: null, file_size_bytes: null, stock: 14, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-7b', product_id: 'seed-deep-work', format: 'pdf', price: 149, compare_at_price: 205, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-7c', product_id: 'seed-deep-work', format: 'epub', price: 149, compare_at_price: 205, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-];
-
-export const DEALS_SEEDS: SeedBook[] = [
-  {
-    id: 'seed-48-laws-of-power',
-    org_id: 'seed-flemela',
-    category_id: 'cat-self-help',
-    category_name: 'Psychology & Self-Help',
-    name: 'The 48 Laws of Power',
-    slug: '48-laws-of-power',
-    author: 'Robert Greene',
-    description: 'Amoral, cunning, and instructive wisdom on mastery.',
-    price: 1200,
-    compare_at_price: 1800,
-    status: 'published',
-    badge: 'DEAL_OF_WEEK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9780140280197-L.jpg', 
-      image_public_id: 'seed_48_laws', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-8', product_id: 'seed-48-laws-of-power', format: 'hardcopy', price: 1200, compare_at_price: 1800, file_url: null, file_public_id: null, file_size_bytes: null, stock: 30, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-8b', product_id: 'seed-48-laws-of-power', format: 'pdf', price: 199, compare_at_price: 300, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-8c', product_id: 'seed-48-laws-of-power', format: 'epub', price: 199, compare_at_price: 300, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-  {
-    id: 'seed-rich-dad-poor-dad',
-    org_id: 'seed-flemela',
-    category_id: 'cat-finance',
-    category_name: 'Business & Finance',
-    name: 'Rich Dad Poor Dad',
-    slug: 'rich-dad-poor-dad',
-    author: 'Robert T. Kiyosaki',
-    description: 'What the rich teach their kids about money.',
-    price: 850,
-    compare_at_price: 1300,
-    status: 'published',
-    badge: 'DEAL_OF_WEEK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9781612680194-L.jpg', 
-      image_public_id: 'seed_rich_dad', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-9', product_id: 'seed-rich-dad-poor-dad', format: 'hardcopy', price: 850, compare_at_price: 1300, file_url: null, file_public_id: null, file_size_bytes: null, stock: 25, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-9b', product_id: 'seed-rich-dad-poor-dad', format: 'pdf', price: 149, compare_at_price: 230, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-9c', product_id: 'seed-rich-dad-poor-dad', format: 'epub', price: 149, compare_at_price: 230, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-  {
-    id: 'seed-the-alchemist',
-    org_id: 'seed-flemela',
-    category_id: 'cat-fiction',
-    category_name: 'Fiction & Literature',
-    name: 'The Alchemist',
-    slug: 'the-alchemist',
-    author: 'Paulo Coelho',
-    description: 'A magical fable about following your dream.',
-    price: 750,
-    compare_at_price: 1100,
-    status: 'published',
-    badge: 'DEAL_OF_WEEK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg', 
-      image_public_id: 'seed_the_alchemist', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-10', product_id: 'seed-the-alchemist', format: 'hardcopy', price: 750, compare_at_price: 1100, file_url: null, file_public_id: null, file_size_bytes: null, stock: 20, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-10b', product_id: 'seed-the-alchemist', format: 'pdf', price: 149, compare_at_price: 220, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-10c', product_id: 'seed-the-alchemist', format: 'epub', price: 149, compare_at_price: 220, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-  {
-    id: 'seed-1984',
-    org_id: 'seed-flemela',
-    category_id: 'cat-fiction',
-    category_name: 'Fiction & Literature',
-    name: '1984',
-    slug: '1984-george-orwell',
-    author: 'George Orwell',
-    description: 'The dystopian masterpiece of surveillance and truth.',
-    price: 799,
-    compare_at_price: 1200,
-    status: 'published',
-    badge: 'DEAL_OF_WEEK',
-    images: [{ 
-      image_url: 'https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg', 
-      image_public_id: 'seed_1984', 
-      sort_order: 0 
-    }],
-    formats: [
-      { id: 'seed-fmt-11', product_id: 'seed-1984', format: 'hardcopy', price: 799, compare_at_price: 1200, file_url: null, file_public_id: null, file_size_bytes: null, stock: 22, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-11b', product_id: 'seed-1984', format: 'pdf', price: 149, compare_at_price: 225, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' },
-      { id: 'seed-fmt-11c', product_id: 'seed-1984', format: 'epub', price: 149, compare_at_price: 225, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
-    ],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    isSeed: true,
-  },
-];
-
-export function mergeWithSeeds(
-  realBooks: Book[] | null | undefined,
-  seedCollection: SeedBook[],
-  targetCount = 4
-): Book[] {
-  const real = realBooks || [];
-
-  if (real.length >= targetCount) {
-    return real;
-  }
-
-  const realSlugs = new Set(real.map((b) => b.slug.toLowerCase()));
-  const realNames = new Set(real.map((b) => b.name.toLowerCase()));
-
-  const eligibleSeeds = seedCollection.filter(
-    (s) => !realSlugs.has(s.slug.toLowerCase()) && !realNames.has(s.name.toLowerCase())
-  );
-
-  const needed = targetCount - real.length;
-  return [...real, ...eligibleSeeds.slice(0, needed)];
-}
-</file>
-
 <file path="middleware/admin-auth.ts">
 // =============================================================================
 // middleware/admin-auth.ts
@@ -4923,41 +4666,6 @@ export default defineEventHandler(async (event) => {
 });
 </file>
 
-<file path="server/api/products/search.get.ts">
-// =============================================================================
-// server/api/products/search.get.ts
-// Full-Catalog Typo-Tolerant Search Proxy (Direct Database-Backed Relevance)
-// =============================================================================
-
-import { sokoClient } from '../../utils/sokoClient';
-import type { Book } from '~/types';
-
-export default defineEventHandler(async (event): Promise<Book[]> => {
-  const config = useRuntimeConfig();
-  const storeSlug = config.public.storeSlug;
-  const query = getQuery(event);
-  const q = typeof query.q === 'string' ? query.q.trim() : '';
-
-  if (!q) {
-    return [];
-  }
-
-  try {
-    const res = await sokoClient<any>(`/public/stores/${storeSlug}/products`, {
-      query: {
-        q,
-        limit: 8,
-      },
-    });
-
-    const books: Book[] = Array.isArray(res) ? res : res?.products || [];
-    return books;
-  } catch {
-    return [];
-  }
-});
-</file>
-
 <file path="server/api/stores/current.get.ts">
 // =============================================================================
 // server/api/stores/current.get.ts
@@ -7100,6 +6808,298 @@ export function useCart() {
 }
 </file>
 
+<file path="data/seeds.ts">
+// data/seeds.ts
+// =============================================================================
+// Permanent Seed Collection with Real Catalog Prioritization & Fuzzy Suppression
+// =============================================================================
+
+import type { Book } from '~/types';
+
+export interface SeedBook extends Book {
+  isSeed: true;
+}
+
+export const MONTHLY_TOP_SEEDS: SeedBook[] = [
+  {
+    id: 'seed-atomic-habits',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-self-help',
+    category_name: 'Psychology & Self-Help',
+    name: 'Atomic Habits',
+    slug: 'atomic-habits',
+    author: 'James Clear',
+    description: 'An Easy & Proven Way to Build Good Habits & Break Bad Ones.',
+    price: 149,
+    compare_at_price: 290,
+    status: 'published',
+    badge: 'NO1_PICK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg', 
+      image_public_id: 'seed_atomic_habits', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-2', product_id: 'seed-atomic-habits', format: 'pdf', price: 149, compare_at_price: 290, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+  {
+    id: 'seed-dont-make-me-think',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-business',
+    category_name: 'Business & Finance',
+    name: "Don't Make Me Think",
+    slug: 'dont-make-me-think',
+    author: 'Steve Krug',
+    description: 'A Common Sense Approach to Web Usability.',
+    price: 149,
+    compare_at_price: 210,
+    status: 'published',
+    badge: 'NO1_PICK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9780321965516-L.jpg', 
+      image_public_id: 'seed_dont_make_me_think', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-4', product_id: 'seed-dont-make-me-think', format: 'pdf', price: 149, compare_at_price: 210, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+  {
+    id: 'seed-psychology-of-money',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-finance',
+    category_name: 'Business & Finance',
+    name: 'The Psychology of Money',
+    slug: 'psychology-of-money',
+    author: 'Morgan Housel',
+    description: 'Timeless lessons on wealth, greed, and happiness.',
+    price: 149,
+    compare_at_price: 215,
+    status: 'published',
+    badge: 'NO1_PICK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9780857197689-L.jpg', 
+      image_public_id: 'seed_psych_money', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-6', product_id: 'seed-psychology-of-money', format: 'pdf', price: 149, compare_at_price: 215, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+  {
+    id: 'seed-deep-work',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-self-help',
+    category_name: 'Psychology & Self-Help',
+    name: 'Deep Work',
+    slug: 'deep-work',
+    author: 'Cal Newport',
+    description: 'Rules for Focused Success in a Distracted World.',
+    price: 149,
+    compare_at_price: 205,
+    status: 'published',
+    badge: 'NO1_PICK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9781455586691-L.jpg', 
+      image_public_id: 'seed_deep_work', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-7', product_id: 'seed-deep-work', format: 'pdf', price: 149, compare_at_price: 205, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+];
+
+export const DEALS_SEEDS: SeedBook[] = [
+  {
+    id: 'seed-48-laws-of-power',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-self-help',
+    category_name: 'Psychology & Self-Help',
+    name: 'The 48 Laws of Power',
+    slug: '48-laws-of-power',
+    author: 'Robert Greene',
+    description: 'Amoral, cunning, and instructive wisdom on mastery.',
+    price: 199,
+    compare_at_price: 300,
+    status: 'published',
+    badge: 'DEAL_OF_WEEK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9780140280197-L.jpg', 
+      image_public_id: 'seed_48_laws', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-8', product_id: 'seed-48-laws-of-power', format: 'pdf', price: 199, compare_at_price: 300, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+  {
+    id: 'seed-rich-dad-poor-dad',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-finance',
+    category_name: 'Business & Finance',
+    name: 'Rich Dad Poor Dad',
+    slug: 'rich-dad-poor-dad',
+    author: 'Robert T. Kiyosaki',
+    description: 'What the rich teach their kids about money.',
+    price: 149,
+    compare_at_price: 230,
+    status: 'published',
+    badge: 'DEAL_OF_WEEK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9781612680194-L.jpg', 
+      image_public_id: 'seed_rich_dad', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-9', product_id: 'seed-rich-dad-poor-dad', format: 'pdf', price: 149, compare_at_price: 230, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+  {
+    id: 'seed-the-alchemist',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-fiction',
+    category_name: 'Fiction & Literature',
+    name: 'The Alchemist',
+    slug: 'the-alchemist',
+    author: 'Paulo Coelho',
+    description: 'A magical fable about following your dream.',
+    price: 149,
+    compare_at_price: 220,
+    status: 'published',
+    badge: 'DEAL_OF_WEEK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg', 
+      image_public_id: 'seed_the_alchemist', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-10', product_id: 'seed-the-alchemist', format: 'pdf', price: 149, compare_at_price: 220, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+  {
+    id: 'seed-1984',
+    org_id: 'seed-ebookreads',
+    category_id: 'cat-fiction',
+    category_name: 'Fiction & Literature',
+    name: '1984',
+    slug: '1984-george-orwell',
+    author: 'George Orwell',
+    description: 'The dystopian masterpiece of surveillance and truth.',
+    price: 149,
+    compare_at_price: 225,
+    status: 'published',
+    badge: 'DEAL_OF_WEEK',
+    images: [{ 
+      image_url: 'https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg', 
+      image_public_id: 'seed_1984', 
+      sort_order: 0 
+    }],
+    formats: [
+      { id: 'seed-fmt-11', product_id: 'seed-1984', format: 'pdf', price: 149, compare_at_price: 225, file_url: null, file_public_id: null, file_size_bytes: null, stock: null, created_at: '', updated_at: '' }
+    ],
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    isSeed: true,
+  },
+];
+
+function normalizeTitleForComparison(title?: string | null): string {
+  if (!title) return '';
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function titlesMatch(a: string, b: string): boolean {
+  const normA = normalizeTitleForComparison(a);
+  const normB = normalizeTitleForComparison(b);
+  if (!normA || !normB) return false;
+  if (normA === normB) return true;
+  // Substring containment for subtitles (e.g. "Atomic Habits: Proven Way...")
+  if (normA.length >= 4 && normB.length >= 4) {
+    if (normA.includes(normB) || normB.includes(normA)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Merges real store books with fallback seeds:
+ * 1. Takes prioritized real books (e.g. tagged with BESTSELLER).
+ * 2. Backfills shelf from other published books in store catalog before reaching for seeds.
+ * 3. Suppresses any seed whose title or slug matches ANY book in the merchant's store.
+ */
+export function mergeWithSeeds(
+  realBooks: Book[] | null | undefined,
+  seedCollection: SeedBook[],
+  targetCount = 4,
+  fullStoreCatalog: Book[] = []
+): Book[] {
+  const real = Array.isArray(realBooks) ? [...realBooks] : [];
+
+  if (real.length >= targetCount) {
+    return real;
+  }
+
+  // Combine display books and entire store catalog to build suppression set
+  const allKnownRealBooks = [...real, ...fullStoreCatalog];
+  const knownSlugs = new Set(allKnownRealBooks.map((b) => (b?.slug || '').toLowerCase().trim()));
+  const knownNames = allKnownRealBooks.map((b) => b?.name || '');
+
+  // Backfill with real published catalog books first
+  if (fullStoreCatalog.length > 0) {
+    const existingIds = new Set(real.map((b) => b.id));
+    for (const storeBook of fullStoreCatalog) {
+      if (real.length >= targetCount) break;
+      if (!existingIds.has(storeBook.id) && storeBook.status !== 'archived') {
+        real.push(storeBook);
+        existingIds.add(storeBook.id);
+      }
+    }
+  }
+
+  if (real.length >= targetCount) {
+    return real;
+  }
+
+  // Suppress any seed matching any real book in store
+  const eligibleSeeds = seedCollection.filter((seed) => {
+    const seedSlug = (seed.slug || '').toLowerCase().trim();
+    if (knownSlugs.has(seedSlug)) return false;
+
+    return !knownNames.some((realName) => titlesMatch(realName, seed.name));
+  });
+
+  const needed = targetCount - real.length;
+  return [...real, ...eligibleSeeds.slice(0, needed)];
+}
+</file>
+
 <file path="pages/admin/banners.vue">
 <!-- pages/admin/banners.vue -->
 <script setup lang="ts">
@@ -8959,79 +8959,6 @@ export default defineEventHandler(async (event) => {
 });
 </file>
 
-<file path="server/api/admin/products/[productId]/formats/[formatId].patch.ts">
-// =============================================================================
-// flemela/server/api/admin/products/[productId]/formats/[formatId].patch.ts
-// =============================================================================
-
-import { defineEventHandler, readBody, getCookie, getHeader, createError } from 'h3';
-import { ofetch } from 'ofetch';
-
-function resolveApiBaseUrl(raw?: string): string {
-  const base = (raw || process.env.SOKO_API_BASE_URL || 'http://localhost:3000/api/v1')
-    .trim()
-    .replace(/\/+$/, '');
-  return base.endsWith('/api/v1') ? base : `${base}/api/v1`;
-}
-
-export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  const { productId, formatId } = event.context.params || {};
-
-  if (!productId || !formatId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      data: { message: 'Missing productId or formatId parameter' },
-    });
-  }
-
-  let token = getCookie(event, 'flemela_admin_session');
-  if (!token) {
-    const authHeader = getHeader(event, 'authorization');
-    if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
-      token = authHeader.slice(7).trim();
-    }
-  }
-
-  if (!token) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-      data: { message: 'Admin session expired. Please log in again.' },
-    });
-  }
-
-  const body = await readBody(event);
-  const baseApiUrl = resolveApiBaseUrl(config.sokoApiBaseUrl);
-  const targetUrl = `${baseApiUrl}/products/${productId}/formats/${formatId}`;
-
-  try {
-    return await ofetch(targetUrl, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
-  } catch (err: any) {
-    const errorMsg =
-      err.data?.error?.message ||
-      err.data?.message ||
-      err.response?._data?.error?.message ||
-      err.message ||
-      'Failed to update format';
-
-    throw createError({
-      statusCode: err.statusCode || err.response?.status || 500,
-      statusMessage: errorMsg,
-      data: { message: errorMsg },
-    });
-  }
-});
-</file>
-
 <file path="server/api/admin/products/[productId]/formats/index.post.ts">
 // =============================================================================
 // flemela/server/api/admin/products/[productId]/formats/index.post.ts
@@ -9156,6 +9083,41 @@ export default defineEventHandler(async (event) => {
       limit: 50,
       totalPages: 1,
     };
+  }
+});
+</file>
+
+<file path="server/api/products/search.get.ts">
+// =============================================================================
+// server/api/products/search.get.ts
+// Full-Catalog Typo-Tolerant Search Proxy (Direct Database-Backed Relevance)
+// =============================================================================
+
+import { sokoClient } from '../../utils/sokoClient';
+import type { Book } from '~/types';
+
+export default defineEventHandler(async (event): Promise<Book[]> => {
+  const config = useRuntimeConfig();
+  const storeSlug = config.public.storeSlug;
+  const query = getQuery(event);
+  const q = typeof query.q === 'string' ? query.q.trim() : '';
+
+  if (!q) {
+    return [];
+  }
+
+  try {
+    const res = await sokoClient<any>(`/public/stores/${storeSlug}/products`, {
+      query: {
+        q,
+        limit: 8,
+      },
+    });
+
+    const books: Book[] = Array.isArray(res) ? res : res?.products || [];
+    return books;
+  } catch {
+    return [];
   }
 });
 </file>
@@ -13303,6 +13265,79 @@ export default defineEventHandler(async (event) => {
 });
 </file>
 
+<file path="server/api/admin/products/[productId]/formats/[formatId].patch.ts">
+// =============================================================================
+// flemela/server/api/admin/products/[productId]/formats/[formatId].patch.ts
+// =============================================================================
+
+import { defineEventHandler, readBody, getCookie, getHeader, createError } from 'h3';
+import { ofetch } from 'ofetch';
+
+function resolveApiBaseUrl(raw?: string): string {
+  const base = (raw || process.env.SOKO_API_BASE_URL || 'http://localhost:3000/api/v1')
+    .trim()
+    .replace(/\/+$/, '');
+  return base.endsWith('/api/v1') ? base : `${base}/api/v1`;
+}
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+  const { productId, formatId } = event.context.params || {};
+
+  if (!productId || !formatId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Bad Request',
+      data: { message: 'Missing productId or formatId parameter' },
+    });
+  }
+
+  let token = getCookie(event, 'flemela_admin_session');
+  if (!token) {
+    const authHeader = getHeader(event, 'authorization');
+    if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+      token = authHeader.slice(7).trim();
+    }
+  }
+
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+      data: { message: 'Admin session expired. Please log in again.' },
+    });
+  }
+
+  const body = await readBody(event);
+  const baseApiUrl = resolveApiBaseUrl(config.sokoApiBaseUrl);
+  const targetUrl = `${baseApiUrl}/products/${productId}/formats/${formatId}`;
+
+  try {
+    return await ofetch(targetUrl, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body,
+    });
+  } catch (err: any) {
+    const errorMsg =
+      err.data?.error?.message ||
+      err.data?.message ||
+      err.response?._data?.error?.message ||
+      err.message ||
+      'Failed to update format';
+
+    throw createError({
+      statusCode: err.statusCode || err.response?.status || 500,
+      statusMessage: errorMsg,
+      data: { message: errorMsg },
+    });
+  }
+});
+</file>
+
 <file path="nuxt.config.ts">
 // nuxt.config.ts
 export default defineNuxtConfig({
@@ -13842,591 +13877,6 @@ const navSections: NavSection[] = [
     <ToastContainer />
   </div>
 </template>
-</file>
-
-<file path="pages/admin/books/[id]/edit.vue">
-<!-- pages/admin/books/[id]/edit.vue -->
-<template>
-  <div class="min-h-screen bg-theme-canvas py-8 px-4 sm:px-6 lg:px-8 font-sans text-theme-ink">
-    <div class="max-w-4xl mx-auto">
-
-      <!-- Loading Skeleton -->
-      <div v-if="isLoadingInitial" class="space-y-6">
-        <div class="h-10 bg-theme-surface-muted rounded-lg w-1/3 animate-pulse"></div>
-        <div class="h-64 bg-theme-surface rounded-2xl border border-theme-border p-6 animate-pulse"></div>
-      </div>
-
-      <div v-else>
-        <!-- Top Action Bar -->
-        <div class="flex items-center justify-between mb-8">
-          <div class="flex items-center space-x-3">
-            <NuxtLink
-              to="/admin/books"
-              class="w-9 h-9 rounded-lg bg-theme-surface border border-theme-border flex items-center justify-center text-theme-muted hover:text-theme-ink transition-colors shadow-sm"
-            >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </NuxtLink>
-            <div>
-              <h1 class="text-2xl font-bold text-theme-ink tracking-tight">Edit PDF eBook</h1>
-              <p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, badges, and Cloudflare R2 file</p>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-3">
-            <NuxtLink
-              to="/admin/books"
-              class="px-4 py-2 text-xs font-semibold text-theme-muted bg-theme-surface border border-theme-border rounded-lg hover:bg-theme-surface-subtle shadow-sm"
-            >
-              Cancel
-            </NuxtLink>
-            <button
-              type="button"
-              :disabled="isSubmitting"
-              @click="handleUpdate"
-              class="inline-flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active disabled:opacity-50 rounded-lg shadow-sm transition-all"
-            >
-              <svg v-if="isSubmitting" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-              </svg>
-              <span>{{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}</span>
-            </button>
-          </div>
-        </div>
-
-        <form @submit.prevent="handleUpdate" class="space-y-6">
-
-          <!-- Success Alert -->
-          <div v-if="successToast" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <svg class="w-5 h-5 text-theme-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <p class="text-xs font-bold text-theme-accent-hover">{{ successToast }}</p>
-            </div>
-            <button type="button" @click="successToast = ''" class="text-xs text-theme-accent font-bold">Dismiss</button>
-          </div>
-
-          <!-- Error Alert -->
-          <div v-if="formError" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-start space-x-3">
-            <svg class="w-5 h-5 text-theme-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h4 class="text-xs font-bold text-theme-accent-hover">Update Blocked</h4>
-              <p class="text-xs text-theme-accent mt-0.5">{{ formError }}</p>
-            </div>
-          </div>
-
-          <!-- Section 1: Book Essentials -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
-            <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider border-b border-theme-border pb-3">
-              Book Details
-            </h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Book Title *</label>
-                <input
-                  v-model="form.name"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                  required
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Author</label>
-                <input
-                  v-model="form.author"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                />
-              </div>
-
-              <!-- Category -->
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Category *</label>
-                <select
-                  v-model="form.category_id"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                  required
-                >
-                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                    {{ cat.name }}
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">SKU / ISBN</label>
-                <input
-                  v-model="form.sku"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                />
-              </div>
-
-              <!-- Promotional Badge -->
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Promotional Badge</label>
-                <select
-                  v-model="form.badge"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                >
-                  <option :value="null">None (Standard)</option>
-                  <option value="BESTSELLER">Bestseller</option>
-                  <option value="FLASH_SALE">Flash Sale</option>
-                  <option value="NO1_PICK">#1 Staff Pick</option>
-                  <option value="DEAL_OF_WEEK">Deal of the Week</option>
-                  <option value="LIMITED_TIME">Limited Time</option>
-                </select>
-              </div>
-
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Synopsis / Description</label>
-                <textarea
-                  v-model="form.description"
-                  rows="3"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 2: Book Cover Art -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
-            <div class="flex items-center justify-between border-b border-theme-border pb-3">
-              <div>
-                <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Book Cover Art</h2>
-                <p class="text-xs text-theme-muted mt-0.5">High-definition publisher jacket</p>
-              </div>
-              <button
-                type="button"
-                :disabled="isFindingCover || !form.name.trim()"
-                @click="handleAutoFindCover"
-                class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink border border-theme-border rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
-              >
-                <svg v-if="isFindingCover" class="animate-spin w-3.5 h-3.5 text-theme-ink" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span v-else>🔍</span>
-                <span>{{ isFindingCover ? 'Searching Studio Art...' : 'Auto-Find Cover' }}</span>
-              </button>
-            </div>
-
-            <div class="flex flex-col sm:flex-row items-start gap-6">
-              <div class="w-32 h-44 bg-theme-surface-subtle rounded-xl border border-theme-border overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
-                <img
-                  v-if="form.cover_image_url"
-                  :src="form.cover_image_url"
-                  alt="Book cover preview"
-                  class="w-full h-full object-cover"
-                  @error="form.cover_image_url = ''"
-                />
-                <div v-else class="text-center p-3 text-theme-subtle">
-                  <svg class="w-8 h-8 mx-auto mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  <span class="text-[10px] block">No Cover</span>
-                </div>
-              </div>
-
-              <div class="flex-1 space-y-3 w-full">
-                <div class="flex items-center gap-2">
-                  <input
-                    ref="coverFileInputRef"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="handleCoverFileSelected"
-                  />
-                  <button
-                    type="button"
-                    :disabled="isUploadingCover"
-                    @click="coverFileInputRef?.click()"
-                    class="px-4 py-2 bg-theme-dark hover:bg-theme-dark-surface text-white rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
-                  >
-                    <svg v-if="isUploadingCover" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                    <span>{{ isUploadingCover ? 'Uploading...' : 'Upload Cover Image' }}</span>
-                  </button>
-
-                  <button
-                    v-if="form.cover_image_url"
-                    type="button"
-                    @click="form.cover_image_url = ''"
-                    class="px-3 py-2 text-xs font-semibold text-theme-accent hover:bg-theme-accent-soft rounded-lg transition-colors cursor-pointer"
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div class="space-y-1">
-                  <label class="block text-[11px] font-semibold text-theme-muted">Or paste image URL directly:</label>
-                  <input
-                    v-model="form.cover_image_url"
-                    type="url"
-                    placeholder="https://..."
-                    class="w-full px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-lg text-xs text-theme-ink focus:bg-white focus:outline-none focus:border-theme-accent font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 3: Pure Digital Edition Management -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
-            <div class="flex items-center justify-between border-b border-theme-border pb-3">
-              <div class="flex items-center space-x-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-theme-accent"></span>
-                <h3 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Digital PDF Edition</h3>
-              </div>
-              <span v-if="pdfFormatId" class="text-xs text-theme-accent font-bold bg-theme-accent-soft px-2 py-0.5 rounded">
-                Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
-              </span>
-            </div>
-
-            <div class="p-5 rounded-xl border border-theme-border bg-theme-surface-subtle space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-theme-ink mb-1">eBook Price (KSh) *</label>
-                  <input
-                    v-model.number="form.pdfPrice"
-                    type="number"
-                    min="0"
-                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono font-bold"
-                    required
-                  />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-theme-ink mb-1">Original Strikethrough Price (KSh)</label>
-                  <input
-                    v-model.number="form.compareAtPrice"
-                    type="number"
-                    min="0"
-                    placeholder="Leave empty if no sale"
-                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono"
-                  />
-                </div>
-              </div>
-
-              <!-- SINGLE PDF UPLOADER -->
-              <div>
-                <label class="block text-xs font-semibold text-theme-ink mb-1.5">
-                  eBook PDF Document
-                </label>
-                <SinglePdfUploader
-                  v-model="form.pdfKey"
-                  :initial-file-name="form.pdfFileName"
-                  :initial-file-size="form.pdfFileSize"
-                  :max-file-size-mb="50"
-                  @success="handlePdfReplaced"
-                  @remove="handlePdfRemoved"
-                />
-              </div>
-
-              <div v-if="isPdfDirty" class="p-3 bg-theme-surface-muted border border-theme-border rounded-lg flex items-center space-x-2">
-                <svg class="w-4 h-4 text-theme-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p class="text-[11px] text-theme-ink font-medium">
-                  New PDF staged in R2. Click <strong>Save Changes</strong> to update customer download streams.
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </form>
-      </div>
-
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { ofetch } from 'ofetch';
-import SinglePdfUploader from '~/components/admin/SinglePdfUploader.vue';
-import { useToast } from '~/composables/useToast';
-
-definePageMeta({
-  middleware: 'admin-auth',
-});
-
-const route = useRoute();
-const productId = route.params.id as string;
-const { push: pushToast } = useToast();
-
-const isLoadingInitial = ref(true);
-const isSubmitting = ref(false);
-const isFindingCover = ref(false);
-const isUploadingCover = ref(false);
-const isPdfDirty = ref(false);
-const formError = ref('');
-const successToast = ref('');
-const coverFileInputRef = ref<HTMLInputElement | null>(null);
-
-const categories = ref<Array<{ id: string; name: string; slug?: string }>>([]);
-const pdfFormatId = ref<string | null>(null);
-
-const form = reactive({
-  name: '',
-  author: '',
-  category_id: '',
-  sku: '',
-  badge: null as string | null,
-  description: '',
-  cover_image_url: '',
-  pdfPrice: 149,
-  compareAtPrice: null as number | null,
-  pdfKey: null as string | null,
-  pdfFileUrl: null as string | null,
-  pdfFileSize: 0,
-  pdfFileName: '',
-});
-
-onMounted(async () => {
-  try {
-    const catRaw = await ofetch<any>('/api/admin/categories');
-    const catList = catRaw?.data || catRaw;
-    if (Array.isArray(catList)) categories.value = catList;
-
-    const bookRaw = await ofetch<any>(`/api/admin/books/${productId}`);
-    const book = bookRaw?.data || bookRaw;
-
-    if (!book || !book.id) {
-      throw new Error('Book record could not be loaded.');
-    }
-
-    form.name = book.name || '';
-    form.category_id = book.category_id || '';
-    form.sku = book.sku || '';
-    form.badge = book.badge || null;
-    form.description = book.description || '';
-    form.pdfPrice = Number(book.price) || 149;
-    form.compareAtPrice = book.compare_at_price ? Number(book.compare_at_price) : null;
-
-    if (book.description && book.description.startsWith('By ')) {
-      const match = book.description.match(/^By\s+([^.]+)\.\s*(.*)$/);
-      if (match) {
-        form.author = match[1].trim();
-        form.description = match[2].trim();
-      }
-    } else if (book.author) {
-      form.author = book.author;
-    }
-
-    const firstImg = book.images?.[0];
-    if (typeof firstImg === 'string') {
-      form.cover_image_url = firstImg;
-    } else if (firstImg?.image_url) {
-      form.cover_image_url = firstImg.image_url;
-    } else if (book.cover_image_url) {
-      form.cover_image_url = book.cover_image_url;
-    }
-
-    const formats: any[] = book.formats || [];
-    const pdf = formats.find((f) => f.format === 'pdf') || formats.find((f) => f.format === 'epub');
-    if (pdf) {
-      pdfFormatId.value = pdf.id;
-      form.pdfPrice = Number(pdf.price) || form.pdfPrice;
-      form.compareAtPrice = pdf.compare_at_price ? Number(pdf.compare_at_price) : form.compareAtPrice;
-      form.pdfKey = pdf.file_public_id || pdf.file_url || null;
-      form.pdfFileUrl = pdf.file_url || null;
-      form.pdfFileSize = pdf.file_size_bytes ? Number(pdf.file_size_bytes) : 0;
-      form.pdfFileName = pdf.file_public_id
-        ? pdf.file_public_id.split('/').pop()?.replace(/^\d+-/, '') || 'eBook-edition.pdf'
-        : `${book.name}.pdf`;
-    }
-  } catch (err: any) {
-    formError.value =
-      err.data?.data?.message || err.data?.message || err.message || 'Failed to load book data.';
-  } finally {
-    isLoadingInitial.value = false;
-  }
-});
-
-async function handleAutoFindCover() {
-  if (!form.name.trim()) {
-    pushToast({ message: 'Enter a book title first to search for cover art', variant: 'info' });
-    return;
-  }
-
-  isFindingCover.value = true;
-  try {
-    const res = await ofetch<{ coverUrl: string | null; title: string; source: string | null }>(
-      `/api/admin/books/find-cover`,
-      {
-        query: {
-          title: form.name.trim(),
-          author: form.author ? form.author.trim() : undefined,
-        },
-      }
-    );
-
-    if (res?.coverUrl) {
-      form.cover_image_url = res.coverUrl;
-      pushToast({
-        message: `High-res cover located (${(res.source || 'Studio').toUpperCase()})!`,
-        variant: 'success',
-      });
-    } else {
-      pushToast({ message: 'No online cover found. You can upload an image file.', variant: 'info' });
-    }
-  } catch {
-    pushToast({ message: 'Auto-find cover search timed out. You can upload manually.', variant: 'error' });
-  } finally {
-    isFindingCover.value = false;
-  }
-}
-
-async function handleCoverFileSelected(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  isUploadingCover.value = true;
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const res = await ofetch<{ url: string }>('/api/admin/banners/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (res?.url) {
-      form.cover_image_url = res.url;
-      pushToast({ message: 'Cover image uploaded successfully!', variant: 'success' });
-    }
-  } catch (err: any) {
-    pushToast({ message: err.data?.message || 'Failed to upload cover image.', variant: 'error' });
-  } finally {
-    isUploadingCover.value = false;
-    target.value = '';
-  }
-}
-
-function handlePdfReplaced(payload: { key: string; fileUrl: string; sizeBytes: number; fileName: string }) {
-  form.pdfKey = payload.key;
-  form.pdfFileUrl = payload.fileUrl;
-  form.pdfFileSize = payload.sizeBytes;
-  form.pdfFileName = payload.fileName;
-  isPdfDirty.value = true;
-}
-
-function handlePdfRemoved() {
-  form.pdfKey = null;
-  form.pdfFileUrl = null;
-  form.pdfFileSize = 0;
-  form.pdfFileName = '';
-  isPdfDirty.value = true;
-}
-
-// Replace lines 490 to 560 inside pages/admin/books/[id]/edit.vue with:
-
-async function handleUpdate() {
-  formError.value = '';
-  successToast.value = '';
-
-  if (!form.name.trim()) {
-    formError.value = 'Book title is required.';
-    return;
-  }
-
-  if (!form.category_id) {
-    formError.value = 'Please select a category.';
-    return;
-  }
-
-  isSubmitting.value = true;
-
-  try {
-    // 1. Update Base Product, Badge & Cover Image
-    await ofetch(`/api/admin/books/${productId}`, {
-      method: 'PATCH',
-      body: {
-        name: form.name.trim(),
-        category_id: form.category_id,
-        sku: form.sku.trim() || null,
-        badge: form.badge || null,
-        description: form.author ? `By ${form.author.trim()}. ${form.description}` : form.description,
-        images: form.cover_image_url
-          ? [{ image_url: form.cover_image_url, image_public_id: 'cover_img' }]
-          : [],
-      },
-    });
-
-    const formatPromises: Promise<any>[] = [];
-
-    // 2. Update Hardcopy Format
-    if (hardcopyFormatId.value) {
-      formatPromises.push(
-        ofetch(`/api/admin/products/${productId}/formats/${hardcopyFormatId.value}`, {
-          method: 'PATCH',
-          body: {
-            price: Math.max(0, Number(form.hardcopyPrice) || 0),
-            stock: Math.max(0, Number(form.hardcopyStock) || 0),
-          },
-        })
-      );
-    }
-
-    // 3. Update or Create PDF Format
-    if (pdfFormatId.value) {
-      formatPromises.push(
-        ofetch(`/api/admin/products/${productId}/formats/${pdfFormatId.value}`, {
-          method: 'PATCH',
-          body: {
-            price: Math.max(0, Number(form.pdfPrice) || 0),
-            file_url: form.pdfFileUrl || form.pdfKey,
-            file_public_id: form.pdfKey,
-            file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
-          },
-        })
-      );
-    } else if (form.pdfKey) {
-      formatPromises.push(
-        ofetch<any>(`/api/admin/products/${productId}/formats`, {
-          method: 'POST',
-          body: {
-            format: 'pdf',
-            price: Math.max(0, Number(form.pdfPrice) || 0),
-            file_url: form.pdfFileUrl || form.pdfKey,
-            file_public_id: form.pdfKey,
-            file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
-          },
-        }).then((createdFormat) => {
-          pdfFormatId.value = createdFormat?.id || createdFormat?.data?.id;
-        })
-      );
-    }
-
-    await Promise.all(formatPromises);
-
-    isPdfDirty.value = false;
-    successToast.value = 'Book details, badges, cover art, and formats saved successfully!';
-    pushToast({ message: successToast.value, variant: 'success' });
-  } catch (err: any) {
-    formError.value =
-      err.data?.message ||
-      err.data?.error?.message ||
-      err.statusMessage ||
-      err.message ||
-      'Failed to save changes.';
-    pushToast({ message: formError.value, variant: 'error' });
-  } finally {
-    isSubmitting.value = false;
-  }
-	  }
-</script>
 </file>
 
 <file path="pages/admin/books/new.vue">
@@ -15300,6 +14750,571 @@ const whatsappUrl = buildWhatsAppLink(
     </div>
   </footer>
 </template>
+</file>
+
+<file path="pages/admin/books/[id]/edit.vue">
+<!-- pages/admin/books/[id]/edit.vue -->
+<template>
+  <div class="min-h-screen bg-theme-canvas py-8 px-4 sm:px-6 lg:px-8 font-sans text-theme-ink">
+    <div class="max-w-4xl mx-auto">
+
+      <!-- Loading Skeleton -->
+      <div v-if="isLoadingInitial" class="space-y-6">
+        <div class="h-10 bg-theme-surface-muted rounded-lg w-1/3 animate-pulse"></div>
+        <div class="h-64 bg-theme-surface rounded-2xl border border-theme-border p-6 animate-pulse"></div>
+      </div>
+
+      <div v-else>
+        <!-- Top Action Bar -->
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center space-x-3">
+            <NuxtLink
+              to="/admin/books"
+              class="w-9 h-9 rounded-lg bg-theme-surface border border-theme-border flex items-center justify-center text-theme-muted hover:text-theme-ink transition-colors shadow-sm"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </NuxtLink>
+            <div>
+              <h1 class="text-2xl font-bold text-theme-ink tracking-tight">Edit PDF eBook</h1>
+              <p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, badges, and Cloudflare R2 file</p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <NuxtLink
+              to="/admin/books"
+              class="px-4 py-2 text-xs font-semibold text-theme-muted bg-theme-surface border border-theme-border rounded-lg hover:bg-theme-surface-subtle shadow-sm"
+            >
+              Cancel
+            </NuxtLink>
+            <button
+              type="button"
+              :disabled="isSubmitting"
+              @click="handleUpdate"
+              class="inline-flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active disabled:opacity-50 rounded-lg shadow-sm transition-all"
+            >
+              <svg v-if="isSubmitting" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>{{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <form @submit.prevent="handleUpdate" class="space-y-6">
+
+          <!-- Success Alert -->
+          <div v-if="successToast" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-theme-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <p class="text-xs font-bold text-theme-accent-hover">{{ successToast }}</p>
+            </div>
+            <button type="button" @click="successToast = ''" class="text-xs text-theme-accent font-bold cursor-pointer">Dismiss</button>
+          </div>
+
+          <!-- Error Alert -->
+          <div v-if="formError" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-start space-x-3">
+            <svg class="w-5 h-5 text-theme-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h4 class="text-xs font-bold text-theme-accent-hover">Update Blocked</h4>
+              <p class="text-xs text-theme-accent mt-0.5">{{ formError }}</p>
+            </div>
+          </div>
+
+          <!-- Section 1: Book Essentials -->
+          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
+            <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider border-b border-theme-border pb-3">
+              Book Details
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Book Title *</label>
+                <input
+                  v-model="form.name"
+                  type="text"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Author</label>
+                <input
+                  v-model="form.author"
+                  type="text"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                />
+              </div>
+
+              <!-- Category -->
+              <div>
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Category *</label>
+                <select
+                  v-model="form.category_id"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                  required
+                >
+                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                    {{ cat.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">SKU / ISBN</label>
+                <input
+                  v-model="form.sku"
+                  type="text"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                />
+              </div>
+
+              <!-- Promotional Badge -->
+              <div>
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Promotional Badge</label>
+                <select
+                  v-model="form.badge"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                >
+                  <option :value="null">None (Standard)</option>
+                  <option value="BESTSELLER">Bestseller</option>
+                  <option value="FLASH_SALE">Flash Sale</option>
+                  <option value="NO1_PICK">#1 Staff Pick</option>
+                  <option value="DEAL_OF_WEEK">Deal of the Week</option>
+                  <option value="LIMITED_TIME">Limited Time</option>
+                </select>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Synopsis / Description</label>
+                <textarea
+                  v-model="form.description"
+                  rows="3"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Book Cover Art -->
+          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
+            <div class="flex items-center justify-between border-b border-theme-border pb-3">
+              <div>
+                <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Book Cover Art</h2>
+                <p class="text-xs text-theme-muted mt-0.5">High-definition publisher jacket</p>
+              </div>
+              <button
+                type="button"
+                :disabled="isFindingCover || !form.name.trim()"
+                @click="handleAutoFindCover"
+                class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink border border-theme-border rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <svg v-if="isFindingCover" class="animate-spin w-3.5 h-3.5 text-theme-ink" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span v-else>🔍</span>
+                <span>{{ isFindingCover ? 'Searching Studio Art...' : 'Auto-Find Cover' }}</span>
+              </button>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start gap-6">
+              <div class="w-32 h-44 bg-theme-surface-subtle rounded-xl border border-theme-border overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
+                <img
+                  v-if="form.cover_image_url"
+                  :src="form.cover_image_url"
+                  alt="Book cover preview"
+                  class="w-full h-full object-cover"
+                  @error="form.cover_image_url = ''"
+                />
+                <div v-else class="text-center p-3 text-theme-subtle">
+                  <svg class="w-8 h-8 mx-auto mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span class="text-[10px] block">No Cover</span>
+                </div>
+              </div>
+
+              <div class="flex-1 space-y-3 w-full">
+                <div class="flex items-center gap-2">
+                  <input
+                    ref="coverFileInputRef"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleCoverFileSelected"
+                  />
+                  <button
+                    type="button"
+                    :disabled="isUploadingCover"
+                    @click="coverFileInputRef?.click()"
+                    class="px-4 py-2 bg-theme-dark hover:bg-theme-dark-surface text-white rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    <svg v-if="isUploadingCover" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>{{ isUploadingCover ? 'Uploading...' : 'Upload Cover Image' }}</span>
+                  </button>
+
+                  <button
+                    v-if="form.cover_image_url"
+                    type="button"
+                    @click="form.cover_image_url = ''"
+                    class="px-3 py-2 text-xs font-semibold text-theme-accent hover:bg-theme-accent-soft rounded-lg transition-colors cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="block text-[11px] font-semibold text-theme-muted">Or paste image URL directly:</label>
+                  <input
+                    v-model="form.cover_image_url"
+                    type="url"
+                    placeholder="https://..."
+                    class="w-full px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-lg text-xs text-theme-ink focus:bg-white focus:outline-none focus:border-theme-accent font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Pure Digital Edition Management (No Hardcopy Logic) -->
+          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
+            <div class="flex items-center justify-between border-b border-theme-border pb-3">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-theme-accent"></span>
+                <h3 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Digital PDF Edition</h3>
+              </div>
+              <span v-if="pdfFormatId" class="text-xs text-theme-accent font-bold bg-theme-accent-soft px-2 py-0.5 rounded">
+                Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
+              </span>
+            </div>
+
+            <div class="p-5 rounded-xl border border-theme-border bg-theme-surface-subtle space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-theme-ink mb-1">eBook Price (KSh) *</label>
+                  <input
+                    v-model.number="form.pdfPrice"
+                    type="number"
+                    min="0"
+                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono font-bold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-theme-ink mb-1">Original Strikethrough Price (KSh)</label>
+                  <input
+                    v-model.number="form.compareAtPrice"
+                    type="number"
+                    min="0"
+                    placeholder="Leave empty if no discount"
+                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono"
+                  />
+                </div>
+              </div>
+
+              <!-- SINGLE PDF UPLOADER -->
+              <div>
+                <label class="block text-xs font-semibold text-theme-ink mb-1.5">
+                  eBook PDF Document
+                </label>
+                <SinglePdfUploader
+                  v-model="form.pdfKey"
+                  :initial-file-name="form.pdfFileName"
+                  :initial-file-size="form.pdfFileSize"
+                  :max-file-size-mb="50"
+                  @success="handlePdfReplaced"
+                  @remove="handlePdfRemoved"
+                />
+              </div>
+
+              <div v-if="isPdfDirty" class="p-3 bg-theme-surface-muted border border-theme-border rounded-lg flex items-center space-x-2">
+                <svg class="w-4 h-4 text-theme-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-[11px] text-theme-ink font-medium">
+                  New PDF staged in R2. Click <strong>Save Changes</strong> to update customer download streams.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { ofetch } from 'ofetch';
+import SinglePdfUploader from '~/components/admin/SinglePdfUploader.vue';
+import { useToast } from '~/composables/useToast';
+
+definePageMeta({
+  middleware: 'admin-auth',
+});
+
+const route = useRoute();
+const productId = route.params.id as string;
+const { push: pushToast } = useToast();
+
+const isLoadingInitial = ref(true);
+const isSubmitting = ref(false);
+const isFindingCover = ref(false);
+const isUploadingCover = ref(false);
+const isPdfDirty = ref(false);
+const formError = ref('');
+const successToast = ref('');
+const coverFileInputRef = ref<HTMLInputElement | null>(null);
+
+const categories = ref<Array<{ id: string; name: string; slug?: string }>>([]);
+const pdfFormatId = ref<string | null>(null);
+
+const form = reactive({
+  name: '',
+  author: '',
+  category_id: '',
+  sku: '',
+  badge: null as string | null,
+  description: '',
+  cover_image_url: '',
+  pdfPrice: 149,
+  compareAtPrice: null as number | null,
+  pdfKey: null as string | null,
+  pdfFileUrl: null as string | null,
+  pdfFileSize: 0,
+  pdfFileName: '',
+});
+
+onMounted(async () => {
+  try {
+    const catRaw = await ofetch<any>('/api/admin/categories');
+    const catList = catRaw?.data || catRaw;
+    if (Array.isArray(catList)) categories.value = catList;
+
+    const bookRaw = await ofetch<any>(`/api/admin/books/${productId}`);
+    const book = bookRaw?.data || bookRaw;
+
+    if (!book || !book.id) {
+      throw new Error('Book record could not be loaded.');
+    }
+
+    form.name = book.name || '';
+    form.category_id = book.category_id || '';
+    form.sku = book.sku || '';
+    form.badge = book.badge || null;
+    form.description = book.description || '';
+    form.pdfPrice = Number(book.price) || 149;
+    form.compareAtPrice = book.compare_at_price ? Number(book.compare_at_price) : null;
+
+    if (book.description && book.description.startsWith('By ')) {
+      const match = book.description.match(/^By\s+([^.]+)\.\s*(.*)$/);
+      if (match) {
+        form.author = match[1].trim();
+        form.description = match[2].trim();
+      }
+    } else if (book.author) {
+      form.author = book.author;
+    }
+
+    const firstImg = book.images?.[0];
+    if (typeof firstImg === 'string') {
+      form.cover_image_url = firstImg;
+    } else if (firstImg?.image_url) {
+      form.cover_image_url = firstImg.image_url;
+    } else if (book.cover_image_url) {
+      form.cover_image_url = book.cover_image_url;
+    }
+
+    const formats: any[] = book.formats || [];
+    const pdf = formats.find((f) => f.format === 'pdf') || formats.find((f) => f.format === 'epub');
+    if (pdf) {
+      pdfFormatId.value = pdf.id;
+      form.pdfPrice = Number(pdf.price) || form.pdfPrice;
+      form.compareAtPrice = pdf.compare_at_price ? Number(pdf.compare_at_price) : form.compareAtPrice;
+      form.pdfKey = pdf.file_public_id || pdf.file_url || null;
+      form.pdfFileUrl = pdf.file_url || null;
+      form.pdfFileSize = pdf.file_size_bytes ? Number(pdf.file_size_bytes) : 0;
+      form.pdfFileName = pdf.file_public_id
+        ? pdf.file_public_id.split('/').pop()?.replace(/^\d+-/, '') || 'eBook-edition.pdf'
+        : `${book.name}.pdf`;
+    }
+  } catch (err: any) {
+    formError.value =
+      err.data?.data?.message || err.data?.message || err.message || 'Failed to load book data.';
+  } finally {
+    isLoadingInitial.value = false;
+  }
+});
+
+async function handleAutoFindCover() {
+  if (!form.name.trim()) {
+    pushToast({ message: 'Enter a book title first to search for cover art', variant: 'info' });
+    return;
+  }
+
+  isFindingCover.value = true;
+  try {
+    const res = await ofetch<{ coverUrl: string | null; title: string; source: string | null }>(
+      `/api/admin/books/find-cover`,
+      {
+        query: {
+          title: form.name.trim(),
+          author: form.author ? form.author.trim() : undefined,
+        },
+      }
+    );
+
+    if (res?.coverUrl) {
+      form.cover_image_url = res.coverUrl;
+      pushToast({
+        message: `High-res cover located (${(res.source || 'Studio').toUpperCase()})!`,
+        variant: 'success',
+      });
+    } else {
+      pushToast({ message: 'No online cover found. You can upload an image file.', variant: 'info' });
+    }
+  } catch {
+    pushToast({ message: 'Auto-find cover search timed out. You can upload manually.', variant: 'error' });
+  } finally {
+    isFindingCover.value = false;
+  }
+}
+
+async function handleCoverFileSelected(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  isUploadingCover.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await ofetch<{ url: string }>('/api/admin/banners/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (res?.url) {
+      form.cover_image_url = res.url;
+      pushToast({ message: 'Cover image uploaded successfully!', variant: 'success' });
+    }
+  } catch (err: any) {
+    pushToast({ message: err.data?.message || 'Failed to upload cover image.', variant: 'error' });
+  } finally {
+    isUploadingCover.value = false;
+    target.value = '';
+  }
+}
+
+function handlePdfReplaced(payload: { key: string; fileUrl: string; sizeBytes: number; fileName: string }) {
+  form.pdfKey = payload.key;
+  form.pdfFileUrl = payload.fileUrl;
+  form.pdfFileSize = payload.sizeBytes;
+  form.pdfFileName = payload.fileName;
+  isPdfDirty.value = true;
+}
+
+function handlePdfRemoved() {
+  form.pdfKey = null;
+  form.pdfFileUrl = null;
+  form.pdfFileSize = 0;
+  form.pdfFileName = '';
+  isPdfDirty.value = true;
+}
+
+async function handleUpdate() {
+  formError.value = '';
+  successToast.value = '';
+
+  if (!form.name.trim()) {
+    formError.value = 'Book title is required.';
+    return;
+  }
+
+  if (!form.category_id) {
+    formError.value = 'Please select a category.';
+    return;
+  }
+
+  isSubmitting.value = true;
+
+  try {
+    // 1. Update Base Product, Price, Discount, Badge & Cover Image
+    await ofetch(`/api/admin/books/${productId}`, {
+      method: 'PATCH',
+      body: {
+        name: form.name.trim(),
+        category_id: form.category_id,
+        price: Math.max(0, Number(form.pdfPrice) || 0),
+        compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
+        sku: form.sku.trim() || null,
+        badge: form.badge || null,
+        description: form.author ? `By ${form.author.trim()}. ${form.description}` : form.description,
+        images: form.cover_image_url
+          ? [{ image_url: form.cover_image_url, image_public_id: 'cover_img' }]
+          : [],
+      },
+    });
+
+    // 2. Update or Create Pure Digital PDF Format (Zero Hardcopy Operations)
+    if (pdfFormatId.value) {
+      await ofetch(`/api/admin/products/${productId}/formats/${pdfFormatId.value}`, {
+        method: 'PATCH',
+        body: {
+          price: Math.max(0, Number(form.pdfPrice) || 0),
+          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
+          file_url: form.pdfFileUrl || form.pdfKey,
+          file_public_id: form.pdfKey,
+          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
+        },
+      });
+    } else if (form.pdfKey) {
+      const createdFormat = await ofetch<any>(`/api/admin/products/${productId}/formats`, {
+        method: 'POST',
+        body: {
+          format: 'pdf',
+          price: Math.max(0, Number(form.pdfPrice) || 0),
+          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
+          file_url: form.pdfFileUrl || form.pdfKey,
+          file_public_id: form.pdfKey,
+          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
+        },
+      });
+      pdfFormatId.value = createdFormat?.id || createdFormat?.data?.id;
+    }
+
+    isPdfDirty.value = false;
+    successToast.value = 'eBook details, digital pricing, cover art, and PDF file saved successfully!';
+    pushToast({ message: successToast.value, variant: 'success' });
+  } catch (err: any) {
+    formError.value =
+      err.data?.message ||
+      err.data?.error?.message ||
+      err.statusMessage ||
+      err.message ||
+      'Failed to save changes.';
+    pushToast({ message: formError.value, variant: 'error' });
+  } finally {
+    isSubmitting.value = false;
+  }
+}
+</script>
 </file>
 
 <file path="components/storefront/BentoCategories.vue">
@@ -16678,19 +16693,20 @@ import BookRequestModal from "~/components/storefront/BookRequestModal.vue";
 import Pagination from "~/components/ui/Pagination.vue";
 import { BookOpen, ChevronDown, Check, Filter, X, Zap } from "lucide-vue-next";
 import { MONTHLY_TOP_SEEDS, DEALS_SEEDS, mergeWithSeeds } from "~/data/seeds";
-import { fuzzySearchBooks } from "~/utils/fuzzy";
 import type { Book } from "~/types";
 import type { PaginatedProductsResponse } from "~/server/api/products/index.get";
+
+const route = useRoute();
 
 // Pagination & Search Reactive State
 const currentPage = ref(1);
 const itemsPerPage = ref(48);
 const activeCategoryFilter = ref<string>("General");
-const searchQuery = ref<string>("");
+const searchQuery = ref<string>("" );
 const debouncedSearch = ref<string>("");
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-// Reactive Catalogue Query
+// Reactive Catalogue Query (Powered natively by backend PostgreSQL pg_trgm fuzzy matching)
 const { data: catalogData, status: booksStatus } =
 	await useFetch<PaginatedProductsResponse>("/api/products", {
 		query: computed(() => ({
@@ -16716,30 +16732,44 @@ const { data: showcaseData } = await useFetch<PaginatedProductsResponse>(
 );
 const { data: storeMetadata } = await useFetch<any>("/api/stores/current");
 
+// Server-Authoritative SEO & Schema.org JSON-LD Metadata (Targeting www.ebookreads.com)
 useHead({
-	title: "Ebook-Reads — Online Bookstore & eBooks in Nairobi, Kenya",
-	link: [{ rel: "canonical", href: "https://www.thesunrisebookstore.com" }],
+	title: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
+	link: [{ rel: "canonical", href: "https://www.ebookreads.com" }],
 	meta: [
 		{
 			name: "description",
 			content:
-				"Shop bestsellers, finance, business, psychology, and African literature at Ebook-Reads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads across Kenya.",
+				"Shop bestsellers, finance, business, psychology, and African literature at EbookReads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads across Kenya.",
 		},
 		{
 			property: "og:title",
-			content:
-				"Ebook-Reads — Online Bookstore & eBooks in Nairobi, Kenya",
+			content: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
 		},
 		{
 			property: "og:description",
 			content:
-				"Shop bestsellers, finance, business, psychology, and African literature at Ebook-Reads, Diamond Mall, Parklands, Nairobi.",
+				"Shop bestsellers, finance, business, psychology, and African literature at EbookReads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads.",
 		},
-		{ property: "og:url", content: "https://www.thesunrisebookstore.com" },
+		{ property: "og:url", content: "https://www.ebookreads.com" },
 		{
 			property: "og:image",
+			content: "https://www.ebookreads.com/images/hero-cover.jpg",
+		},
+		{ property: "og:type", content: "website" },
+		{ name: "twitter:card", content: "summary_large_image" },
+		{
+			name: "twitter:title",
+			content: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
+		},
+		{
+			name: "twitter:description",
 			content:
-				"https://www.thesunrisebookstore.com/images/hero-cover.jpg",
+				"Shop bestsellers, finance, business, and literature at EbookReads. Instant eBook downloads.",
+		},
+		{
+			name: "twitter:image",
+			content: "https://www.ebookreads.com/images/hero-cover.jpg",
 		},
 	],
 	script: [
@@ -16750,12 +16780,12 @@ useHead({
 				"@graph": [
 					{
 						"@type": "BookStore",
-						"@id": "https://www.thesunrisebookstore.com/#bookstore",
-						name: "Ebook-Reads",
-						url: "https://www.thesunrisebookstore.com",
-						logo: "https://www.thesunrisebookstore.com/images/logo.png",
-						image: "https://www.thesunrisebookstore.com/images/hero-cover.jpg",
-						email: "admin@thesunrisebookstore.com",
+						"@id": "https://www.ebookreads.com/#bookstore",
+						name: "EbookReads",
+						url: "https://www.ebookreads.com",
+						logo: "https://www.ebookreads.com/images/logo.png",
+						image: "https://www.ebookreads.com/images/hero-cover.jpg",
+						email: "admin@ebookreads.com",
 						telephone: "+254143304460",
 						priceRange: "KSh 149 - KSh 4500",
 						currenciesAccepted: "KES",
@@ -16777,58 +16807,31 @@ const tickerItems = computed<PromoTickerMessage[]>(
 	() => storeMetadata.value?.promo_ticker || [],
 );
 
-const fullCatalogPool = computed<Book[]>(() => {
-	const remoteList: Book[] = showcaseData.value?.products || [];
-	return mergeWithSeeds(
-		remoteList,
-		[...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS],
-		20,
-	);
-});
-
-const isFuzzyFallbackActive = ref(false);
-
+// Server-authoritative catalogue list directly resolved from database
 const displayBooks = computed<Book[]>(() => {
-	const rawQuery = debouncedSearch.value.trim();
-	const backendResults = catalogData.value?.products || [];
-
-	if (!rawQuery) {
-		isFuzzyFallbackActive.value = false;
-		return backendResults;
-	}
-
-	if (backendResults.length > 0) {
-		isFuzzyFallbackActive.value = false;
-		return backendResults;
-	}
-
-	const fuzzyResults = fuzzySearchBooks(
-		fullCatalogPool.value,
-		rawQuery,
-		0.35,
-		itemsPerPage.value,
-	);
-	if (fuzzyResults.length > 0) {
-		isFuzzyFallbackActive.value = true;
-		return fuzzyResults.map((r) => r.book);
-	}
-
-	isFuzzyFallbackActive.value = false;
-	return [];
+	return catalogData.value?.products || [];
 });
 
 const totalBooksCount = computed<number>(() => {
-	if (isFuzzyFallbackActive.value) return displayBooks.value.length;
 	return catalogData.value?.total ?? displayBooks.value.length;
 });
 
 const totalPages = computed<number>(() => {
-	if (isFuzzyFallbackActive.value)
-		return Math.max(
-			1,
-			Math.ceil(displayBooks.value.length / itemsPerPage.value),
-		);
 	return catalogData.value?.totalPages ?? 1;
+});
+
+// Detects whether a typo correction/fuzzy hit was served by PostgreSQL pg_trgm
+const isTypoCorrectionActive = computed<boolean>(() => {
+	const q = debouncedSearch.value.trim().toLowerCase();
+	if (!q || displayBooks.value.length === 0) return false;
+
+	// If none of the top 3 books literally contain the query string in title, author, or SKU, it is a fuzzy hit
+	return !displayBooks.value.slice(0, 3).some((b) => {
+		const nameMatch = b.name?.toLowerCase().includes(q);
+		const authorMatch = b.author?.toLowerCase().includes(q);
+		const skuMatch = b.sku?.toLowerCase().includes(q);
+		return Boolean(nameMatch || authorMatch || skuMatch);
+	});
 });
 
 const paginationRangeText = computed<string>(() => {
@@ -16847,13 +16850,13 @@ const isFilterActive = computed<boolean>(() => {
 	);
 });
 
+
 const bestsellersOfWeek = computed<Book[]>(() => {
 	const list: Book[] = showcaseData.value?.products || [];
-	const tagged = list.filter((b) => b.badge === "BESTSELLER");
+	const tagged = list.filter((b) => b.badge === "BESTSELLER" || b.badge === "DEAL_OF_WEEK");
 	const combinedSeeds = [...MONTHLY_TOP_SEEDS, ...DEALS_SEEDS];
-	return mergeWithSeeds(tagged, combinedSeeds, 8);
+	return mergeWithSeeds(tagged, combinedSeeds, 8, list);
 });
-
 const catalogueCategories = computed<string[]>(() => {
 	const set = new Set<string>();
 	const allList: Book[] = showcaseData.value?.products || [];
@@ -16948,6 +16951,14 @@ function handleOutsideClickCatalogue(event: MouseEvent): void {
 }
 
 onMounted(() => {
+	// Deep-link query param hydration (e.g. /?q=mindset or /?category=business)
+	if (route.query.q && typeof route.query.q === "string") {
+		searchQuery.value = route.query.q;
+		debouncedSearch.value = route.query.q.trim();
+	}
+	if (route.query.category && typeof route.query.category === "string") {
+		activeCategoryFilter.value = route.query.category;
+	}
 	if (process.client) {
 		window.addEventListener("click", handleOutsideClickCatalogue);
 	}
@@ -16965,7 +16976,7 @@ onUnmounted(() => {
 	<div
 		class="min-h-screen flex flex-col bg-theme-canvas text-theme-ink antialiased"
 	>
-		<!-- Top Announcement Ribbon -->
+		<!-- Top Rotating Announcement Ribbon -->
 		<PromoTickerStrip :messages="tickerItems" />
 
 		<!-- Sticky Store Navbar -->
@@ -16975,7 +16986,7 @@ onUnmounted(() => {
 			@request-book="() => handleRequestSeed()"
 		/>
 
-		<!-- 1. The Hero Section -->
+		<!-- 1. Hero Carousel -->
 		<HeroCarousel
 			@search="handleSearch"
 			@select-category="handleCategorySelect"
@@ -16984,13 +16995,13 @@ onUnmounted(() => {
 		<!-- 2. Bento Categories Grid -->
 		<BentoCategories @select="handleCategorySelect" />
 
-		<!-- 3. Bestsellers Section (1-Row Scrollable Shelf) -->
+		<!-- 3. Bestsellers of the Week (1-Row Scrollable Shelf) -->
 		<DealsWeek
 			:books="bestsellersOfWeek"
 			@request-seed="handleRequestSeed"
 		/>
 
-		<!-- 4. Catalogue Section: Standardized to font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl -->
+		<!-- 4. Catalogue Section with Server-Authoritative Fuzzy Search -->
 		<section
 			id="catalog-results"
 			class="pt-8 sm:pt-12 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6"
@@ -17125,23 +17136,23 @@ onUnmounted(() => {
 				</div>
 			</div>
 
-			<!-- Typo Match Notice Banner -->
+			<!-- Typo-Tolerant Match Notice Banner -->
 			<div
-				v-if="isFuzzyFallbackActive"
+				v-if="isTypoCorrectionActive"
 				class="p-3.5 bg-theme-accent-soft border border-theme-accent-border rounded-2xl flex items-center justify-between gap-3 text-xs text-theme-accent-hover"
 			>
 				<div class="flex items-center gap-2">
 					<Zap :size="16" class="text-theme-accent flex-shrink-0" />
 					<span
-						>No exact title found for "<strong>{{
+						>Showing closest matching eBooks for "<strong>{{
 							debouncedSearch
 						}}</strong
-						>". Displaying closest matching eBooks below:</span
+						>":</span
 					>
 				</div>
 				<button
 					type="button"
-					class="text-xs font-bold underline hover:text-theme-accent cursor-pointer flex-shrink-0"
+					class="text-xs font-bold underline hover:text-theme-accent-active cursor-pointer flex-shrink-0"
 					@click="clearAllFilters"
 				>
 					View All Books
@@ -17188,7 +17199,7 @@ onUnmounted(() => {
 				/>
 			</div>
 
-			<!-- EMPTY STATE -->
+			<!-- EMPTY STATE (With Zero-Dead-End Recovery Actions) -->
 			<div
 				v-else
 				class="bg-theme-surface rounded-2xl border border-theme-border p-12 text-center space-y-3 shadow-sm animate-in fade-in duration-200"
@@ -17198,19 +17209,27 @@ onUnmounted(() => {
 					class="mx-auto text-theme-muted opacity-60"
 				/>
 				<h3 class="font-sans font-bold text-base text-theme-ink">
-					No books found matching "{{ debouncedSearch }}"
+					No eBooks found matching "{{ debouncedSearch }}"
 				</h3>
 				<p class="text-xs text-theme-muted max-w-xs mx-auto">
-					We can source any eBook in Kenya directly for you upon
-					request via WhatsApp.
+					We can source any eBook in Kenya directly for you upon request via WhatsApp.
 				</p>
-				<button
-					type="button"
-					class="bg-theme-accent hover:bg-theme-accent-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
-					@click="handleRequestSeed(debouncedSearch)"
-				>
-					Request This Book on WhatsApp
-				</button>
+				<div class="flex items-center justify-center gap-3 pt-2">
+					<button
+						type="button"
+						class="bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold uppercase px-4 py-2.5 rounded-xl border border-theme-border cursor-pointer transition-all active:scale-95"
+						@click="clearAllFilters"
+					>
+						Clear Search
+					</button>
+					<button
+						type="button"
+						class="bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs font-bold uppercase px-5 py-2.5 rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
+						@click="handleRequestSeed(debouncedSearch)"
+					>
+						Request This eBook on WhatsApp
+					</button>
+				</div>
 			</div>
 
 			<!-- NUMBERED PAGINATION CONTROLS -->

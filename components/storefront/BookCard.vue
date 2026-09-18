@@ -161,78 +161,91 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <div class="relative w-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
-    <div>
-      <!-- Book Cover Wrapper -->
-      <div class="relative mb-3">
+  <div class="relative w-full h-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
+    <div class="flex flex-col flex-1">
+      
+      <!-- Studio Display Stage (Exact bounding dimension preserved: aspect-[1/1.37], mb-3) -->
+      <div class="ebookreads-book-stage relative mb-3 w-full aspect-[1/1.37] rounded-xl flex items-center justify-center p-3.5 sm:p-4 overflow-hidden">
+        
+        <!-- Physical 3D Book Construction (~74% scaled with generous surrounding padding) -->
         <NuxtLink
           :to="book.isSeed ? '#' : `/book/${book.slug}`"
-          class="block relative aspect-[1/1.37] rounded-xl overflow-hidden bg-theme-surface-subtle book-cover-3d cursor-pointer"
+          class="ebookreads-book-physical block relative w-[74%] max-w-[140px] aspect-[1/1.44] cursor-pointer"
+          :aria-label="`View details for ${book.name}`"
           @click="handleCardClick"
         >
-          <div
-            v-if="imageFailed || !coverImage"
-            class="w-full h-full flex flex-col justify-between p-3.5 bg-theme-dark text-white text-left select-none"
-          >
-            <div class="space-y-1">
-              <span class="text-[10px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
-                {{ book.category_name || 'eBook' }}
+          <!-- Ground Shadow underneath the book base -->
+          <div class="ebookreads-book-shadow" aria-hidden="true" />
+
+          <!-- Page Block Fore-Edge Thickness (Right and Bottom stack depth) -->
+          <div class="ebookreads-book-pages" aria-hidden="true" />
+
+          <!-- Book Jacket Cover Board -->
+          <div class="ebookreads-book-jacket relative w-full h-full overflow-hidden bg-theme-surface-subtle">
+            <!-- Missing Cover Fallback -->
+            <div
+              v-if="imageFailed || !coverImage"
+              class="w-full h-full flex flex-col justify-between p-2.5 bg-gradient-to-br from-theme-dark to-theme-dark-surface text-white text-left select-none"
+            >
+              <div class="space-y-0.5">
+                <span class="text-[9.5px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
+                  {{ book.category_name || 'eBook' }}
+                </span>
+                <h4 class="font-display font-bold text-xs sm:text-sm leading-tight line-clamp-3 text-white">
+                  {{ book.name }}
+                </h4>
+              </div>
+              <span class="text-[9.5px] font-mono text-white/70 truncate block pt-1 border-t border-white/10">
+                {{ book.author || 'Edition' }}
               </span>
-              <h4 class="font-display font-bold text-sm leading-snug line-clamp-3 text-white">
-                {{ book.name }}
-              </h4>
             </div>
-            <span class="text-xs font-mono text-white/70 truncate block pt-1 border-t border-white/10">
-              {{ book.author || 'Edition' }}
-            </span>
+
+            <!-- Cover Jacket Image -->
+            <img
+              v-else
+              :src="coverImage"
+              :alt="`Cover for ${book.name}`"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              loading="lazy"
+              width="150"
+              height="216"
+              referrerpolicy="no-referrer"
+              @error="handleImageError"
+            />
+
+            <!-- Spine Roll & Debossed Joint Hinge Crease -->
+            <div class="ebookreads-book-spine" aria-hidden="true" />
+
+            <!-- Laminate Sheen Reflection & Board Bevel -->
+            <div class="ebookreads-book-sheen" aria-hidden="true" />
           </div>
 
-          <img
-            v-else
-            :src="coverImage"
-            :alt="book.name"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-            width="240"
-            height="328"
-            referrerpolicy="no-referrer"
-            @error="handleImageError"
-          />
-
-          <!-- Top-Left Curated Badge -->
+          <!-- Identity Badge (Top Left of Book Jacket) -->
           <span
             v-if="badgeInfo"
-            class="absolute top-2.5 left-2.5 bg-theme-dark/90 backdrop-blur-xs text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded-md uppercase z-10 flex items-center gap-1 shadow-xs"
+            class="absolute top-1.5 left-2 bg-theme-dark/95 text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded uppercase z-20 flex items-center gap-1 shadow-xs border border-white/15 pointer-events-none"
           >
-            <component :is="badgeInfo.icon" :size="10" class="text-theme-accent" />
+            <component :is="badgeInfo.icon" :size="9" class="text-theme-accent" />
             {{ badgeInfo.label }}
           </span>
         </NuxtLink>
 
-        <!-- UPRIGHT ZIGZAG STARBURST DISCOUNT BADGE (Centered on cover's top-right corner, No Tilt, No 'OFF' text) -->
+        <!-- Upright Crimson Red Starburst Discount Badge -->
         <div
           v-if="discountPercentage > 0"
-          class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 z-20 w-16 h-16 sm:w-[70px] sm:h-[70px] flex items-center justify-center pointer-events-none drop-shadow-md transition-transform duration-300 group-hover:scale-105"
+          class="absolute top-2 right-2 z-20 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center pointer-events-none drop-shadow-[0_3px_8px_rgba(229,9,20,0.40)] transition-transform duration-300 group-hover:scale-110"
           aria-label="Discount badge"
         >
-          <!-- 16-point Zigzag Starburst Medallion SVG -->
-          <svg
-            viewBox="0 0 100 100"
-            class="absolute inset-0 w-full h-full text-theme-accent fill-current"
-          >
-            <path
-              d="M50 0 L59 10 L73 7 L78 20 L92 23 L91 37 L100 45 L94 58 L99 71 L87 77 L85 91 L71 89 L63 100 L50 93 L37 100 L29 89 L15 91 L13 77 L1 71 L6 58 L0 45 L9 37 L8 23 L22 20 L27 7 L41 10 Z"
-            />
+          <svg viewBox="0 0 100 100" class="w-full h-full text-theme-accent fill-current">
+            <polygon points="98,50 89.2,57.8 94.3,68.4 83.3,72.2 83.9,83.9 72.2,83.3 68.4,94.3 57.8,89.2 50,98 42.2,89.2 31.6,94.3 27.8,83.3 16.1,83.9 16.7,72.2 5.7,68.4 10.8,57.8 2,50 10.8,42.2 5.7,31.6 16.7,27.8 16.1,16.1 27.8,16.7 31.6,5.7 42.2,10.8 50,2 57.8,10.8 68.4,5.7 72.2,16.7 83.9,16.1 83.3,27.8 94.3,31.6 89.2,42.2" />
           </svg>
-
-          <!-- Bigger, Bolder -#% (Upright) -->
-          <span class="relative z-10 font-black font-mono text-[16px] sm:text-[18px] text-white tracking-tight leading-none">
+          <span class="absolute inset-0 flex items-center justify-center font-black font-mono text-[12px] sm:text-[13px] text-white tracking-tighter drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
             -{{ discountPercentage }}%
           </span>
         </div>
       </div>
 
-      <!-- Format Line: Simple Minimal Text -->
+      <!-- Format Line: Minimal Modern Publisher Tag -->
       <div class="flex items-center justify-between gap-1 text-xs sm:text-[13px] pb-1.5">
         <span class="font-bold text-theme-accent flex items-center gap-1.5">
           <FileText :size="13" class="stroke-[2.5]" />
@@ -243,7 +256,7 @@ function handleAddToCart(event: Event): void {
         </span>
       </div>
 
-      <!-- Book Title: Bold, Large & Strictly Single-Line -->
+      <!-- Book Title: Strictly Single-Line Clamp -->
       <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
         <h3
           class="font-display font-extrabold text-base sm:text-lg lg:text-xl text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-tight tracking-tight"
@@ -259,15 +272,15 @@ function handleAddToCart(event: Event): void {
       </p>
 
       <!-- Rating Line -->
-      <div class="flex items-center gap-1.5 pt-1.5 text-xs">
+      <div class="flex items-center gap-1.5 pt-1.5 text-xs select-none">
         <span class="text-amber-500 font-bold tracking-tight">★★★★★</span>
         <span class="text-theme-ink font-mono font-bold text-xs">4.9</span>
       </div>
     </div>
 
-    <!-- Bottom Pricing & Full-Width Download Action Button -->
+    <!-- Bottom Pricing & Full-Width Crimson Red Download Action Button -->
     <div class="pt-3 mt-3 border-t border-theme-border space-y-2.5">
-      <!-- Price Row with Red Strikethrough -->
+      <!-- Price Row with Crimson Strikethrough -->
       <div class="flex items-baseline gap-2.5">
         <span class="text-lg sm:text-xl font-extrabold font-mono text-theme-ink tabular-figure tracking-tight">
           {{ formatCurrency(currentPrice) }}
@@ -283,13 +296,13 @@ function handleAddToCart(event: Event): void {
       <!-- Full-Width Download Action Button -->
       <button
         type="button"
-        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-theme-accent"
         :title="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
         :aria-label="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
         @click="handleAddToCart"
       >
         <Download :size="17" class="stroke-[2.5]" />
-        <span>Download</span>
+        <span>{{ book.isSeed ? 'Request eBook' : 'Download' }}</span>
       </button>
     </div>
   </div>
