@@ -161,27 +161,34 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <div class="relative w-full h-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
+  <!-- Unified card: The entire card scales and elevates together on hover -->
+  <div class="relative w-full h-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-xl hover:-translate-y-1.5 hover:scale-[1.01] hover:border-theme-accent/60 transition-all duration-200 flex flex-col justify-between group select-none text-left border border-theme-border">
     <div class="flex flex-col flex-1">
       
       <!-- Studio Display Stage (Exact bounding dimension preserved: aspect-[1/1.37], mb-3) -->
-      <div class="ebookreads-book-stage relative mb-3 w-full aspect-[1/1.37] rounded-xl flex items-center justify-center p-3.5 sm:p-4 overflow-hidden">
+      <div class="ebookreads-book-stage relative mb-3 w-full aspect-[1/1.37] rounded-xl flex items-center justify-center p-4 sm:p-5 overflow-hidden">
         
-        <!-- Physical 3D Book Construction (~74% scaled with generous surrounding padding) -->
+        <!-- Multi-Planar 3D Physical Book Assembly (~68% scaled with generous negative space) -->
         <NuxtLink
           :to="book.isSeed ? '#' : `/book/${book.slug}`"
-          class="ebookreads-book-physical block relative w-[74%] max-w-[140px] aspect-[1/1.44] cursor-pointer"
+          class="ebookreads-3d-book-assembly block cursor-pointer"
           :aria-label="`View details for ${book.name}`"
           @click="handleCardClick"
         >
-          <!-- Ground Shadow underneath the book base -->
-          <div class="ebookreads-book-shadow" aria-hidden="true" />
+          <!-- 1. Directional Ground Cast Shadow -->
+          <div class="ebookreads-3d-cast-shadow" aria-hidden="true" />
 
-          <!-- Page Block Fore-Edge Thickness (Right and Bottom stack depth) -->
-          <div class="ebookreads-book-pages" aria-hidden="true" />
+          <!-- 2. Exposed Back Cover Board Lip -->
+          <div class="ebookreads-3d-back-board" aria-hidden="true" />
 
-          <!-- Book Jacket Cover Board -->
-          <div class="ebookreads-book-jacket relative w-full h-full overflow-hidden bg-theme-surface-subtle">
+          <!-- 3. Bottom Page Trim Facet -->
+          <div class="ebookreads-3d-pages-bottom" aria-hidden="true" />
+
+          <!-- 4. Fore-Edge Page Block (Right 3D white paper depth facet) -->
+          <div class="ebookreads-3d-pages-side" aria-hidden="true" />
+
+          <!-- 5. Front Cover Board (Jacket artwork, spine apex roll & laminate sheen) -->
+          <div class="ebookreads-3d-front bg-theme-surface-subtle">
             <!-- Missing Cover Fallback -->
             <div
               v-if="imageFailed || !coverImage"
@@ -205,22 +212,22 @@ function handleAddToCart(event: Event): void {
               v-else
               :src="coverImage"
               :alt="`Cover for ${book.name}`"
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              class="w-full h-full object-cover"
               loading="lazy"
-              width="150"
-              height="216"
+              width="135"
+              height="195"
               referrerpolicy="no-referrer"
               @error="handleImageError"
             />
 
             <!-- Spine Roll & Debossed Joint Hinge Crease -->
-            <div class="ebookreads-book-spine" aria-hidden="true" />
+            <div class="ebookreads-3d-spine-crease" aria-hidden="true" />
 
             <!-- Laminate Sheen Reflection & Board Bevel -->
-            <div class="ebookreads-book-sheen" aria-hidden="true" />
+            <div class="ebookreads-3d-sheen" aria-hidden="true" />
           </div>
 
-          <!-- Identity Badge (Top Left of Book Jacket) -->
+          <!-- Identity Badge (Top Left of Front Cover) -->
           <span
             v-if="badgeInfo"
             class="absolute top-1.5 left-2 bg-theme-dark/95 text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded uppercase z-20 flex items-center gap-1 shadow-xs border border-white/15 pointer-events-none"
@@ -230,10 +237,10 @@ function handleAddToCart(event: Event): void {
           </span>
         </NuxtLink>
 
-        <!-- Upright Crimson Red Starburst Discount Badge -->
+        <!-- Upright Crimson Red Starburst Discount Badge (Anchored to Stage Corner) -->
         <div
           v-if="discountPercentage > 0"
-          class="absolute top-2 right-2 z-20 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center pointer-events-none drop-shadow-[0_3px_8px_rgba(229,9,20,0.40)] transition-transform duration-300 group-hover:scale-110"
+          class="absolute top-2.5 right-2.5 z-20 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center pointer-events-none drop-shadow-[0_3px_8px_rgba(229,9,20,0.40)]"
           aria-label="Discount badge"
         >
           <svg viewBox="0 0 100 100" class="w-full h-full text-theme-accent fill-current">
