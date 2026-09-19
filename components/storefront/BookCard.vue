@@ -175,16 +175,16 @@ function handleAddToCart(event: Event): void {
           :aria-label="`View details for ${book.name}`"
           @click="handleCardClick"
         >
-          <!-- 1. Directional Ground Cast Shadow -->
+          <!-- 1. Directional Perspective Ground Shadow -->
           <div class="ebookreads-3d-cast-shadow" aria-hidden="true" />
 
-          <!-- 2. Back Cover Board (translateZ(-7px)) -->
+          <!-- 2. Back Cover Board (translateZ(-7.5px)) -->
           <div class="ebookreads-3d-back-board" aria-hidden="true" />
 
-          <!-- 3. Fore-Edge Page Block (Natural white paper block, rotateY(90deg)) -->
+          <!-- 3. Fore-Edge Page Block (Tucked between -7px and +7px) -->
           <div class="ebookreads-3d-pages-side" aria-hidden="true" />
 
-          <!-- 4. Front Cover Board (translateZ(7px) with board bevel & overhang shadow) -->
+          <!-- 4. Front Cover Board (translateZ(7.5px)) -->
           <div class="ebookreads-3d-front bg-theme-surface-subtle">
             <!-- Missing Cover Fallback -->
             <div
