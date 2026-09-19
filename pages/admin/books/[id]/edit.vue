@@ -101,7 +101,7 @@
                 />
               </div>
 
-              <!-- Category with "+ New Category" Action -->
+              <!-- Category with "+ New Category" Action Button -->
               <div>
                 <div class="flex items-center justify-between mb-1.5">
                   <label class="block text-xs font-bold text-theme-ink">Category *</label>
@@ -135,7 +135,7 @@
                 />
               </div>
 
-              <!-- Promotional Badge (Presets or Custom Badge) -->
+              <!-- Promotional Badge (Presets + Custom Badge Input) -->
               <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-theme-ink">Promotional Badge</label>
                 <div class="space-y-2">
@@ -153,7 +153,7 @@
                     <option value="__CUSTOM__">✨ Custom Badge...</option>
                   </select>
 
-                  <!-- Custom Badge Input -->
+                  <!-- Custom Badge Input Box -->
                   <div v-if="badgeSelectValue === '__CUSTOM__'" class="space-y-1 animate-in fade-in duration-200">
                     <input
                       v-model="form.customBadgeText"
@@ -263,7 +263,7 @@
             </div>
           </div>
 
-          <!-- Section 3: Pure Digital Edition Management with Strikethrough Pricing -->
+          <!-- Section 3: Pure Digital Edition Management with Strikethrough Pricing UI -->
           <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between border-b border-theme-border pb-3">
               <div class="flex items-center space-x-2.5">
@@ -272,6 +272,9 @@
               </div>
               <span v-if="pdfFormatId" class="text-xs text-theme-accent font-bold bg-theme-accent-soft px-2 py-0.5 rounded">
                 Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
+              </span>
+              <span v-else class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                Will be generated upon save
               </span>
             </div>
 
@@ -375,7 +378,6 @@ const coverFileInputRef = ref<HTMLInputElement | null>(null);
 const categories = ref<Array<{ id: string; name: string; slug?: string }>>([]);
 const pdfFormatId = ref<string | null>(null);
 
-// Badge Selector Mode
 const badgeSelectValue = ref<string>('');
 
 const form = reactive({
@@ -397,14 +399,14 @@ const form = reactive({
 
 const STANDARD_BADGES = ['BESTSELLER', 'FLASH_SALE', 'NO1_PICK', 'DEAL_OF_WEEK', 'LIMITED_TIME'];
 
-onMounted(async () => {
+async function loadBookData() {
   try {
     // 1. Fetch Categories
     const catRaw = await ofetch<any>('/api/admin/categories');
     const catList = catRaw?.data || catRaw;
     if (Array.isArray(catList)) categories.value = catList;
 
-    // 2. Fetch Book Record
+    // 2. Fetch Book Record (merged with formats via updated [id].get.ts)
     const bookRaw = await ofetch<any>(`/api/admin/books/${productId}`);
     const book = bookRaw?.data || bookRaw;
 
@@ -413,13 +415,18 @@ onMounted(async () => {
     }
 
     form.name = book.name || '';
-    form.category_id = book.category_id || '';
+    
+    // Multi-casing category hydration
+    form.category_id = book.category_id || book.categoryId || book.category?.id || '';
+    
     form.sku = book.sku || '';
     form.description = book.description || '';
     form.pdfPrice = Number(book.price) || 149;
-    form.compareAtPrice = book.compare_at_price ? Number(book.compare_at_price) : null;
+    form.compareAtPrice = (book.compare_at_price || book.compareAtPrice) 
+      ? Number(book.compare_at_price || book.compareAtPrice) 
+      : null;
 
-    // Badge Hydration: Preset vs Custom String
+    // Badge Hydration: Presets vs Custom
     if (book.badge) {
       if (STANDARD_BADGES.includes(book.badge)) {
         badgeSelectValue.value = book.badge;
@@ -454,15 +461,15 @@ onMounted(async () => {
       form.cover_image_url = firstImg.image_url;
     } else if (book.cover_image_url) {
       form.cover_image_url = book.cover_image_url;
-    }
-
-    // Formats Hydration (Strictly digital eBook PDF/ePub format)
+	}
+	      // Formats Hydration (Strictly digital PDF/ePub format)
     const formats: any[] = book.formats || [];
     const pdf = formats.find((f) => f.format === 'pdf') || formats.find((f) => f.format === 'epub');
     if (pdf) {
       pdfFormatId.value = pdf.id;
       form.pdfPrice = Number(pdf.price) || form.pdfPrice;
-      form.compareAtPrice = pdf.compare_at_price ? Number(pdf.compare_at_price) : form.compareAtPrice;
+      const cp = pdf.compare_at_price || pdf.compareAtPrice;
+      form.compareAtPrice = cp ? Number(cp) : form.compareAtPrice;
       form.pdfKey = pdf.file_public_id || pdf.file_url || null;
       form.pdfFileUrl = pdf.file_url || null;
       form.pdfFileSize = pdf.file_size_bytes ? Number(pdf.file_size_bytes) : 0;
@@ -476,6 +483,10 @@ onMounted(async () => {
   } finally {
     isLoadingInitial.value = false;
   }
+}
+
+onMounted(() => {
+  loadBookData();
 });
 
 function handleBadgeSelectChange() {
@@ -487,8 +498,9 @@ function handleBadgeSelectChange() {
   } else {
     form.badge = badgeSelectValue.value;
   }
-	}
-	function handleCategoryCreated(newCat: { id: string; name: string; slug: string }) {
+}
+
+function handleCategoryCreated(newCat: { id: string; name: string; slug: string }) {
   if (!categories.value.some((c) => c.id === newCat.id)) {
     categories.value.push(newCat);
   }
@@ -597,14 +609,20 @@ async function handleUpdate() {
       resolvedBadge = badgeSelectValue.value;
     }
 
-    // 1. Update Base Product with Strikethrough & Resolved Badge
+    const compareAtValue = form.compareAtPrice 
+      ? Math.max(0, Number(form.compareAtPrice)) 
+      : null;
+
+    // 1. Update Base Product (providing dual camelCase & snake_case for DTO compatibility)
     await ofetch(`/api/admin/books/${productId}`, {
       method: 'PATCH',
       body: {
         name: form.name.trim(),
         category_id: form.category_id,
+        categoryId: form.category_id,
         price: Math.max(0, Number(form.pdfPrice) || 0),
-        compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
+        compare_at_price: compareAtValue,
+        compareAtPrice: compareAtValue,
         sku: form.sku.trim() || null,
         badge: resolvedBadge,
         description: form.author ? `By ${form.author.trim()}. ${form.description}` : form.description,
@@ -614,36 +632,37 @@ async function handleUpdate() {
       },
     });
 
-    // 2. Update or Create Pure Digital PDF Format with Strikethrough Price
+    const formatBody = {
+      format: 'pdf',
+      price: Math.max(0, Number(form.pdfPrice) || 0),
+      compare_at_price: compareAtValue,
+      compareAtPrice: compareAtValue,
+      file_url: form.pdfFileUrl || form.pdfKey,
+      file_public_id: form.pdfKey,
+      file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
+    };
+
+    // 2. Update OR Create Pure Digital PDF Format
     if (pdfFormatId.value) {
-      await ofetch(`/api/admin/products/${productId}/formats/${pdfFormatId.value}`, {
+      await ofetch(`/api/admin/books/${productId}/formats/${pdfFormatId.value}`, {
         method: 'PATCH',
-        body: {
-          price: Math.max(0, Number(form.pdfPrice) || 0),
-          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
-          file_url: form.pdfFileUrl || form.pdfKey,
-          file_public_id: form.pdfKey,
-          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
-        },
+        body: formatBody,
       });
-    } else if (form.pdfKey) {
-      const createdFormat = await ofetch<any>(`/api/admin/products/${productId}/formats`, {
+    } else {
+      await ofetch(`/api/admin/books/${productId}/formats`, {
         method: 'POST',
-        body: {
-          format: 'pdf',
-          price: Math.max(0, Number(form.pdfPrice) || 0),
-          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
-          file_url: form.pdfFileUrl || form.pdfKey,
-          file_public_id: form.pdfKey,
-          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
-        },
+        body: formatBody,
+      }).then((res: any) => {
+        pdfFormatId.value = res?.id || res?.data?.id || null;
       });
-      pdfFormatId.value = createdFormat?.id || createdFormat?.data?.id;
     }
 
     isPdfDirty.value = false;
     successToast.value = 'eBook details, discounts, badges, cover art, and PDF file saved successfully!';
     pushToast({ message: successToast.value, variant: 'success' });
+
+    // Reload book data to ensure live synchronized state
+    await loadBookData();
   } catch (err: any) {
     formError.value =
       err.data?.message ||
@@ -655,5 +674,5 @@ async function handleUpdate() {
   } finally {
     isSubmitting.value = false;
   }
-	  }
+	}
 </script>
