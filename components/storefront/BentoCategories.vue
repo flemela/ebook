@@ -1,172 +1,187 @@
 <!-- components/storefront/BentoCategories.vue -->
 <script setup lang="ts">
-import { computed, type Component } from "vue";
+import { ref, computed, type Component } from 'vue';
 import {
-	BookOpen,
-	GraduationCap,
-	Heart,
-	Briefcase,
-	Laptop,
-	Star,
-	ArrowRight,
-} from "lucide-vue-next";
-import type { Book } from "~/types";
-import type { PaginatedProductsResponse } from "~/server/api/products/index.get";
+  BookOpen,
+  GraduationCap,
+  Heart,
+  Briefcase,
+  Laptop,
+  Star,
+  ArrowRight,
+} from 'lucide-vue-next';
+import type { Book } from '~/types';
+import type { PaginatedProductsResponse } from '~/server/api/products/index.get';
 
 interface CategoryItem {
-	name: string;
-	icon: Component;
-	fallbackCount: string;
-	query: string;
+  name: string;
+  icon: Component;
+  fallbackCount: string;
+  query: string;
 }
 
 const emit = defineEmits<{
-	select: [category: string];
+  select: [category: string];
 }>();
 
 const { data: catalogResponse } = await useFetch<PaginatedProductsResponse>(
-	"/api/products",
-	{
-		query: { limit: 100 },
-	},
+  '/api/products',
+  {
+    query: { limit: 100 },
+  },
 );
 
 const CATEGORIES: CategoryItem[] = [
-	{
-		name: "Fiction",
-		icon: BookOpen,
-		fallbackCount: "2,450+",
-		query: "Fiction",
-	},
-	{
-		name: "Non-Fiction",
-		icon: GraduationCap,
-		fallbackCount: "1,630+",
-		query: "Non-Fiction",
-	},
-	{
-		name: "Self Help",
-		icon: Heart,
-		fallbackCount: "980+",
-		query: "Self-Help",
-	},
-	{
-		name: "Business",
-		icon: Briefcase,
-		fallbackCount: "760+",
-		query: "Business",
-	},
-	{
-		name: "Technology",
-		icon: Laptop,
-		fallbackCount: "540+",
-		query: "Technology",
-	},
-	{
-		name: "Classic",
-		icon: Star,
-		fallbackCount: "320+",
-		query: "Classic",
-	},
+  {
+    name: 'Fiction',
+    icon: BookOpen,
+    fallbackCount: '2,450+',
+    query: 'Fiction',
+  },
+  {
+    name: 'Non-Fiction',
+    icon: GraduationCap,
+    fallbackCount: '1,630+',
+    query: 'Non-Fiction',
+  },
+  {
+    name: 'Self Help',
+    icon: Heart,
+    fallbackCount: '980+',
+    query: 'Self-Help',
+  },
+  {
+    name: 'Business',
+    icon: Briefcase,
+    fallbackCount: '760+',
+    query: 'Business',
+  },
+  {
+    name: 'Technology',
+    icon: Laptop,
+    fallbackCount: '540+',
+    query: 'Technology',
+  },
+  {
+    name: 'Classic',
+    icon: Star,
+    fallbackCount: '320+',
+    query: 'Classic',
+  },
 ];
 
-const countMap = computed(() => {
-	const map = new Map<string, number>();
-	const list: Book[] = catalogResponse.value?.products || [];
+// Resolves category images from public/images using categoryName.png convention
+function getCategoryImageUrl(name: string): string {
+  const clean = name.trim().toLowerCase();
+  if (clean === 'classic' || clean === 'classics') return '/images/classics.png';
+  if (clean === 'self help' || clean === 'self-help') return '/images/self help.png';
+  if (clean === 'non-fiction' || clean === 'nonfiction') return '/images/non-fiction.png';
+  if (clean === 'fiction') return '/images/fiction.png';
+  if (clean === 'technology' || clean === 'tech') return '/images/technology.png';
+  return `/images/${clean}.png`;
+}
 
-	for (const b of list) {
-		const cat = (b?.category_name || "General").toLowerCase();
-		map.set(cat, (map.get(cat) || 0) + 1);
-	}
-	return map;
+// Track image failures to gracefully apply fallback gradients without broken image icons
+const failedImages = ref<Set<string>>(new Set());
+
+function onImageError(catName: string): void {
+  failedImages.value.add(catName);
+}
+
+const countMap = computed(() => {
+  const map = new Map<string, number>();
+  const list: Book[] = catalogResponse.value?.products || [];
+
+  for (const b of list) {
+    const cat = (b?.category_name || 'General').toLowerCase();
+    map.set(cat, (map.get(cat) || 0) + 1);
+  }
+  return map;
 });
 
 function getDisplayCount(query: string, fallback: string): string {
-	const q = query.toLowerCase();
-	let total = 0;
-	for (const [cat, count] of countMap.value.entries()) {
-		if (cat.includes(q) || q.includes(cat)) {
-			total += count;
-		}
-	}
-	return total > 0 ? `${total} eBooks` : `${fallback} eBooks`;
+  const q = query.toLowerCase();
+  let total = 0;
+  for (const [cat, count] of countMap.value.entries()) {
+    if (cat.includes(q) || q.includes(cat)) {
+      total += count;
+    }
+  }
+  return total > 0 ? `${total} eBooks` : `${fallback} eBooks`;
 }
 
 function handleCategoryClick(catQuery: string): void {
-	emit("select", catQuery);
-	if (process.client) {
-		const el = document.getElementById("catalog-results");
-		if (el) {
-			el.scrollIntoView({ behavior: "smooth" });
-		}
-	}
+  emit('select', catQuery);
+  if (process.client) {
+    const el = document.getElementById('catalog-results');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 }
 </script>
 
 <template>
-	<section
-		id="categories-grid"
-		class="py-8 sm:py-10 md:py-12 px-4 max-w-6xl mx-auto w-full space-y-4 sm:space-y-5 select-none"
-	>
-		<!-- Section Header: Standardized to font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl -->
-		<div
-			class="flex items-end justify-between border-b border-theme-border pb-3.5"
-		>
+	<section id="categories-grid"
+		class="py-8 sm:py-10 md:py-12 px-4 max-w-6xl mx-auto w-full space-y-4 sm:space-y-5 select-none">
+		<!-- Section Header -->
+		<div class="flex items-end justify-between border-b border-theme-border pb-3.5">
 			<div class="space-y-1">
-				<span
-					class="text-[11px] font-mono font-bold uppercase tracking-widest text-theme-accent block"
-				>
+				<span class="text-[11px] font-mono font-bold uppercase tracking-widest text-theme-accent block">
 					eBook Catalog
 				</span>
 				<h2
-					class="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl text-theme-ink tracking-tight leading-tight"
-				>
+					class="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl text-theme-ink tracking-tight leading-tight">
 					Shop by Category
 				</h2>
 			</div>
 
-			<button
-				type="button"
+			<button type="button"
 				class="text-xs sm:text-sm font-extrabold text-theme-accent hover:text-theme-accent-hover flex items-center gap-1 transition-colors cursor-pointer"
-				@click="handleCategoryClick('General')"
-			>
+				@click="handleCategoryClick('General')">
 				<span>View all</span>
 				<ArrowRight :size="14" />
 			</button>
 		</div>
 
-		<!-- Category Grid -->
-		<div
-			class="grid grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4"
-		>
-			<button
-				v-for="cat in CATEGORIES"
-				:key="cat.name"
-				type="button"
-				class="bg-theme-surface hover:bg-theme-surface-subtle border border-theme-border hover:border-theme-border-strong rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center text-center gap-2 transition-all duration-200 group cursor-pointer shadow-2xs hover:shadow-xs hover:-translate-y-0.5 min-h-[96px] sm:min-h-[114px]"
-				@click="handleCategoryClick(cat.query)"
-			>
-				<div
-					class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-theme-accent-soft group-hover:bg-theme-surface-muted flex items-center justify-center transition-colors duration-200 flex-shrink-0"
-				>
-					<component
-						:is="cat.icon"
-						:size="19"
-						class="sm:w-5 sm:h-5 stroke-[1.75] text-theme-accent fill-theme-accent group-hover:text-black group-hover:fill-black transition-colors duration-200"
-					/>
-				</div>
+		<!-- Category Grid: 3 on Mobile, 6 on Desktop with Visible Photographic Backgrounds -->
+		<div class="grid grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4">
+			<button v-for="cat in CATEGORIES" :key="cat.name" type="button"
+				class="relative overflow-hidden rounded-xl p-3.5 sm:p-4 md:p-5 flex flex-col items-center justify-center text-center transition-all duration-300 group cursor-pointer shadow-md hover:shadow-xl hover:-translate-y-1 min-h-[110px] sm:min-h-[135px] md:min-h-[155px] border border-black/10 hover:border-theme-accent/80"
+				@click="handleCategoryClick(cat.query)">
+				<!-- Background Image with smooth zoom on hover -->
+				<img v-if="!failedImages.has(cat.name)" :src="getCategoryImageUrl(cat.name)" :alt="`${cat.name} eBooks`"
+					class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-110 pointer-events-none"
+					loading="lazy" @error="onImageError(cat.name)" />
 
-				<div class="space-y-0.5 w-full min-w-0">
-					<h3
-						class="font-sans font-bold text-xs sm:text-sm text-theme-ink group-hover:text-theme-accent transition-colors leading-tight truncate"
-					>
-						{{ cat.name }}
-					</h3>
-					<p
-						class="text-[10px] sm:text-[11px] text-theme-muted font-medium truncate"
-					>
-						{{ getDisplayCount(cat.query, cat.fallbackCount) }}
-					</p>
+				<!-- Fallback Dark Atmospheric Gradient if Image is missing -->
+				<div v-else
+					class="absolute inset-0 w-full h-full bg-gradient-to-br from-[#111315] via-[#1A1D20] to-[#272B30] pointer-events-none" />
+
+				<!-- Balanced Scrim: Allows Artwork to Pop while Preserving Pure White Text Legibility -->
+				<div
+					class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10 group-hover:from-black/65 group-hover:via-black/20 group-hover:to-transparent transition-colors duration-300 pointer-events-none" />
+
+				<!-- Tile Foreground Content -->
+				<div
+					class="relative z-10 flex flex-col items-center justify-center text-center gap-2 sm:gap-2.5 w-full min-w-0">
+					<!-- Filled Icon with Translucent Dark Glass Badge -->
+					<div
+						class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/35 backdrop-blur-xs border border-white/20 flex items-center justify-center shadow-xs flex-shrink-0 group-hover:bg-black/45 group-hover:scale-110 transition-all duration-300">
+						<component :is="cat.icon" :size="18" class="sm:w-5 sm:h-5 fill-white text-white stroke-[1.5]" />
+					</div>
+
+					<!-- Large Bold White Typography with Protective Drop Shadow -->
+					<div class="space-y-0.5 w-full min-w-0 px-1">
+						<h3
+							class="font-sans font-extrabold text-xs sm:text-sm md:text-base text-white leading-tight truncate drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+							{{ cat.name }}
+						</h3>
+						<p
+							class="text-[9px] sm:text-[10px] md:text-[11px] text-white/90 font-semibold font-mono truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+							{{ getDisplayCount(cat.query, cat.fallbackCount) }}
+						</p>
+					</div>
 				</div>
 			</button>
 		</div>
