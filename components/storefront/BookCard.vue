@@ -125,6 +125,10 @@ function handleCardClick(event: Event): void {
   }
 }
 
+const buttonAriaLabel = computed(() => {
+  return props.book.isSeed ? 'Request eBook' : 'Download eBook (PDF)';
+});
+
 function handleAddToCart(event: Event): void {
   event.preventDefault();
   event.stopPropagation();
@@ -161,153 +165,136 @@ function handleAddToCart(event: Event): void {
 </script>
 
 <template>
-  <!-- Unified Card: The whole card elevates & scales as a single solid unit on hover -->
-  <div class="relative w-full h-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-xl hover:-translate-y-1.5 hover:scale-[1.01] hover:border-theme-accent/60 transition-all duration-200 flex flex-col justify-between group select-none text-left border border-theme-border">
-    <div class="flex flex-col flex-1">
-      
-      <!-- Studio Display Stage (Exact bounding dimension preserved: aspect-[1/1.37], mb-3; NO overflow: hidden) -->
-      <div class="ebookreads-book-stage relative mb-3 w-full aspect-[1/1.37] rounded-xl flex items-center justify-center p-4 sm:p-5">
-        
-        <!-- Multi-Planar 3D Physical Book Assembly (Rotated -24° with 14px thickness) -->
-        <NuxtLink
-          :to="book.isSeed ? '#' : `/book/${book.slug}`"
-          class="ebookreads-3d-book-assembly block cursor-pointer"
-          :aria-label="`View details for ${book.name}`"
-          @click="handleCardClick"
-        >
-          <!-- 1. Directional Perspective Ground Shadow -->
-          <div class="ebookreads-3d-cast-shadow" aria-hidden="true" />
+	<!-- Form-fitting Card with snug padding -->
+	<div
+		class="relative w-full h-full bg-theme-surface text-theme-ink rounded-2xl p-2.5 sm:p-3 shadow-card hover:shadow-xl hover:-translate-y-1 hover:border-theme-accent/60 transition-all duration-200 flex flex-col justify-between group select-none text-left border border-theme-border">
+		<div class="flex flex-col flex-1">
 
-          <!-- 2. Back Cover Board (translateZ(-7.5px)) -->
-          <div class="ebookreads-3d-back-board" aria-hidden="true" />
+			<!-- Streamlined Stage Alcove framing the 3D book cover snugly -->
+			<div
+				class="ebookreads-book-stage relative mb-2 w-full aspect-[1/1.18] max-h-[210px] rounded-xl flex items-center justify-center p-2">
 
-          <!-- 3. Fore-Edge Page Block (Tucked between -7px and +7px) -->
-          <div class="ebookreads-3d-pages-side" aria-hidden="true" />
+				<!-- Multi-Planar 3D Physical Book Assembly (Size preserved at max-width: 128px) -->
+				<NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`"
+					class="ebookreads-3d-book-assembly block cursor-pointer"
+					:aria-label="`View details for ${book.name}`" @click="handleCardClick">
+					<!-- 1. Directional Perspective Ground Shadow -->
+					<div class="ebookreads-3d-cast-shadow" aria-hidden="true" />
 
-          <!-- 4. Front Cover Board (translateZ(7.5px)) -->
-          <div class="ebookreads-3d-front bg-theme-surface-subtle">
-            <!-- Missing Cover Fallback -->
-            <div
-              v-if="imageFailed || !coverImage"
-              class="w-full h-full flex flex-col justify-between p-2.5 bg-gradient-to-br from-theme-dark to-theme-dark-surface text-white text-left select-none"
-            >
-              <div class="space-y-0.5">
-                <span class="text-[9.5px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
-                  {{ book.category_name || 'eBook' }}
-                </span>
-                <h4 class="font-display font-bold text-xs sm:text-sm leading-tight line-clamp-3 text-white">
-                  {{ book.name }}
-                </h4>
-              </div>
-              <span class="text-[9.5px] font-mono text-white/70 truncate block pt-1 border-t border-white/10">
-                {{ book.author || 'Edition' }}
-              </span>
-            </div>
+					<!-- 2. Back Cover Board (translateZ(-7.5px)) -->
+					<div class="ebookreads-3d-back-board" aria-hidden="true" />
 
-            <!-- Cover Jacket Image -->
-            <img
-              v-else
-              :src="coverImage"
-              :alt="`Cover for ${book.name}`"
-              class="w-full h-full object-cover"
-              loading="lazy"
-              width="128"
-              height="186"
-              referrerpolicy="no-referrer"
-              @error="handleImageError"
-            />
+					<!-- 3. Fore-Edge Page Block (Tucked between -7px and +7px) -->
+					<div class="ebookreads-3d-pages-side" aria-hidden="true" />
 
-            <!-- Spine Roll & Debossed Joint Hinge Crease -->
-            <div class="ebookreads-3d-spine-crease" aria-hidden="true" />
+					<!-- 4. Front Cover Board (translateZ(7.5px)) -->
+					<div class="ebookreads-3d-front bg-theme-surface-subtle">
+						<!-- Missing Cover Fallback -->
+						<div v-if="imageFailed || !coverImage"
+							class="w-full h-full flex flex-col justify-between p-2.5 bg-gradient-to-br from-theme-dark to-theme-dark-surface text-white text-left select-none">
+							<div class="space-y-0.5">
+								<span
+									class="text-[9.5px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
+									{{ book.category_name || 'eBook' }}
+								</span>
+								<h4
+									class="font-display font-bold text-xs sm:text-sm leading-tight line-clamp-3 text-white">
+									{{ book.name }}
+								</h4>
+							</div>
+							<span
+								class="text-[9.5px] font-mono text-white/70 truncate block pt-1 border-t border-white/10">
+								{{ book.author || 'Edition' }}
+							</span>
+						</div>
 
-            <!-- Laminate Sheen Reflection -->
-            <div class="ebookreads-3d-sheen" aria-hidden="true" />
-          </div>
+						<!-- Cover Jacket Image -->
+						<img v-else :src="coverImage" :alt="`Cover for ${book.name}`" class="w-full h-full object-cover"
+							loading="lazy" width="128" height="186" referrerpolicy="no-referrer"
+							@error="handleImageError" />
 
-          <!-- Identity Badge (Top Left of Front Cover) -->
-          <span
-            v-if="badgeInfo"
-            class="absolute top-1.5 left-2 bg-theme-dark/95 text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded uppercase z-20 flex items-center gap-1 shadow-xs border border-white/15 pointer-events-none"
-          >
-            <component :is="badgeInfo.icon" :size="9" class="text-theme-accent" />
-            {{ badgeInfo.label }}
-          </span>
-        </NuxtLink>
+						<!-- Spine Roll & Debossed Joint Hinge Crease -->
+						<div class="ebookreads-3d-spine-crease" aria-hidden="true" />
 
-        <!-- Upright Crimson Red Starburst Discount Badge (Anchored cleanly to Stage Top-Right) -->
-        <div
-          v-if="discountPercentage > 0"
-          class="absolute top-2.5 right-2.5 z-20 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center pointer-events-none drop-shadow-[0_3px_8px_rgba(229,9,20,0.40)]"
-          aria-label="Discount badge"
-        >
-          <svg viewBox="0 0 100 100" class="w-full h-full text-theme-accent fill-current">
-            <polygon points="98,50 89.2,57.8 94.3,68.4 83.3,72.2 83.9,83.9 72.2,83.3 68.4,94.3 57.8,89.2 50,98 42.2,89.2 31.6,94.3 27.8,83.3 16.1,83.9 16.7,72.2 5.7,68.4 10.8,57.8 2,50 10.8,42.2 5.7,31.6 16.7,27.8 16.1,16.1 27.8,16.7 31.6,5.7 42.2,10.8 50,2 57.8,10.8 68.4,5.7 72.2,16.7 83.9,16.1 83.3,27.8 94.3,31.6 89.2,42.2" />
-          </svg>
-          <span class="absolute inset-0 flex items-center justify-center font-black font-mono text-[12px] sm:text-[13px] text-white tracking-tighter drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
-            -{{ discountPercentage }}%
-          </span>
-        </div>
-      </div>
+						<!-- Laminate Sheen Reflection -->
+						<div class="ebookreads-3d-sheen" aria-hidden="true" />
+					</div>
 
-      <!-- Format Line: Minimal Modern Publisher Tag -->
-      <div class="flex items-center justify-between gap-1 text-xs sm:text-[13px] pb-1.5">
-        <span class="font-bold text-theme-accent flex items-center gap-1.5">
-          <FileText :size="13" class="stroke-[2.5]" />
-          <span>eBook (PDF)</span>
-        </span>
-        <span class="text-theme-muted truncate text-[11px] sm:text-xs">
-          {{ book.category_name || 'General' }}
-        </span>
-      </div>
+					<!-- Identity Badge (Top Left of Front Cover) -->
+					<span v-if="badgeInfo"
+						class="absolute top-1.5 left-2 bg-theme-dark/95 text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded uppercase z-20 flex items-center gap-1 shadow-xs border border-white/15 pointer-events-none">
+						<component :is="badgeInfo.icon" :size="9" class="text-theme-accent" />
+						{{ badgeInfo.label }}
+					</span>
+				</NuxtLink>
 
-      <!-- Book Title: Strictly Single-Line Clamp -->
-      <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
-        <h3
-          class="font-display font-extrabold text-base sm:text-lg lg:text-xl text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-tight tracking-tight"
-          :title="book.name"
-        >
-          {{ book.name }}
-        </h3>
-      </NuxtLink>
+				<!-- Upright Starburst Discount Badge (Anchored cleanly to Stage Top-Right) -->
+				<div v-if="discountPercentage > 0"
+					class="absolute top-2 right-2 z-20 w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center pointer-events-none drop-shadow-[0_3px_8px_rgba(229,9,20,0.40)]"
+					aria-label="Discount badge">
+					<svg viewBox="0 0 100 100" class="w-full h-full text-theme-accent fill-current">
+						<polygon
+							points="98,50 89.2,57.8 94.3,68.4 83.3,72.2 83.9,83.9 72.2,83.3 68.4,94.3 57.8,89.2 50,98 42.2,89.2 31.6,94.3 27.8,83.3 16.1,83.9 16.7,72.2 5.7,68.4 10.8,57.8 2,50 10.8,42.2 5.7,31.6 16.7,27.8 16.1,16.1 27.8,16.7 31.6,5.7 42.2,10.8 50,2 57.8,10.8 68.4,5.7 72.2,16.7 83.9,16.1 83.3,27.8 94.3,31.6 89.2,42.2" />
+					</svg>
+					<span
+						class="absolute inset-0 flex items-center justify-center font-black font-mono text-[11px] sm:text-[12px] text-white tracking-tighter drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+						-{{ discountPercentage }}%
+					</span>
+				</div>
+			</div>
 
-      <!-- Author -->
-      <p class="text-xs sm:text-[13px] text-theme-muted italic truncate mt-0.5">
-        {{ displayAuthor }}
-      </p>
+			<!-- Format Line: Minimal Modern Publisher Tag -->
+			<div class="flex items-center justify-between gap-1 text-xs sm:text-[13px] pb-1">
+				<span class="font-bold text-theme-accent flex items-center gap-1.5">
+					<FileText :size="13" class="stroke-[2.5]" />
+					<span>eBook (PDF)</span>
+				</span>
+				<span class="text-theme-muted truncate text-[11px] sm:text-xs">
+					{{ book.category_name || 'General' }}
+				</span>
+			</div>
 
-      <!-- Rating Line -->
-      <div class="flex items-center gap-1.5 pt-1.5 text-xs select-none">
-        <span class="text-amber-500 font-bold tracking-tight">★★★★★</span>
-        <span class="text-theme-ink font-mono font-bold text-xs">4.9</span>
-      </div>
-    </div>
+			<!-- Book Title -->
+			<NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
+				<h3 class="font-display font-extrabold text-sm sm:text-base md:text-lg text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-tight tracking-tight"
+					:title="book.name">
+					{{ book.name }}
+				</h3>
+			</NuxtLink>
 
-    <!-- Bottom Pricing & Full-Width Crimson Red Download Action Button -->
-    <div class="pt-3 mt-3 border-t border-theme-border space-y-2.5">
-      <!-- Price Row with Crimson Strikethrough -->
-      <div class="flex items-baseline gap-2.5">
-        <span class="text-lg sm:text-xl font-extrabold font-mono text-theme-ink tabular-figure tracking-tight">
-          {{ formatCurrency(currentPrice) }}
-        </span>
-        <span
-          v-if="originalPrice && originalPrice > currentPrice"
-          class="text-xs sm:text-sm font-semibold font-mono text-theme-accent line-through decoration-theme-accent"
-        >
-          {{ formatCurrency(originalPrice) }}
-        </span>
-      </div>
+			<!-- Author -->
+			<p class="text-xs sm:text-[13px] text-theme-muted italic truncate mt-0.5">
+				{{ displayAuthor }}
+			</p>
 
-      <!-- Full-Width Download Action Button -->
-      <button
-        type="button"
-        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-theme-accent"
-        :title="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
-        :aria-label="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
-        @click="handleAddToCart"
-      >
-        <Download :size="17" class="stroke-[2.5]" />
-        <span>{{ book.isSeed ? 'Request eBook' : 'Download' }}</span>
-      </button>
-    </div>
-  </div>
+			<!-- Rating Line -->
+			<div class="flex items-center gap-1.5 pt-1 text-xs select-none">
+				<span class="text-amber-500 font-bold tracking-tight">★★★★★</span>
+				<span class="text-theme-ink font-mono font-bold text-xs">4.9</span>
+			</div>
+		</div>
+
+		<!-- Bottom Pricing & Download Action Button -->
+		<div class="pt-2 mt-2 border-t border-theme-border space-y-2">
+			<!-- Price Row -->
+			<div class="flex items-baseline gap-2">
+				<span
+					class="text-base sm:text-lg font-extrabold font-mono text-theme-ink tabular-figure tracking-tight">
+					{{ formatCurrency(currentPrice) }}
+				</span>
+				<span v-if="originalPrice && originalPrice > currentPrice"
+					class="text-xs sm:text-sm font-semibold font-mono text-theme-accent line-through decoration-theme-accent">
+					{{ formatCurrency(originalPrice) }}
+				</span>
+			</div>
+
+			<!-- Full-Width Download Action Button -->
+			<button type="button"
+				class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-2.5 sm:py-3 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-theme-accent"
+				:title="buttonAriaLabel" :aria-label="buttonAriaLabel" @click="handleAddToCart">
+				<Download :size="16" class="stroke-[2.5]" />
+				<span>{{ book.isSeed ? 'Request eBook' : 'Download' }}</span>
+			</button>
+		</div>
+	</div>
 </template>

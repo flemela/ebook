@@ -1,4 +1,4 @@
-<!-- pages/admin/books/index.vue -->
+<!-- pages/admin/books/index.vue (EbookReads) -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import {
@@ -13,6 +13,7 @@ import {
   Loader2,
   X,
   RotateCcw,
+  ArrowUpDown,
 } from 'lucide-vue-next';
 import AdminLayout from '~/components/admin/AdminLayout.vue';
 import Pagination from '~/components/ui/Pagination.vue';
@@ -42,6 +43,7 @@ function onSearchInput(): void {
   }, 350);
 }
 
+// Queries catalog: backend listProducts defaults to FIFO (created_at ASC, id ASC)
 const { data: booksData, refresh, status: fetchStatus } = await useFetch<{
   products: Book[];
   total: number;
@@ -76,7 +78,7 @@ const rangeText = computed(() => {
   if (total === 0) return '0 books';
   const start = (currentPage.value - 1) * itemsPerPage.value + 1;
   const end = Math.min(currentPage.value * itemsPerPage.value, total);
-  return `Showing ${start}–${end} of ${total.toLocaleString('en-KE')} books`;
+  return `Showing ${start}–${end} of ${total.toLocaleString('en-KE')} eBooks (First Added First)`;
 });
 
 const isFilterActive = computed(() => {
@@ -183,242 +185,204 @@ async function handleBulkDelete(): Promise<void> {
 </script>
 
 <template>
-  <AdminLayout>
-    <div class="space-y-6 max-w-7xl mx-auto text-theme-ink">
-      
-      <!-- Top Header Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-theme-border">
-        <div>
-          <h1 class="font-display text-2xl font-bold text-theme-ink">Books &amp; eBooks Catalog</h1>
-          <p class="text-xs text-theme-muted">Manage multi-format pricing, physical stock, and digital downloads.</p>
-        </div>
+	<AdminLayout>
+		<div class="space-y-6 max-w-7xl mx-auto text-theme-ink">
 
-        <div class="flex items-center gap-2.5">
-          <button
-            v-if="selectedBookIds.length > 0"
-            type="button"
-            class="bg-theme-accent hover:bg-theme-accent-hover text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.98] disabled:opacity-50"
-            :disabled="isDeletingBulk"
-            @click="handleBulkDelete"
-          >
-            <Loader2 v-if="isDeletingBulk" :size="14" class="animate-spin" />
-            <Trash2 v-else :size="14" />
-            <span>{{ isDeletingBulk ? 'Deleting...' : `Delete Selected (${selectedBookIds.length})` }}</span>
-          </button>
+			<!-- Top Header Bar -->
+			<div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-theme-border">
+				<div>
+					<h1 class="font-display text-2xl font-bold text-theme-ink">eBooks Catalog Desk</h1>
+					<p class="text-xs text-theme-muted">Manage multi-format pricing and Cloudflare R2 digital downloads.
+						Ordered with foundational bestsellers first.</p>
+				</div>
 
-          <NuxtLink
-            to="/admin/books/new"
-            class="bg-theme-dark text-white hover:bg-theme-dark-surface text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.98]"
-          >
-            <Plus :size="15" class="text-theme-accent" />
-            <span>Add New Book</span>
-          </NuxtLink>
-        </div>
-      </div>
+				<div class="flex items-center gap-2.5">
+					<button v-if="selectedBookIds.length > 0" type="button"
+						class="bg-theme-accent hover:bg-theme-accent-hover text-white text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-[0.98] disabled:opacity-50"
+						:disabled="isDeletingBulk" @click="handleBulkDelete">
+						<Loader2 v-if="isDeletingBulk" :size="14" class="animate-spin" />
+						<Trash2 v-else :size="14" />
+						<span>{{ isDeletingBulk ? 'Deleting...' : `Delete Selected (${selectedBookIds.length})`
+							}}</span>
+					</button>
 
-      <!-- Search & Database Filter Toolbar -->
-      <div class="bg-theme-surface p-4 rounded-2xl border border-theme-border shadow-soft flex flex-wrap gap-3 items-center justify-between">
-        <div class="relative flex-1 min-w-[260px]">
-          <Search :size="15" class="absolute left-3.5 top-3 text-theme-subtle pointer-events-none" />
-          <input
-            v-model="searchInput"
-            type="text"
-            placeholder="Search entire database by title, author, or SKU..."
-            class="w-full pl-10 pr-9 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs outline-none focus:bg-white focus:border-theme-accent transition-all text-theme-ink placeholder:text-theme-muted"
-            @input="onSearchInput"
-          />
-          <button
-            v-if="searchInput"
-            type="button"
-            class="absolute right-3 top-2.5 text-theme-muted hover:text-theme-ink"
-            @click="searchInput = ''; debouncedSearch = ''; currentPage = 1;"
-          >
-            <X :size="14" />
-          </button>
-        </div>
+					<NuxtLink to="/admin/books/new"
+						class="bg-theme-dark text-white hover:bg-theme-dark-surface text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.98]">
+						<Plus :size="15" class="text-theme-accent" />
+						<span>Add New Book</span>
+					</NuxtLink>
+				</div>
+			</div>
 
-        <select
-          v-model="selectedCategory"
-          class="px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs font-semibold text-theme-ink outline-none focus:bg-white focus:border-theme-accent"
-          @change="currentPage = 1"
-        >
-          <option value="">All Categories</option>
-          <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-            {{ cat.name }}
-          </option>
-        </select>
+			<!-- Search & Database Filter Toolbar -->
+			<div
+				class="bg-theme-surface p-4 rounded-2xl border border-theme-border shadow-soft flex flex-wrap gap-3 items-center justify-between">
+				<div class="relative flex-1 min-w-[260px]">
+					<Search :size="15" class="absolute left-3.5 top-3 text-theme-subtle pointer-events-none" />
+					<input v-model="searchInput" type="text"
+						placeholder="Search entire database by title, author, or SKU..."
+						class="w-full pl-10 pr-9 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs outline-none focus:bg-white focus:border-theme-accent transition-all text-theme-ink placeholder:text-theme-muted"
+						@input="onSearchInput" />
+					<button v-if="searchInput" type="button"
+						class="absolute right-3 top-2.5 text-theme-muted hover:text-theme-ink"
+						@click="searchInput = ''; debouncedSearch = ''; currentPage = 1;">
+						<X :size="14" />
+					</button>
+				</div>
 
-        <button
-          v-if="isFilterActive"
-          type="button"
-          class="px-3 py-2 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 border border-theme-border"
-          @click="clearFilters"
-        >
-          <RotateCcw :size="13" />
-          <span>Reset</span>
-        </button>
+				<select v-model="selectedCategory"
+					class="px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-xl text-xs font-semibold text-theme-ink outline-none focus:bg-white focus:border-theme-accent"
+					@change="currentPage = 1">
+					<option value="">All Categories</option>
+					<option v-for="cat in categories" :key="cat.id" :value="cat.id">
+						{{ cat.name }}
+					</option>
+				</select>
 
-        <div class="text-xs text-theme-muted font-mono font-bold bg-theme-surface-subtle px-3 py-1.5 rounded-xl border border-theme-border">
-          {{ rangeText }}
-        </div>
-      </div>
+				<button v-if="isFilterActive" type="button"
+					class="px-3 py-2 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 border border-theme-border"
+					@click="clearFilters">
+					<RotateCcw :size="13" />
+					<span>Reset</span>
+				</button>
 
-      <!-- Catalog Table -->
-      <div class="bg-theme-surface rounded-2xl border border-theme-border shadow-soft overflow-hidden">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="bg-theme-surface-subtle border-b border-theme-border text-theme-muted uppercase tracking-wider font-mono text-[9px]">
-              <th class="py-3 px-4 w-10">
-                <input
-                  type="checkbox"
-                  :checked="isAllSelected"
-                  class="rounded border-theme-border text-theme-accent focus:ring-theme-accent cursor-pointer"
-                  @change="toggleSelectAll"
-                />
-              </th>
-              <th class="py-3 px-4">Cover</th>
-              <th class="py-3 px-4">Title &amp; Author</th>
-              <th class="py-3 px-4">Category</th>
-              <th class="py-3 px-4">Available Formats</th>
-              <th class="py-3 px-4">Status</th>
-              <th class="py-3 px-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-theme-border">
-            <tr v-if="fetchStatus === 'pending'">
-              <td colspan="7" class="py-12 text-center text-theme-muted text-xs">
-                Searching database catalog...
-              </td>
-            </tr>
+				<div
+					class="text-xs text-theme-muted font-mono font-bold bg-theme-surface-subtle px-3 py-1.5 rounded-xl border border-theme-border flex items-center gap-1.5">
+					<ArrowUpDown :size="12" class="text-theme-accent" />
+					<span>{{ rangeText }}</span>
+				</div>
+			</div>
 
-            <tr v-else-if="books.length === 0">
-              <td colspan="7" class="py-12 text-center text-theme-muted text-xs space-y-2">
-                <p>No books match the current query.</p>
-                <button
-                  v-if="isFilterActive"
-                  type="button"
-                  class="text-theme-accent font-bold underline cursor-pointer text-xs"
-                  @click="clearFilters"
-                >
-                  Clear all search filters
-                </button>
-              </td>
-            </tr>
+			<!-- Catalog Table -->
+			<div class="bg-theme-surface rounded-2xl border border-theme-border shadow-soft overflow-hidden">
+				<table class="w-full text-left text-xs border-collapse">
+					<thead>
+						<tr
+							class="bg-theme-surface-subtle border-b border-theme-border text-theme-muted uppercase tracking-wider font-mono text-[9px]">
+							<th class="py-3 px-4 w-10">
+								<input type="checkbox" :checked="isAllSelected"
+									class="rounded border-theme-border text-theme-accent focus:ring-theme-accent cursor-pointer"
+									@change="toggleSelectAll" />
+							</th>
+							<th class="py-3 px-4">Cover</th>
+							<th class="py-3 px-4">Title &amp; Author</th>
+							<th class="py-3 px-4">Category</th>
+							<th class="py-3 px-4">Available Formats</th>
+							<th class="py-3 px-4">Status</th>
+							<th class="py-3 px-4 text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-theme-border">
+						<tr v-if="fetchStatus === 'pending'">
+							<td colspan="7" class="py-12 text-center text-theme-muted text-xs">
+								Searching database catalog...
+							</td>
+						</tr>
 
-            <tr
-              v-for="book in books"
-              :key="book.id"
-              class="hover:bg-theme-surface-subtle transition-colors"
-              :class="{ 'bg-emerald-50/40': selectedBookIds.includes(book.id) }"
-            >
-              <td class="py-3.5 px-4">
-                <input
-                  type="checkbox"
-                  :value="book.id"
-                  v-model="selectedBookIds"
-                  class="rounded border-theme-border text-theme-accent focus:ring-theme-accent cursor-pointer"
-                />
-              </td>
+						<tr v-else-if="books.length === 0">
+							<td colspan="7" class="py-12 text-center text-theme-muted text-xs space-y-2">
+								<p>No books match the current query.</p>
+								<button v-if="isFilterActive" type="button"
+									class="text-theme-accent font-bold underline cursor-pointer text-xs"
+									@click="clearFilters">
+									Clear all search filters
+								</button>
+							</td>
+						</tr>
 
-              <td class="py-3.5 px-4 w-16">
-                <div class="w-10 h-14 bg-theme-surface-subtle rounded-book border border-theme-border overflow-hidden flex items-center justify-center shadow-xs">
-                  <img
-                    v-if="resolveCoverUrl(book)"
-                    :src="resolveCoverUrl(book)"
-                    :alt="`Cover for ${book.name}`"
-                    class="w-full h-full object-cover"
-                    referrerpolicy="no-referrer"
-                    @error="($event.target as HTMLImageElement).src = '/images/book-placeholder.svg'"
-                  />
-                  <BookOpen v-else :size="16" class="text-theme-muted opacity-40" />
-                </div>
-              </td>
+						<tr v-for="book in books" :key="book.id" class="hover:bg-theme-surface-subtle transition-colors"
+							:class="{ 'bg-emerald-50/40': selectedBookIds.includes(book.id) }">
+							<td class="py-3.5 px-4">
+								<input type="checkbox" :value="book.id" v-model="selectedBookIds"
+									class="rounded border-theme-border text-theme-accent focus:ring-theme-accent cursor-pointer" />
+							</td>
 
-              <td class="py-3.5 px-4 max-w-xs">
-                <NuxtLink :to="`/admin/books/${book.id}/edit`" class="font-bold text-theme-ink hover:text-theme-accent transition-colors line-clamp-1">
-                  {{ book.name }}
-                </NuxtLink>
-                <p class="text-[11px] text-theme-muted truncate italic">{{ book.author || '—' }}</p>
-                <span v-if="book.sku" class="text-[10px] font-mono text-theme-subtle">SKU: {{ book.sku }}</span>
-              </td>
+							<td class="py-3.5 px-4 w-16">
+								<div
+									class="w-10 h-14 bg-theme-surface-subtle rounded-book border border-theme-border overflow-hidden flex items-center justify-center shadow-xs">
+									<img v-if="resolveCoverUrl(book)" :src="resolveCoverUrl(book)"
+										:alt="`Cover for ${book.name}`" class="w-full h-full object-cover"
+										referrerpolicy="no-referrer"
+										@error="($event.target as HTMLImageElement).src = '/images/book-placeholder.svg'" />
+									<BookOpen v-else :size="16" class="text-theme-muted opacity-40" />
+								</div>
+							</td>
 
-              <td class="py-3.5 px-4">
-                <span class="inline-block text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-md bg-theme-surface-subtle text-theme-ink border border-theme-border">
-                  {{ book.category_name || 'General' }}
-                </span>
-              </td>
+							<td class="py-3.5 px-4 max-w-xs">
+								<NuxtLink :to="`/admin/books/${book.id}/edit`"
+									class="font-bold text-theme-ink hover:text-theme-accent transition-colors line-clamp-1">
+									{{ book.name }}
+								</NuxtLink>
+								<p class="text-[11px] text-theme-muted truncate italic">{{ book.author || '—' }}</p>
+								<span v-if="book.sku" class="text-[10px] font-mono text-theme-subtle">SKU: {{ book.sku
+									}}</span>
+							</td>
 
-              <td class="py-3.5 px-4">
-                <div class="flex flex-wrap gap-1.5">
-                  <span
-                    v-for="fmt in book.formats"
-                    :key="fmt.id"
-                    class="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border"
-                    :class="{
+							<td class="py-3.5 px-4">
+								<span
+									class="inline-block text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-md bg-theme-surface-subtle text-theme-ink border border-theme-border">
+									{{ book.category_name || 'General' }}
+								</span>
+							</td>
+
+							<td class="py-3.5 px-4">
+								<div class="flex flex-wrap gap-1.5">
+									<span v-for="fmt in book.formats" :key="fmt.id"
+										class="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border"
+										:class="{
                       'bg-theme-surface-subtle text-theme-ink border-theme-border': fmt.format === 'hardcopy',
                       'bg-emerald-50 text-emerald-800 border-emerald-200': fmt.format === 'pdf',
                       'bg-theme-surface-muted text-theme-ink border-theme-border': fmt.format === 'epub',
-                    }"
-                  >
-                    <component :is="fmt.format === 'hardcopy' ? Truck : Download" :size="10" />
-                    {{ fmt.format.toUpperCase() }}: KSh {{ fmt.price }}
-                  </span>
-                  <span v-if="!book.formats?.length" class="text-[10px] text-theme-subtle italic">No formats</span>
-                </div>
-              </td>
+                    }">
+										<component :is="fmt.format === 'hardcopy' ? Truck : Download" :size="10" />
+										{{ fmt.format.toUpperCase() }}: KSh {{ fmt.price }}
+									</span>
+									<span v-if="!book.formats?.length" class="text-[10px] text-theme-subtle italic">No
+										formats</span>
+								</div>
+							</td>
 
-              <td class="py-3.5 px-4">
-                <span
-                  class="inline-flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border"
-                  :class="book.status === 'published' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="book.status === 'published' ? 'bg-emerald-600' : 'bg-slate-400'" />
-                  {{ book.status }}
-                </span>
-              </td>
+							<td class="py-3.5 px-4">
+								<span
+									class="inline-flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border"
+									:class="book.status === 'published' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'">
+									<span class="w-1.5 h-1.5 rounded-full"
+										:class="book.status === 'published' ? 'bg-emerald-600' : 'bg-slate-400'" />
+									{{ book.status }}
+								</span>
+							</td>
 
-              <td class="py-3.5 px-4 text-right">
-                <div class="inline-flex items-center gap-1">
-                  <NuxtLink
-                    :to="`/book/${book.slug}`"
-                    target="_blank"
-                    class="p-1.5 rounded-lg hover:bg-theme-surface-subtle text-theme-muted hover:text-theme-ink transition-colors"
-                    title="View on Storefront"
-                  >
-                    <ExternalLink :size="14" />
-                  </NuxtLink>
+							<td class="py-3.5 px-4 text-right">
+								<div class="inline-flex items-center gap-1">
+									<NuxtLink :to="`/book/${book.slug}`" target="_blank"
+										class="p-1.5 rounded-lg hover:bg-theme-surface-subtle text-theme-muted hover:text-theme-ink transition-colors"
+										title="View on Storefront">
+										<ExternalLink :size="14" />
+									</NuxtLink>
 
-                  <NuxtLink
-                    :to="`/admin/books/${book.id}/edit`"
-                    class="p-1.5 rounded-lg hover:bg-theme-surface-subtle text-theme-muted hover:text-theme-ink transition-colors"
-                    title="Edit Book"
-                  >
-                    <Edit2 :size="14" />
-                  </NuxtLink>
+									<NuxtLink :to="`/admin/books/${book.id}/edit`"
+										class="p-1.5 rounded-lg hover:bg-theme-surface-subtle text-theme-muted hover:text-theme-ink transition-colors"
+										title="Edit Book">
+										<Edit2 :size="14" />
+									</NuxtLink>
 
-                  <button
-                    type="button"
-                    class="p-1.5 rounded-lg hover:bg-theme-accent-soft text-theme-muted hover:text-theme-accent transition-colors cursor-pointer disabled:opacity-50"
-                    :disabled="deletingBookId === book.id"
-                    title="Delete book"
-                    @click="handleDeleteBook(book.id, book.name)"
-                  >
-                    <Loader2 v-if="deletingBookId === book.id" :size="14" class="animate-spin text-theme-accent" />
-                    <Trash2 v-else :size="14" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+									<button type="button"
+										class="p-1.5 rounded-lg hover:bg-theme-accent-soft text-theme-muted hover:text-theme-accent transition-colors cursor-pointer disabled:opacity-50"
+										:disabled="deletingBookId === book.id" title="Delete book"
+										@click="handleDeleteBook(book.id, book.name)">
+										<Loader2 v-if="deletingBookId === book.id" :size="14"
+											class="animate-spin text-theme-accent" />
+										<Trash2 v-else :size="14" />
+									</button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-      <Pagination
-        :page="currentPage"
-        :total-pages="totalPages"
-        :disabled="fetchStatus === 'pending'"
-        @change="handlePageChange"
-      />
-    </div>
-  </AdminLayout>
+			<Pagination :page="currentPage" :total-pages="totalPages" :disabled="fetchStatus === 'pending'"
+				@change="handlePageChange" />
+		</div>
+	</AdminLayout>
 </template>
