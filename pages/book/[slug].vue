@@ -93,7 +93,7 @@ function formatCurrency(val: number): string {
 }
 
 function formatFileSize(bytes: number | null | undefined): string {
-	if (!bytes) return "Cloudflare R2 Encrypted";
+	if (!bytes) return "Digital PDF Edition";
 	const mb = bytes / (1024 * 1024);
 	return `${mb.toFixed(1)} MB (PDF)`;
 }
@@ -104,7 +104,7 @@ const pageDescription = computed(() => {
 	const priceText = activePricing.value.currentPrice
 		? `Only KSh ${activePricing.value.currentPrice.toLocaleString("en-KE")} in Kenya. `
 		: "";
-	return `${book.value?.name || "Book"} ${authorText}${priceText}Instant Cloudflare R2 digital eBook PDF download at Ebook-Reads.`;
+	return `${book.value?.name || "Book"} ${authorText}${priceText}Instant digital eBook PDF download at Ebook-Reads.`;
 });
 
 const canonicalUrl = computed(
@@ -300,27 +300,27 @@ function handleAddToCart(): void {
 						</label>
 
 						<div
-							class="p-4 rounded-xl border border-theme-accent-border bg-theme-accent-soft flex items-center justify-between"
+							class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/70 flex items-center justify-between"
 						>
 							<div class="space-y-1">
 								<div
-									class="flex items-center gap-1.5 text-xs font-bold text-theme-accent-hover uppercase"
+									class="flex items-center gap-1.5 text-xs font-bold text-emerald-950 uppercase"
 								>
 									<Download
 										:size="14"
-										class="text-theme-accent"
+										class="text-emerald-700"
 									/>
 									<span>Digital eBook (PDF Edition)</span>
 								</div>
 								<span
-									class="text-[11px] text-theme-muted block font-mono"
+									class="text-[11px] text-emerald-800 block font-mono"
 								>
 									{{
 										formatFileSize(
 											activePdfFormat.file_size_bytes,
 										)
 									}}
-									• Instant Token Delivery
+									• Instant Download
 								</span>
 							</div>
 
@@ -373,10 +373,10 @@ function handleAddToCart(): void {
 					>
 						<CheckCircle2
 							:size="15"
-							class="text-theme-accent flex-shrink-0"
+							class="text-emerald-600 flex-shrink-0"
 						/>
 						<span>
-							Instant Cloudflare R2 download tokens &amp;
+							Instant download link &amp;
 							permanent email backup issued upon M-Pesa approval.
 						</span>
 					</div>

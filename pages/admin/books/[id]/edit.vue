@@ -23,7 +23,7 @@
             </NuxtLink>
             <div>
               <h1 class="text-2xl font-bold text-theme-ink tracking-tight">Edit PDF eBook</h1>
-              <p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, discounts, badges, categories, and Cloudflare R2 file</p>
+              <p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, discounts, badges, categories, and eBook file</p>
             </div>
           </div>
 
@@ -52,14 +52,14 @@
         <form @submit.prevent="handleUpdate" class="space-y-6">
 
           <!-- Success Alert -->
-          <div v-if="successToast" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-center justify-between">
+          <div v-if="successToast" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <svg class="w-5 h-5 text-theme-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <p class="text-xs font-bold text-theme-accent-hover">{{ successToast }}</p>
+              <p class="text-xs font-bold text-emerald-900">{{ successToast }}</p>
             </div>
-            <button type="button" @click="successToast = ''" class="text-xs text-theme-accent font-bold cursor-pointer">Dismiss</button>
+            <button type="button" @click="successToast = ''" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer">Dismiss</button>
           </div>
 
           <!-- Error Alert -->
@@ -267,10 +267,10 @@
           <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
             <div class="flex items-center justify-between border-b border-theme-border pb-3">
               <div class="flex items-center space-x-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-theme-accent"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
                 <h3 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Digital PDF Edition</h3>
               </div>
-              <span v-if="pdfFormatId" class="text-xs text-theme-accent font-bold bg-theme-accent-soft px-2 py-0.5 rounded">
+              <span v-if="pdfFormatId" class="text-xs text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
                 Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
               </span>
               <span v-else class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
@@ -325,11 +325,11 @@
               </div>
 
               <div v-if="isPdfDirty" class="p-3 bg-theme-surface-muted border border-theme-border rounded-lg flex items-center space-x-2">
-                <svg class="w-4 h-4 text-theme-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p class="text-[11px] text-theme-ink font-medium">
-                  New PDF staged in Cloudflare R2. Click <strong>Save Changes</strong> to update customer download streams.
+                  New PDF file ready. Click <strong>Save Changes</strong> to update customer download streams.
                 </p>
               </div>
             </div>
@@ -461,8 +461,9 @@ async function loadBookData() {
       form.cover_image_url = firstImg.image_url;
     } else if (book.cover_image_url) {
       form.cover_image_url = book.cover_image_url;
-	}
-	      // Formats Hydration (Strictly digital PDF/ePub format)
+    }
+
+    // Formats Hydration (Strictly digital PDF/ePub format)
     const formats: any[] = book.formats || [];
     const pdf = formats.find((f) => f.format === 'pdf') || formats.find((f) => f.format === 'epub');
     if (pdf) {
@@ -539,9 +540,8 @@ async function handleAutoFindCover() {
   } finally {
     isFindingCover.value = false;
   }
-}
-
-async function handleCoverFileSelected(e: Event) {
+		 }
+	async function handleCoverFileSelected(e: Event) {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
@@ -613,7 +613,7 @@ async function handleUpdate() {
       ? Math.max(0, Number(form.compareAtPrice)) 
       : null;
 
-    // 1. Update Base Product (providing dual camelCase & snake_case for DTO compatibility)
+    // 1. Update Base Product
     await ofetch(`/api/admin/books/${productId}`, {
       method: 'PATCH',
       body: {
@@ -674,5 +674,5 @@ async function handleUpdate() {
   } finally {
     isSubmitting.value = false;
   }
-	}
+}
 </script>

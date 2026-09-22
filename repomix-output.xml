@@ -8725,71 +8725,6 @@ export default defineEventHandler(async (event) => {
 });
 </file>
 
-<file path="server/api/admin/books/[id].patch.ts">
-// =============================================================================
-// flemela/server/api/admin/books/[id].patch.ts
-// Updates product details via Soko PATCH /api/v1/products/:id
-// =============================================================================
-
-import { defineEventHandler, readBody, getCookie, getHeader, createError } from 'h3';
-import { ofetch } from 'ofetch';
-
-function resolveApiBaseUrl(raw?: string): string {
-  const base = (raw || process.env.SOKO_API_BASE_URL || 'http://localhost:3000/api/v1')
-    .trim()
-    .replace(/\/+$/, '');
-  return base.endsWith('/api/v1') ? base : `${base}/api/v1`;
-}
-
-export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  const id = event.context.params?.id;
-
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      data: { message: 'Missing product ID parameter.' },
-    });
-  }
-
-  let token = getCookie(event, 'flemela_admin_session');
-  if (!token) {
-    const authHeader = getHeader(event, 'authorization');
-    if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
-      token = authHeader.slice(7).trim();
-    }
-  }
-
-  if (!token) throw createError({ statusCode: 401, message: 'Unauthorized' });
-
-  const body = await readBody(event);
-  const baseApiUrl = resolveApiBaseUrl(config.sokoApiBaseUrl);
-
-  try {
-    const res = await ofetch<{ success: boolean; data: any }>(
-      `${baseApiUrl}/products/${id}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body,
-      }
-    );
-
-    return res.data || res;
-  } catch (err: any) {
-    throw createError({
-      statusCode: err.statusCode || 500,
-      statusMessage: 'Update Error',
-      data: { message: err.data?.message || err.message || 'Failed to update book.' },
-    });
-  }
-});
-</file>
-
 <file path="server/api/admin/books/import.post.ts">
 // =============================================================================
 // flemela/server/api/admin/books/index.post.ts
@@ -9316,156 +9251,6 @@ const isAdminRoute = computed(() => route.path.startsWith('/admin'));
     <FloatingWhatsappButton v-if="!isAdminRoute" />
   </div>
 </template>
-</file>
-
-<file path="assets/css/main.css">
-/* =============================================================================
-   assets/css/main.css
-   Single Source of Truth — 70/20/10 White/Charcoal/Red System
-   ============================================================================= */
-
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600;1,9..144,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  /* -------------------------------------------------------------------------
-     70% White Canvas & Surfaces
-     ------------------------------------------------------------------------- */
-  --theme-canvas: #FFFFFF;
-  --theme-surface: #FFFFFF;
-  --theme-surface-subtle: #F8F9FA;
-  --theme-surface-muted: #F1F3F5;
-  --theme-border: #E5E7EB;
-  --theme-border-strong: #D1D5DB;
-
-  /* Typography Ink */
-  --theme-ink: #14171A;
-  --theme-ink-muted: #656F7D;
-  --theme-ink-subtle: #9AA2AD;
-
-  /* -------------------------------------------------------------------------
-     20% Deep Charcoal Black (Structural Anchor)
-     ------------------------------------------------------------------------- */
-  --theme-dark-deep: #0B0C0E;             /* Footer & deepest ground */
-  --theme-dark: #111315;                  /* Hero ambient background */
-  --theme-dark-surface: #1A1D20;          /* Dark card / elevated element */
-  --theme-dark-border: rgba(255, 255, 255, 0.12);
-  --theme-dark-muted: #8E98A5;
-
-  /* -------------------------------------------------------------------------
-     10% Vibrant Crimson Red (High-Impact Accent)
-     ------------------------------------------------------------------------- */
-  --theme-accent: #E50914;                /* Primary CTA & Brand Red */
-  --theme-accent-hover: #CC0812;
-  --theme-accent-active: #B20710;
-  --theme-accent-soft: #FEF2F2;
-  --theme-accent-border: #FECACA;
-  --theme-accent-text: #FFFFFF;
-
-  /* Backward Compatibility Mapping (keeps legacy component bindings intact) */
-  --theme-forest: var(--theme-dark-surface);
-  --theme-coral: var(--theme-accent);
-  --theme-coral-hover: var(--theme-accent-hover);
-  --theme-sand: var(--theme-surface-subtle);
-  --theme-cream: var(--theme-surface-subtle);
-  --theme-mint: var(--theme-accent);
-  --theme-turquoise: var(--theme-accent);
-  --theme-orange: var(--theme-accent);
-}
-
-@layer base {
-  html {
-    background-color: var(--theme-canvas);
-    color: var(--theme-ink);
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: smooth;
-    text-rendering: optimizeLegibility;
-  }
-
-  body {
-    min-height: 100vh;
-    background-color: var(--theme-canvas);
-    color: var(--theme-ink);
-    overflow-x: hidden;
-  }
-
-  .font-poster {
-    font-family: 'Bebas Neue', 'Oswald', sans-serif;
-    letter-spacing: 0.015em;
-  }
-
-  .font-display {
-    font-family: 'Fraunces', Georgia, serif;
-    letter-spacing: -0.02em;
-  }
-
-  .font-sans {
-    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  }
-
-  .font-mono {
-    font-family: 'IBM Plex Mono', monospace;
-    font-variant-numeric: tabular-nums;
-  }
-
-  ::selection {
-    background-color: rgba(229, 9, 20, 0.18);
-    color: var(--theme-accent);
-  }
-}
-
-/* Studio 3D Book Cover Shader */
-.book-cover-3d {
-  position: relative;
-  border-radius: 2px 8px 8px 2px;
-  box-shadow: -2px 0 6px -1px rgba(0, 0, 0, 0.10), 3px 6px 18px -2px rgba(17, 19, 21, 0.14);
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.book-cover-3d::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 4px;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.18) 0%, rgba(255, 255, 255, 0.16) 50%, rgba(0, 0, 0, 0.05) 100%);
-  pointer-events: none;
-}
-
-.book-hover-lift {
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.book-hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: -3px 0 10px -1px rgba(0, 0, 0, 0.12), 6px 16px 30px -3px rgba(17, 19, 21, 0.20);
-}
-
-.hero-faded-stack {
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 15%, black 35%, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 15%, black 35%, black 100%);
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-input:-webkit-autofill,
-textarea:-webkit-autofill {
-  -webkit-text-fill-color: var(--theme-ink);
-  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
-  transition: background-color 5000s ease-in-out 0s;
-}
 </file>
 
 <file path="components/storefront/BestsellersSection.vue">
@@ -13118,6 +12903,81 @@ async function handlePlaceOrder(): Promise<void> {
 </template>
 </file>
 
+<file path="server/api/admin/books/[id].patch.ts">
+// =============================================================================
+// server/api/admin/books/[id].patch.ts
+// Updates product details via Soko PATCH /api/v1/products/:id
+// Preserves all original ofetch, URL resolution, and dual payload unwrap logic
+// =============================================================================
+
+import { defineEventHandler, readBody, getCookie, getHeader, createError } from 'h3';
+import { ofetch } from 'ofetch';
+
+function resolveApiBaseUrl(raw?: string): string {
+  const base = (raw || process.env.SOKO_API_BASE_URL || 'http://localhost:3000/api/v1')
+    .trim()
+    .replace(/\/+$/, '');
+  return base.endsWith('/api/v1') ? base : `${base}/api/v1`;
+}
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+  const id = event.context.params?.id;
+
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Bad Request',
+      data: { message: 'Missing product ID parameter.' },
+    });
+  }
+
+  let token =
+    getCookie(event, 'flemela_admin_session') ||
+    event.context.authToken;
+
+  if (!token) {
+    const authHeader = getHeader(event, 'authorization');
+    if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+      token = authHeader.slice(7).trim();
+    }
+  }
+
+  if (!token && config.sokoOrgApiKey) {
+    token = config.sokoOrgApiKey;
+  }
+
+  if (!token) {
+    throw createError({ statusCode: 401, message: 'Unauthorized' });
+  }
+
+  const body = await readBody(event);
+  const baseApiUrl = resolveApiBaseUrl(config.sokoApiBaseUrl);
+
+  try {
+    const res = await ofetch<{ success: boolean; data: any }>(
+      `${baseApiUrl}/products/${id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body,
+      }
+    );
+
+    return res.data || res;
+  } catch (err: any) {
+    throw createError({
+      statusCode: err.statusCode || 500,
+      statusMessage: 'Update Error',
+      data: { message: err.data?.message || err.message || 'Failed to update book.' },
+    });
+  }
+});
+</file>
+
 <file path="server/api/admin/books/index.post.ts">
 // =============================================================================
 // flemela/server/api/admin/books/index.post.ts
@@ -14752,571 +14612,6 @@ const whatsappUrl = buildWhatsAppLink(
 </template>
 </file>
 
-<file path="pages/admin/books/[id]/edit.vue">
-<!-- pages/admin/books/[id]/edit.vue -->
-<template>
-  <div class="min-h-screen bg-theme-canvas py-8 px-4 sm:px-6 lg:px-8 font-sans text-theme-ink">
-    <div class="max-w-4xl mx-auto">
-
-      <!-- Loading Skeleton -->
-      <div v-if="isLoadingInitial" class="space-y-6">
-        <div class="h-10 bg-theme-surface-muted rounded-lg w-1/3 animate-pulse"></div>
-        <div class="h-64 bg-theme-surface rounded-2xl border border-theme-border p-6 animate-pulse"></div>
-      </div>
-
-      <div v-else>
-        <!-- Top Action Bar -->
-        <div class="flex items-center justify-between mb-8">
-          <div class="flex items-center space-x-3">
-            <NuxtLink
-              to="/admin/books"
-              class="w-9 h-9 rounded-lg bg-theme-surface border border-theme-border flex items-center justify-center text-theme-muted hover:text-theme-ink transition-colors shadow-sm"
-            >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </NuxtLink>
-            <div>
-              <h1 class="text-2xl font-bold text-theme-ink tracking-tight">Edit PDF eBook</h1>
-              <p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, badges, and Cloudflare R2 file</p>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-3">
-            <NuxtLink
-              to="/admin/books"
-              class="px-4 py-2 text-xs font-semibold text-theme-muted bg-theme-surface border border-theme-border rounded-lg hover:bg-theme-surface-subtle shadow-sm"
-            >
-              Cancel
-            </NuxtLink>
-            <button
-              type="button"
-              :disabled="isSubmitting"
-              @click="handleUpdate"
-              class="inline-flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active disabled:opacity-50 rounded-lg shadow-sm transition-all"
-            >
-              <svg v-if="isSubmitting" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-              </svg>
-              <span>{{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}</span>
-            </button>
-          </div>
-        </div>
-
-        <form @submit.prevent="handleUpdate" class="space-y-6">
-
-          <!-- Success Alert -->
-          <div v-if="successToast" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <svg class="w-5 h-5 text-theme-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <p class="text-xs font-bold text-theme-accent-hover">{{ successToast }}</p>
-            </div>
-            <button type="button" @click="successToast = ''" class="text-xs text-theme-accent font-bold cursor-pointer">Dismiss</button>
-          </div>
-
-          <!-- Error Alert -->
-          <div v-if="formError" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-start space-x-3">
-            <svg class="w-5 h-5 text-theme-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h4 class="text-xs font-bold text-theme-accent-hover">Update Blocked</h4>
-              <p class="text-xs text-theme-accent mt-0.5">{{ formError }}</p>
-            </div>
-          </div>
-
-          <!-- Section 1: Book Essentials -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
-            <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider border-b border-theme-border pb-3">
-              Book Details
-            </h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Book Title *</label>
-                <input
-                  v-model="form.name"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                  required
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Author</label>
-                <input
-                  v-model="form.author"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                />
-              </div>
-
-              <!-- Category -->
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Category *</label>
-                <select
-                  v-model="form.category_id"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                  required
-                >
-                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                    {{ cat.name }}
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">SKU / ISBN</label>
-                <input
-                  v-model="form.sku"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                />
-              </div>
-
-              <!-- Promotional Badge -->
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Promotional Badge</label>
-                <select
-                  v-model="form.badge"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                >
-                  <option :value="null">None (Standard)</option>
-                  <option value="BESTSELLER">Bestseller</option>
-                  <option value="FLASH_SALE">Flash Sale</option>
-                  <option value="NO1_PICK">#1 Staff Pick</option>
-                  <option value="DEAL_OF_WEEK">Deal of the Week</option>
-                  <option value="LIMITED_TIME">Limited Time</option>
-                </select>
-              </div>
-
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Synopsis / Description</label>
-                <textarea
-                  v-model="form.description"
-                  rows="3"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 2: Book Cover Art -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
-            <div class="flex items-center justify-between border-b border-theme-border pb-3">
-              <div>
-                <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Book Cover Art</h2>
-                <p class="text-xs text-theme-muted mt-0.5">High-definition publisher jacket</p>
-              </div>
-              <button
-                type="button"
-                :disabled="isFindingCover || !form.name.trim()"
-                @click="handleAutoFindCover"
-                class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink border border-theme-border rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
-              >
-                <svg v-if="isFindingCover" class="animate-spin w-3.5 h-3.5 text-theme-ink" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span v-else>🔍</span>
-                <span>{{ isFindingCover ? 'Searching Studio Art...' : 'Auto-Find Cover' }}</span>
-              </button>
-            </div>
-
-            <div class="flex flex-col sm:flex-row items-start gap-6">
-              <div class="w-32 h-44 bg-theme-surface-subtle rounded-xl border border-theme-border overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
-                <img
-                  v-if="form.cover_image_url"
-                  :src="form.cover_image_url"
-                  alt="Book cover preview"
-                  class="w-full h-full object-cover"
-                  @error="form.cover_image_url = ''"
-                />
-                <div v-else class="text-center p-3 text-theme-subtle">
-                  <svg class="w-8 h-8 mx-auto mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  <span class="text-[10px] block">No Cover</span>
-                </div>
-              </div>
-
-              <div class="flex-1 space-y-3 w-full">
-                <div class="flex items-center gap-2">
-                  <input
-                    ref="coverFileInputRef"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="handleCoverFileSelected"
-                  />
-                  <button
-                    type="button"
-                    :disabled="isUploadingCover"
-                    @click="coverFileInputRef?.click()"
-                    class="px-4 py-2 bg-theme-dark hover:bg-theme-dark-surface text-white rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
-                  >
-                    <svg v-if="isUploadingCover" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                    <span>{{ isUploadingCover ? 'Uploading...' : 'Upload Cover Image' }}</span>
-                  </button>
-
-                  <button
-                    v-if="form.cover_image_url"
-                    type="button"
-                    @click="form.cover_image_url = ''"
-                    class="px-3 py-2 text-xs font-semibold text-theme-accent hover:bg-theme-accent-soft rounded-lg transition-colors cursor-pointer"
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div class="space-y-1">
-                  <label class="block text-[11px] font-semibold text-theme-muted">Or paste image URL directly:</label>
-                  <input
-                    v-model="form.cover_image_url"
-                    type="url"
-                    placeholder="https://..."
-                    class="w-full px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-lg text-xs text-theme-ink focus:bg-white focus:outline-none focus:border-theme-accent font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 3: Pure Digital Edition Management (No Hardcopy Logic) -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
-            <div class="flex items-center justify-between border-b border-theme-border pb-3">
-              <div class="flex items-center space-x-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-theme-accent"></span>
-                <h3 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Digital PDF Edition</h3>
-              </div>
-              <span v-if="pdfFormatId" class="text-xs text-theme-accent font-bold bg-theme-accent-soft px-2 py-0.5 rounded">
-                Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
-              </span>
-            </div>
-
-            <div class="p-5 rounded-xl border border-theme-border bg-theme-surface-subtle space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-theme-ink mb-1">eBook Price (KSh) *</label>
-                  <input
-                    v-model.number="form.pdfPrice"
-                    type="number"
-                    min="0"
-                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono font-bold"
-                    required
-                  />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-theme-ink mb-1">Original Strikethrough Price (KSh)</label>
-                  <input
-                    v-model.number="form.compareAtPrice"
-                    type="number"
-                    min="0"
-                    placeholder="Leave empty if no discount"
-                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono"
-                  />
-                </div>
-              </div>
-
-              <!-- SINGLE PDF UPLOADER -->
-              <div>
-                <label class="block text-xs font-semibold text-theme-ink mb-1.5">
-                  eBook PDF Document
-                </label>
-                <SinglePdfUploader
-                  v-model="form.pdfKey"
-                  :initial-file-name="form.pdfFileName"
-                  :initial-file-size="form.pdfFileSize"
-                  :max-file-size-mb="50"
-                  @success="handlePdfReplaced"
-                  @remove="handlePdfRemoved"
-                />
-              </div>
-
-              <div v-if="isPdfDirty" class="p-3 bg-theme-surface-muted border border-theme-border rounded-lg flex items-center space-x-2">
-                <svg class="w-4 h-4 text-theme-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p class="text-[11px] text-theme-ink font-medium">
-                  New PDF staged in R2. Click <strong>Save Changes</strong> to update customer download streams.
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </form>
-      </div>
-
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { ofetch } from 'ofetch';
-import SinglePdfUploader from '~/components/admin/SinglePdfUploader.vue';
-import { useToast } from '~/composables/useToast';
-
-definePageMeta({
-  middleware: 'admin-auth',
-});
-
-const route = useRoute();
-const productId = route.params.id as string;
-const { push: pushToast } = useToast();
-
-const isLoadingInitial = ref(true);
-const isSubmitting = ref(false);
-const isFindingCover = ref(false);
-const isUploadingCover = ref(false);
-const isPdfDirty = ref(false);
-const formError = ref('');
-const successToast = ref('');
-const coverFileInputRef = ref<HTMLInputElement | null>(null);
-
-const categories = ref<Array<{ id: string; name: string; slug?: string }>>([]);
-const pdfFormatId = ref<string | null>(null);
-
-const form = reactive({
-  name: '',
-  author: '',
-  category_id: '',
-  sku: '',
-  badge: null as string | null,
-  description: '',
-  cover_image_url: '',
-  pdfPrice: 149,
-  compareAtPrice: null as number | null,
-  pdfKey: null as string | null,
-  pdfFileUrl: null as string | null,
-  pdfFileSize: 0,
-  pdfFileName: '',
-});
-
-onMounted(async () => {
-  try {
-    const catRaw = await ofetch<any>('/api/admin/categories');
-    const catList = catRaw?.data || catRaw;
-    if (Array.isArray(catList)) categories.value = catList;
-
-    const bookRaw = await ofetch<any>(`/api/admin/books/${productId}`);
-    const book = bookRaw?.data || bookRaw;
-
-    if (!book || !book.id) {
-      throw new Error('Book record could not be loaded.');
-    }
-
-    form.name = book.name || '';
-    form.category_id = book.category_id || '';
-    form.sku = book.sku || '';
-    form.badge = book.badge || null;
-    form.description = book.description || '';
-    form.pdfPrice = Number(book.price) || 149;
-    form.compareAtPrice = book.compare_at_price ? Number(book.compare_at_price) : null;
-
-    if (book.description && book.description.startsWith('By ')) {
-      const match = book.description.match(/^By\s+([^.]+)\.\s*(.*)$/);
-      if (match) {
-        form.author = match[1].trim();
-        form.description = match[2].trim();
-      }
-    } else if (book.author) {
-      form.author = book.author;
-    }
-
-    const firstImg = book.images?.[0];
-    if (typeof firstImg === 'string') {
-      form.cover_image_url = firstImg;
-    } else if (firstImg?.image_url) {
-      form.cover_image_url = firstImg.image_url;
-    } else if (book.cover_image_url) {
-      form.cover_image_url = book.cover_image_url;
-    }
-
-    const formats: any[] = book.formats || [];
-    const pdf = formats.find((f) => f.format === 'pdf') || formats.find((f) => f.format === 'epub');
-    if (pdf) {
-      pdfFormatId.value = pdf.id;
-      form.pdfPrice = Number(pdf.price) || form.pdfPrice;
-      form.compareAtPrice = pdf.compare_at_price ? Number(pdf.compare_at_price) : form.compareAtPrice;
-      form.pdfKey = pdf.file_public_id || pdf.file_url || null;
-      form.pdfFileUrl = pdf.file_url || null;
-      form.pdfFileSize = pdf.file_size_bytes ? Number(pdf.file_size_bytes) : 0;
-      form.pdfFileName = pdf.file_public_id
-        ? pdf.file_public_id.split('/').pop()?.replace(/^\d+-/, '') || 'eBook-edition.pdf'
-        : `${book.name}.pdf`;
-    }
-  } catch (err: any) {
-    formError.value =
-      err.data?.data?.message || err.data?.message || err.message || 'Failed to load book data.';
-  } finally {
-    isLoadingInitial.value = false;
-  }
-});
-
-async function handleAutoFindCover() {
-  if (!form.name.trim()) {
-    pushToast({ message: 'Enter a book title first to search for cover art', variant: 'info' });
-    return;
-  }
-
-  isFindingCover.value = true;
-  try {
-    const res = await ofetch<{ coverUrl: string | null; title: string; source: string | null }>(
-      `/api/admin/books/find-cover`,
-      {
-        query: {
-          title: form.name.trim(),
-          author: form.author ? form.author.trim() : undefined,
-        },
-      }
-    );
-
-    if (res?.coverUrl) {
-      form.cover_image_url = res.coverUrl;
-      pushToast({
-        message: `High-res cover located (${(res.source || 'Studio').toUpperCase()})!`,
-        variant: 'success',
-      });
-    } else {
-      pushToast({ message: 'No online cover found. You can upload an image file.', variant: 'info' });
-    }
-  } catch {
-    pushToast({ message: 'Auto-find cover search timed out. You can upload manually.', variant: 'error' });
-  } finally {
-    isFindingCover.value = false;
-  }
-}
-
-async function handleCoverFileSelected(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  isUploadingCover.value = true;
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const res = await ofetch<{ url: string }>('/api/admin/banners/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (res?.url) {
-      form.cover_image_url = res.url;
-      pushToast({ message: 'Cover image uploaded successfully!', variant: 'success' });
-    }
-  } catch (err: any) {
-    pushToast({ message: err.data?.message || 'Failed to upload cover image.', variant: 'error' });
-  } finally {
-    isUploadingCover.value = false;
-    target.value = '';
-  }
-}
-
-function handlePdfReplaced(payload: { key: string; fileUrl: string; sizeBytes: number; fileName: string }) {
-  form.pdfKey = payload.key;
-  form.pdfFileUrl = payload.fileUrl;
-  form.pdfFileSize = payload.sizeBytes;
-  form.pdfFileName = payload.fileName;
-  isPdfDirty.value = true;
-}
-
-function handlePdfRemoved() {
-  form.pdfKey = null;
-  form.pdfFileUrl = null;
-  form.pdfFileSize = 0;
-  form.pdfFileName = '';
-  isPdfDirty.value = true;
-}
-
-async function handleUpdate() {
-  formError.value = '';
-  successToast.value = '';
-
-  if (!form.name.trim()) {
-    formError.value = 'Book title is required.';
-    return;
-  }
-
-  if (!form.category_id) {
-    formError.value = 'Please select a category.';
-    return;
-  }
-
-  isSubmitting.value = true;
-
-  try {
-    // 1. Update Base Product, Price, Discount, Badge & Cover Image
-    await ofetch(`/api/admin/books/${productId}`, {
-      method: 'PATCH',
-      body: {
-        name: form.name.trim(),
-        category_id: form.category_id,
-        price: Math.max(0, Number(form.pdfPrice) || 0),
-        compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
-        sku: form.sku.trim() || null,
-        badge: form.badge || null,
-        description: form.author ? `By ${form.author.trim()}. ${form.description}` : form.description,
-        images: form.cover_image_url
-          ? [{ image_url: form.cover_image_url, image_public_id: 'cover_img' }]
-          : [],
-      },
-    });
-
-    // 2. Update or Create Pure Digital PDF Format (Zero Hardcopy Operations)
-    if (pdfFormatId.value) {
-      await ofetch(`/api/admin/products/${productId}/formats/${pdfFormatId.value}`, {
-        method: 'PATCH',
-        body: {
-          price: Math.max(0, Number(form.pdfPrice) || 0),
-          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
-          file_url: form.pdfFileUrl || form.pdfKey,
-          file_public_id: form.pdfKey,
-          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
-        },
-      });
-    } else if (form.pdfKey) {
-      const createdFormat = await ofetch<any>(`/api/admin/products/${productId}/formats`, {
-        method: 'POST',
-        body: {
-          format: 'pdf',
-          price: Math.max(0, Number(form.pdfPrice) || 0),
-          compare_at_price: form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null,
-          file_url: form.pdfFileUrl || form.pdfKey,
-          file_public_id: form.pdfKey,
-          file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
-        },
-      });
-      pdfFormatId.value = createdFormat?.id || createdFormat?.data?.id;
-    }
-
-    isPdfDirty.value = false;
-    successToast.value = 'eBook details, digital pricing, cover art, and PDF file saved successfully!';
-    pushToast({ message: successToast.value, variant: 'success' });
-  } catch (err: any) {
-    formError.value =
-      err.data?.message ||
-      err.data?.error?.message ||
-      err.statusMessage ||
-      err.message ||
-      'Failed to save changes.';
-    pushToast({ message: formError.value, variant: 'error' });
-  } finally {
-    isSubmitting.value = false;
-  }
-}
-</script>
-</file>
-
 <file path="components/storefront/BentoCategories.vue">
 <!-- components/storefront/BentoCategories.vue -->
 <script setup lang="ts">
@@ -15714,6 +15009,286 @@ onUnmounted(() => {
   transform: translateY(-6px);
 }
 </style>
+</file>
+
+<file path="assets/css/main.css">
+/* =============================================================================
+   ebookreads/assets/css/main.css
+   EbookReads — 70/20/10 Design System & Studio 3D Physical Book Shader
+   ============================================================================= */
+
+/* 1. Unified Typography Imports */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600;1,9..144,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+/* 2. Tailwind Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Global CSS Custom Properties (Strict 70/20/10 System) */
+:root {
+  /* -------------------------------------------------------------------------
+     70% White Canvas & Surfaces
+     ------------------------------------------------------------------------- */
+  --theme-canvas: #FFFFFF;
+  --theme-surface: #FFFFFF;
+  --theme-surface-subtle: #F8F9FA;
+  --theme-surface-muted: #F1F3F5;
+  --theme-border: #E5E7EB;
+  --theme-border-strong: #D1D5DB;
+
+  /* Typography Ink */
+  --theme-ink: #14171A;
+  --theme-ink-muted: #656F7D;
+  --theme-ink-subtle: #9AA2AD;
+
+  /* -------------------------------------------------------------------------
+     20% Deep Charcoal Black (Structural Anchor)
+     ------------------------------------------------------------------------- */
+  --theme-dark-deep: #0B0C0E;
+  --theme-dark: #111315;
+  --theme-dark-surface: #1A1D20;
+  --theme-dark-border: rgba(255, 255, 255, 0.12);
+  --theme-dark-muted: #8E98A5;
+
+  /* -------------------------------------------------------------------------
+     10% Vibrant Crimson Red (High-Impact Accent)
+     ------------------------------------------------------------------------- */
+  --theme-accent: #E50914;
+  --theme-accent-hover: #CC0812;
+  --theme-accent-active: #B20710;
+  --theme-accent-soft: #FEF2F2;
+  --theme-accent-border: #FECACA;
+  --theme-accent-text: #FFFFFF;
+
+  /* Legacy Compatibility Mapping */
+  --theme-forest: var(--theme-dark-surface);
+  --theme-coral: var(--theme-accent);
+  --theme-coral-hover: var(--theme-accent-hover);
+  --theme-sand: var(--theme-surface-subtle);
+  --theme-cream: var(--theme-surface-subtle);
+  --theme-mint: var(--theme-accent);
+  --theme-turquoise: var(--theme-accent);
+  --theme-orange: var(--theme-accent);
+}
+
+/* 4. Base Element Rules */
+@layer base {
+  html {
+    background-color: var(--theme-canvas);
+    color: var(--theme-ink);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--theme-canvas);
+    color: var(--theme-ink);
+    overflow-x: hidden;
+  }
+
+  /* Canonical Typography Classes */
+  .font-poster {
+    font-family: 'Bebas Neue', 'Oswald', sans-serif;
+    letter-spacing: 0.015em;
+  }
+
+  .font-display {
+    font-family: 'Fraunces', Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-sans {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: rgba(229, 9, 20, 0.18);
+    color: var(--theme-accent);
+  }
+}
+
+/* =============================================================================
+   EbookReads — Studio 3D Physical Book Construction & Staging
+   ============================================================================= */
+
+/* 1. Display Stage: Defines 3D perspective space (NO overflow: hidden) */
+.ebookreads-book-stage {
+  position: relative;
+  background: radial-gradient(circle at 45% 25%, #FFFFFF 0%, #F4F5F7 100%);
+  border: 1px solid var(--theme-border);
+  box-shadow: inset 0 1px 3px rgba(20, 23, 26, 0.03), inset 0 -1px 2px rgba(20, 23, 26, 0.02);
+  perspective: 800px;
+}
+
+/* 2. 3D Book Assembly: Proportional physical book volume */
+.ebookreads-3d-book-assembly {
+  position: relative;
+  width: 68%;
+  max-width: 128px;
+  aspect-ratio: 1 / 1.45;
+  transform-style: preserve-3d;
+  transform: rotateY(-24deg) rotateX(1deg);
+  transform-origin: center center;
+  user-select: none;
+}
+
+/* 3. True 3D Fore-Edge Page Block (Tucked inside Z = [-7px, +7px]) */
+.ebookreads-3d-pages-side {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 0;
+  width: 14px;
+  transform-origin: center center;
+  transform: translateX(5.5px) rotateY(90deg);
+  background: 
+    /* Ambient occlusion shadow cast by front cover board */
+    linear-gradient(to right, 
+      rgba(17, 19, 21, 0.40) 0%, 
+      rgba(17, 19, 21, 0.16) 20%, 
+      transparent 55%, 
+      rgba(17, 19, 21, 0.22) 100%
+    ),
+    /* Faint microscopic paper strata (8% opacity grain) */
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 1px,
+      rgba(150, 155, 165, 0.08) 1.5px,
+      transparent 2px
+    ),
+    /* Solid crisp publisher white paper */
+    linear-gradient(to bottom, #FFFFFF 0%, #F7F8FA 50%, #E9ECEF 100%);
+  box-shadow: inset 0 0 2px rgba(17, 19, 21, 0.14);
+  border-radius: 0 1px 1px 0;
+  pointer-events: none;
+}
+
+/* 4. Back Cover Board: Charcoal rim anchored at Z = -7.5px */
+.ebookreads-3d-back-board {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(-7.5px);
+  border-radius: 2px 4px 4px 2px;
+  background: linear-gradient(135deg, #1C1F22 0%, #0F1113 100%);
+  box-shadow: 
+    1.5px 0 2px rgba(17, 19, 21, 0.35),
+    -1px 0 2px rgba(0, 0, 0, 0.20);
+  pointer-events: none;
+}
+
+/* 5. Front Cover Board: Extruded to Z = +7.5px (Always on top of pages) */
+.ebookreads-3d-front {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(7.5px);
+  border-radius: 2px 4px 4px 2px;
+  overflow: hidden;
+  box-shadow: 
+    /* Board lip shadow cast onto pages */
+    2px 0 4px -1px rgba(17, 19, 21, 0.40),
+    -1.5px 0 2px rgba(17, 19, 21, 0.25),
+    /* Board edge bevel cut (Eliminates white strip!) */
+    inset -1px 0 1px rgba(0, 0, 0, 0.25);
+}
+
+/* Cylindrical Spine Apex Roll & Debossed Joint Hinge Crease */
+.ebookreads-3d-spine-crease {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 22px;
+  pointer-events: none;
+  z-index: 15;
+  background: 
+    /* Cylindrical spine roll highlight on bound apex */
+    linear-gradient(to right, 
+      rgba(17, 19, 21, 0.35) 0%, 
+      rgba(255, 255, 255, 0.40) 6%, 
+      rgba(255, 255, 255, 0.14) 16%, 
+      rgba(17, 19, 21, 0.16) 36%, 
+      transparent 50%
+    ),
+    /* Debossed joint channel groove */
+    linear-gradient(to right, 
+      transparent 0px, 
+      transparent 12px, 
+      rgba(17, 19, 21, 0.30) 13px, 
+      rgba(255, 255, 255, 0.42) 14px, 
+      rgba(17, 19, 21, 0.14) 15px, 
+      transparent 18px
+    );
+}
+
+/* Laminate Gloss Sheen Reflection */
+.ebookreads-3d-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 16;
+  border-radius: 2px 4px 4px 2px;
+  background: linear-gradient(118deg, 
+    rgba(255, 255, 255, 0.25) 0%, 
+    rgba(255, 255, 255, 0.08) 26%, 
+    transparent 45%, 
+    rgba(17, 19, 21, 0.05) 100%
+  );
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.40),
+    inset -1px 0 1px rgba(17, 19, 21, 0.15),
+    inset 0 -1px 1px rgba(17, 19, 21, 0.20);
+}
+
+/* 6. Realistic Directional Ground Shadow (Anchored at base) */
+.ebookreads-3d-cast-shadow {
+  position: absolute;
+  bottom: -14px;
+  left: -4px;
+  right: -24px;
+  height: 20px;
+  z-index: 0;
+  background: radial-gradient(ellipse at 35% 50%, rgba(17, 19, 21, 0.40) 0%, rgba(17, 19, 21, 0.14) 55%, transparent 75%);
+  filter: blur(5px);
+  transform: rotateX(80deg) translateZ(-6px);
+  pointer-events: none;
+}
+
+/* =============================================================================
+   Functional Utilities
+   ============================================================================= */
+
+/* Invisible Scrollbar Utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Prevent Browser Autofill Background Discoloration */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--theme-ink);
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
 </file>
 
 <file path="components/storefront/DealsWeek.vue">
@@ -16375,303 +15950,685 @@ onUnmounted(() => {
 </style>
 </file>
 
-<file path="components/storefront/BookCard.vue">
-<!-- components/storefront/BookCard.vue -->
-<script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Download, Zap, Flame, Star, Tag, Clock, FileText } from 'lucide-vue-next';
-import { useCart } from '~/composables/useCart';
-import { useToast } from '~/composables/useToast';
-import type { Book, ProductFormat } from '~/types';
-
-interface Props {
-  book: Book;
-}
-
-const props = defineProps<Props>();
-const emit = defineEmits<{
-  requestSeed: [title: string, author?: string];
-}>();
-
-const { addItem, openDrawer } = useCart();
-const { push: pushToast } = useToast();
-
-const imageFailed = ref(false);
-
-const activePdfFormat = computed<ProductFormat>(() => {
-  const formats = props.book?.formats || [];
-  const pdf = formats.find((f) => f.format === 'pdf');
-  if (pdf) return pdf;
-
-  const epub = formats.find((f) => f.format === 'epub');
-  if (epub) return epub;
-
-  const defaultEbookPrice = props.book.price && props.book.price < 500 ? props.book.price : 149;
-  return {
-    id: `pdf-${props.book.id}`,
-    product_id: props.book.id,
-    format: 'pdf',
-    price: defaultEbookPrice,
-    compare_at_price: props.book.compare_at_price || null,
-    file_url: null,
-    file_public_id: null,
-    file_size_bytes: null,
-    stock: null,
-    created_at: props.book.created_at || '',
-    updated_at: props.book.updated_at || '',
-  };
-});
-
-const pricing = computed(() => {
-  const fmt = activePdfFormat.value;
-  const p = fmt.price;
-  const cp = fmt.compare_at_price ?? null;
-
-  if (cp !== null && cp !== undefined && cp > p && p > 0) {
-    const diff = cp - p;
-    const percentDown = Math.round((diff / cp) * 100);
-    return {
-      currentPrice: p,
-      originalPrice: cp,
-      discountPercentage: percentDown > 0 ? percentDown : 0,
-    };
-  }
-
-  return {
-    currentPrice: p,
-    originalPrice: null,
-    discountPercentage: 0,
-  };
-});
-
-const currentPrice = computed<number>(() => pricing.value.currentPrice);
-const originalPrice = computed<number | null>(() => pricing.value.originalPrice);
-const discountPercentage = computed<number>(() => pricing.value.discountPercentage);
-
-const coverImage = computed<string | null>(() => {
-  if (!props.book) return null;
-  const rawImg: unknown = props.book.images?.[0];
-  if (typeof rawImg === 'string' && rawImg.trim().length > 5) return rawImg.trim();
-  if (rawImg && typeof rawImg === 'object' && 'image_url' in rawImg) {
-    const url = (rawImg as { image_url?: string }).image_url;
-    if (typeof url === 'string' && url.trim().length > 5) return url.trim();
-  }
-  const fallback = (props.book as any).cover_image_url;
-  if (typeof fallback === 'string' && fallback.trim().length > 5) return fallback.trim();
-  return null;
-});
-
-const displayAuthor = computed(() => {
-  if (!props.book.author) return 'Original Edition';
-  return props.book.author.startsWith('By ') ? props.book.author : `By ${props.book.author}`;
-});
-
-type BadgeInfo = { icon: typeof Zap; label: string } | null;
-
-function getBadgeInfo(badgeStr?: string | null): BadgeInfo {
-  if (!badgeStr) return null;
-  switch (badgeStr) {
-    case 'FLASH_SALE':
-      return { icon: Zap, label: 'FLASH' };
-    case 'BESTSELLER':
-      return { icon: Flame, label: 'BESTSELLER' };
-    case 'NO1_PICK':
-      return { icon: Star, label: '#1 PICK' };
-    case 'DEAL_OF_WEEK':
-      return { icon: Tag, label: 'DEAL' };
-    case 'LIMITED_TIME':
-      return { icon: Clock, label: 'LIMITED' };
-    default:
-      return { icon: Tag, label: badgeStr.replace(/_/g, ' ') };
-  }
-}
-
-const badgeInfo = computed(() => getBadgeInfo(props.book.badge));
-
-function handleImageError(): void {
-  imageFailed.value = true;
-}
-
-function formatCurrency(val: number): string {
-  return `KSh ${val.toLocaleString('en-KE')}`;
-}
-
-function handleCardClick(event: Event): void {
-  if (props.book.isSeed) {
-    event.preventDefault();
-    emit('requestSeed', props.book.name, props.book.author || undefined);
-  }
-}
-
-function handleAddToCart(event: Event): void {
-  event.preventDefault();
-  event.stopPropagation();
-
-  if (props.book.isSeed) {
-    emit('requestSeed', props.book.name, props.book.author || undefined);
-    return;
-  }
-
-  const fmt = activePdfFormat.value;
-  const isSynthetic = !fmt.id || fmt.id.startsWith('pdf-');
-  const validFormatId = isSynthetic ? '' : fmt.id;
-
-  addItem({
-    productId: props.book.id,
-    formatId: validFormatId,
-    title: props.book.name,
-    format: 'pdf',
-    price: currentPrice.value,
-    compare_at_price: originalPrice.value,
-    quantity: 1,
-    deliveryMethod: 'digital',
-    coverUrl: coverImage.value,
-    author: props.book.author,
-  });
-
-  pushToast({
-    message: `Added "${props.book.name}" (PDF eBook) to cart!`,
-    variant: 'success',
-  });
-
-  openDrawer();
-}
-</script>
-
+<file path="pages/admin/books/[id]/edit.vue">
+<!-- pages/admin/books/[id]/edit.vue -->
 <template>
-  <div class="relative w-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-medium border border-theme-border hover:border-theme-border-strong transition-all flex flex-col justify-between group select-none text-left">
-    <div>
-      <!-- Book Cover Wrapper -->
-      <div class="relative mb-3">
-        <NuxtLink
-          :to="book.isSeed ? '#' : `/book/${book.slug}`"
-          class="block relative aspect-[1/1.37] rounded-xl overflow-hidden bg-theme-surface-subtle book-cover-3d cursor-pointer"
-          @click="handleCardClick"
-        >
-          <div
-            v-if="imageFailed || !coverImage"
-            class="w-full h-full flex flex-col justify-between p-3.5 bg-theme-dark text-white text-left select-none"
-          >
-            <div class="space-y-1">
-              <span class="text-[10px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
-                {{ book.category_name || 'eBook' }}
-              </span>
-              <h4 class="font-display font-bold text-sm leading-snug line-clamp-3 text-white">
-                {{ book.name }}
-              </h4>
+  <div class="min-h-screen bg-theme-canvas py-8 px-4 sm:px-6 lg:px-8 font-sans text-theme-ink">
+    <div class="max-w-4xl mx-auto">
+
+      <!-- Loading Skeleton -->
+      <div v-if="isLoadingInitial" class="space-y-6">
+        <div class="h-10 bg-theme-surface-muted rounded-lg w-1/3 animate-pulse"></div>
+        <div class="h-64 bg-theme-surface rounded-2xl border border-theme-border p-6 animate-pulse"></div>
+      </div>
+
+      <div v-else>
+        <!-- Top Action Bar -->
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center space-x-3">
+            <NuxtLink
+              to="/admin/books"
+              class="w-9 h-9 rounded-lg bg-theme-surface border border-theme-border flex items-center justify-center text-theme-muted hover:text-theme-ink transition-colors shadow-sm cursor-pointer"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </NuxtLink>
+            <div>
+              <h1 class="text-2xl font-bold text-theme-ink tracking-tight">Edit PDF eBook</h1>
+              <p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, discounts, badges, categories, and Cloudflare R2 file</p>
             </div>
-            <span class="text-xs font-mono text-white/70 truncate block pt-1 border-t border-white/10">
-              {{ book.author || 'Edition' }}
-            </span>
           </div>
 
-          <img
-            v-else
-            :src="coverImage"
-            :alt="book.name"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-            width="240"
-            height="328"
-            referrerpolicy="no-referrer"
-            @error="handleImageError"
-          />
-
-          <!-- Top-Left Curated Badge -->
-          <span
-            v-if="badgeInfo"
-            class="absolute top-2.5 left-2.5 bg-theme-dark/90 backdrop-blur-xs text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded-md uppercase z-10 flex items-center gap-1 shadow-xs"
-          >
-            <component :is="badgeInfo.icon" :size="10" class="text-theme-accent" />
-            {{ badgeInfo.label }}
-          </span>
-        </NuxtLink>
-
-        <!-- UPRIGHT ZIGZAG STARBURST DISCOUNT BADGE (Centered on cover's top-right corner, No Tilt, No 'OFF' text) -->
-        <div
-          v-if="discountPercentage > 0"
-          class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 z-20 w-16 h-16 sm:w-[70px] sm:h-[70px] flex items-center justify-center pointer-events-none drop-shadow-md transition-transform duration-300 group-hover:scale-105"
-          aria-label="Discount badge"
-        >
-          <!-- 16-point Zigzag Starburst Medallion SVG -->
-          <svg
-            viewBox="0 0 100 100"
-            class="absolute inset-0 w-full h-full text-theme-accent fill-current"
-          >
-            <path
-              d="M50 0 L59 10 L73 7 L78 20 L92 23 L91 37 L100 45 L94 58 L99 71 L87 77 L85 91 L71 89 L63 100 L50 93 L37 100 L29 89 L15 91 L13 77 L1 71 L6 58 L0 45 L9 37 L8 23 L22 20 L27 7 L41 10 Z"
-            />
-          </svg>
-
-          <!-- Bigger, Bolder -#% (Upright) -->
-          <span class="relative z-10 font-black font-mono text-[16px] sm:text-[18px] text-white tracking-tight leading-none">
-            -{{ discountPercentage }}%
-          </span>
+          <div class="flex items-center space-x-3">
+            <NuxtLink
+              to="/admin/books"
+              class="px-4 py-2 text-xs font-semibold text-theme-muted bg-theme-surface border border-theme-border rounded-lg hover:bg-theme-surface-subtle shadow-sm transition-colors"
+            >
+              Cancel
+            </NuxtLink>
+            <button
+              type="button"
+              :disabled="isSubmitting"
+              @click="handleUpdate"
+              class="inline-flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active disabled:opacity-50 rounded-lg shadow-sm transition-all cursor-pointer"
+            >
+              <svg v-if="isSubmitting" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>{{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}</span>
+            </button>
+          </div>
         </div>
+
+        <form @submit.prevent="handleUpdate" class="space-y-6">
+
+          <!-- Success Alert -->
+          <div v-if="successToast" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-theme-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <p class="text-xs font-bold text-theme-accent-hover">{{ successToast }}</p>
+            </div>
+            <button type="button" @click="successToast = ''" class="text-xs text-theme-accent font-bold cursor-pointer">Dismiss</button>
+          </div>
+
+          <!-- Error Alert -->
+          <div v-if="formError" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-start space-x-3">
+            <svg class="w-5 h-5 text-theme-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h4 class="text-xs font-bold text-theme-accent-hover">Update Blocked</h4>
+              <p class="text-xs text-theme-accent mt-0.5">{{ formError }}</p>
+            </div>
+          </div>
+
+          <!-- Section 1: Book Essentials -->
+          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
+            <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider border-b border-theme-border pb-3">
+              Book Details
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Book Title *</label>
+                <input
+                  v-model="form.name"
+                  type="text"
+                  placeholder="e.g. The Psychology of Money"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Author</label>
+                <input
+                  v-model="form.author"
+                  type="text"
+                  placeholder="e.g. Morgan Housel"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                />
+              </div>
+
+              <!-- Category with "+ New Category" Action Button -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-xs font-bold text-theme-ink">Category *</label>
+                  <button
+                    type="button"
+                    class="text-[11px] font-bold text-theme-accent hover:text-theme-accent-hover hover:underline cursor-pointer flex items-center gap-1"
+                    @click="isCategoryModalOpen = true"
+                  >
+                    <span>+ New Category</span>
+                  </button>
+                </div>
+                <select
+                  v-model="form.category_id"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all cursor-pointer"
+                  required
+                >
+                  <option value="" disabled>Select category</option>
+                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                    {{ cat.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">SKU / ISBN</label>
+                <input
+                  v-model="form.sku"
+                  type="text"
+                  placeholder="e.g. 978-0857197689"
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+                />
+              </div>
+
+              <!-- Promotional Badge (Presets + Custom Badge Input) -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-theme-ink">Promotional Badge</label>
+                <div class="space-y-2">
+                  <select
+                    v-model="badgeSelectValue"
+                    class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all cursor-pointer"
+                    @change="handleBadgeSelectChange"
+                  >
+                    <option value="">None (Standard)</option>
+                    <option value="BESTSELLER">Bestseller (BESTSELLER)</option>
+                    <option value="FLASH_SALE">Flash Sale (FLASH_SALE)</option>
+                    <option value="NO1_PICK">#1 Staff Pick (NO1_PICK)</option>
+                    <option value="DEAL_OF_WEEK">Deal of the Week (DEAL_OF_WEEK)</option>
+                    <option value="LIMITED_TIME">Limited Time (LIMITED_TIME)</option>
+                    <option value="__CUSTOM__">✨ Custom Badge...</option>
+                  </select>
+
+                  <!-- Custom Badge Input Box -->
+                  <div v-if="badgeSelectValue === '__CUSTOM__'" class="space-y-1 animate-in fade-in duration-200">
+                    <input
+                      v-model="form.customBadgeText"
+                      type="text"
+                      placeholder="Type custom badge (e.g. EDITOR'S CHOICE, 20% OFF)"
+                      class="w-full px-3 py-2 bg-theme-surface border border-theme-accent rounded-lg text-xs font-mono font-bold uppercase text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-accent/20"
+                      maxlength="30"
+                    />
+                    <p class="text-[10px] text-theme-muted">Appears as an editorial promotional badge across the digital storefront.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-theme-ink mb-1.5">Synopsis / Description</label>
+                <textarea
+                  v-model="form.description"
+                  rows="3"
+                  placeholder="Describe the eBook content..."
+                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all resize-none"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Book Cover Art -->
+          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
+            <div class="flex items-center justify-between border-b border-theme-border pb-3">
+              <div>
+                <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Book Cover Art</h2>
+                <p class="text-xs text-theme-muted mt-0.5">High-definition publisher jacket</p>
+              </div>
+              <button
+                type="button"
+                :disabled="isFindingCover || !form.name.trim()"
+                @click="handleAutoFindCover"
+                class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink border border-theme-border rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <svg v-if="isFindingCover" class="animate-spin w-3.5 h-3.5 text-theme-ink" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span v-else>🔍</span>
+                <span>{{ isFindingCover ? 'Searching Studio Art...' : 'Auto-Find Cover' }}</span>
+              </button>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start gap-6">
+              <div class="w-32 h-44 bg-theme-surface-subtle rounded-xl border border-theme-border overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
+                <img
+                  v-if="form.cover_image_url"
+                  :src="form.cover_image_url"
+                  alt="Book cover preview"
+                  class="w-full h-full object-cover"
+                  @error="form.cover_image_url = ''"
+                />
+                <div v-else class="text-center p-3 text-theme-subtle">
+                  <svg class="w-8 h-8 mx-auto mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span class="text-[10px] block">No Cover</span>
+                </div>
+              </div>
+
+              <div class="flex-1 space-y-3 w-full">
+                <div class="flex items-center gap-2">
+                  <input
+                    ref="coverFileInputRef"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleCoverFileSelected"
+                  />
+                  <button
+                    type="button"
+                    :disabled="isUploadingCover"
+                    @click="coverFileInputRef?.click()"
+                    class="px-4 py-2 bg-theme-dark hover:bg-theme-dark-surface text-white rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    <svg v-if="isUploadingCover" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>{{ isUploadingCover ? 'Uploading...' : 'Upload Cover Image' }}</span>
+                  </button>
+
+                  <button
+                    v-if="form.cover_image_url"
+                    type="button"
+                    @click="form.cover_image_url = ''"
+                    class="px-3 py-2 text-xs font-semibold text-theme-accent hover:bg-theme-accent-soft rounded-lg transition-colors cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="block text-[11px] font-semibold text-theme-muted">Or paste image URL directly:</label>
+                  <input
+                    v-model="form.cover_image_url"
+                    type="url"
+                    placeholder="https://..."
+                    class="w-full px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-lg text-xs text-theme-ink focus:bg-white focus:outline-none focus:border-theme-accent font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Pure Digital Edition Management with Strikethrough Pricing UI -->
+          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
+            <div class="flex items-center justify-between border-b border-theme-border pb-3">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-theme-accent"></span>
+                <h3 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Digital PDF Edition</h3>
+              </div>
+              <span v-if="pdfFormatId" class="text-xs text-theme-accent font-bold bg-theme-accent-soft px-2 py-0.5 rounded">
+                Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
+              </span>
+              <span v-else class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                Will be generated upon save
+              </span>
+            </div>
+
+            <div class="p-5 rounded-xl border border-theme-border bg-theme-surface-subtle space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- PDF Selling Price -->
+                <div>
+                  <label class="block text-xs font-semibold text-theme-ink mb-1">eBook Price (KSh) *</label>
+                  <input
+                    v-model.number="form.pdfPrice"
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 149"
+                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono font-bold"
+                    required
+                  />
+                </div>
+
+                <!-- PDF Strikethrough Price -->
+                <div>
+                  <label class="block text-xs font-semibold text-theme-ink mb-1">
+                    Original Price (KSh)
+                    <span class="text-[10px] text-theme-muted font-normal">Strikethrough</span>
+                  </label>
+                  <input
+                    v-model.number="form.compareAtPrice"
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 299 (Optional discount)"
+                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono"
+                  />
+                </div>
+              </div>
+
+              <!-- SINGLE PDF UPLOADER -->
+              <div>
+                <label class="block text-xs font-semibold text-theme-ink mb-1.5">
+                  eBook PDF Document
+                </label>
+                <SinglePdfUploader
+                  v-model="form.pdfKey"
+                  :initial-file-name="form.pdfFileName"
+                  :initial-file-size="form.pdfFileSize"
+                  :max-file-size-mb="50"
+                  @success="handlePdfReplaced"
+                  @remove="handlePdfRemoved"
+                />
+              </div>
+
+              <div v-if="isPdfDirty" class="p-3 bg-theme-surface-muted border border-theme-border rounded-lg flex items-center space-x-2">
+                <svg class="w-4 h-4 text-theme-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-[11px] text-theme-ink font-medium">
+                  New PDF staged in Cloudflare R2. Click <strong>Save Changes</strong> to update customer download streams.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </form>
       </div>
 
-      <!-- Format Line: Simple Minimal Text -->
-      <div class="flex items-center justify-between gap-1 text-xs sm:text-[13px] pb-1.5">
-        <span class="font-bold text-theme-accent flex items-center gap-1.5">
-          <FileText :size="13" class="stroke-[2.5]" />
-          <span>eBook (PDF)</span>
-        </span>
-        <span class="text-theme-muted truncate text-[11px] sm:text-xs">
-          {{ book.category_name || 'General' }}
-        </span>
-      </div>
+      <!-- Add Category Modal -->
+      <AddCategoryModal
+        :open="isCategoryModalOpen"
+        @close="isCategoryModalOpen = false"
+        @created="handleCategoryCreated"
+      />
 
-      <!-- Book Title: Bold, Large & Strictly Single-Line -->
-      <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
-        <h3
-          class="font-display font-extrabold text-base sm:text-lg lg:text-xl text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-tight tracking-tight"
-          :title="book.name"
-        >
-          {{ book.name }}
-        </h3>
-      </NuxtLink>
-
-      <!-- Author -->
-      <p class="text-xs sm:text-[13px] text-theme-muted italic truncate mt-0.5">
-        {{ displayAuthor }}
-      </p>
-
-      <!-- Rating Line -->
-      <div class="flex items-center gap-1.5 pt-1.5 text-xs">
-        <span class="text-amber-500 font-bold tracking-tight">★★★★★</span>
-        <span class="text-theme-ink font-mono font-bold text-xs">4.9</span>
-      </div>
-    </div>
-
-    <!-- Bottom Pricing & Full-Width Download Action Button -->
-    <div class="pt-3 mt-3 border-t border-theme-border space-y-2.5">
-      <!-- Price Row with Red Strikethrough -->
-      <div class="flex items-baseline gap-2.5">
-        <span class="text-lg sm:text-xl font-extrabold font-mono text-theme-ink tabular-figure tracking-tight">
-          {{ formatCurrency(currentPrice) }}
-        </span>
-        <span
-          v-if="originalPrice && originalPrice > currentPrice"
-          class="text-xs sm:text-sm font-semibold font-mono text-theme-accent line-through decoration-theme-accent"
-        >
-          {{ formatCurrency(originalPrice) }}
-        </span>
-      </div>
-
-      <!-- Full-Width Download Action Button -->
-      <button
-        type="button"
-        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
-        :title="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
-        :aria-label="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
-        @click="handleAddToCart"
-      >
-        <Download :size="17" class="stroke-[2.5]" />
-        <span>Download</span>
-      </button>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { ofetch } from 'ofetch';
+import SinglePdfUploader from '~/components/admin/SinglePdfUploader.vue';
+import AddCategoryModal from '~/components/admin/AddCategoryModal.vue';
+import { useToast } from '~/composables/useToast';
+
+definePageMeta({
+  middleware: 'admin-auth',
+});
+
+const route = useRoute();
+const productId = route.params.id as string;
+const { push: pushToast } = useToast();
+
+const isLoadingInitial = ref(true);
+const isSubmitting = ref(false);
+const isFindingCover = ref(false);
+const isUploadingCover = ref(false);
+const isPdfDirty = ref(false);
+const isCategoryModalOpen = ref(false);
+const formError = ref('');
+const successToast = ref('');
+const coverFileInputRef = ref<HTMLInputElement | null>(null);
+
+const categories = ref<Array<{ id: string; name: string; slug?: string }>>([]);
+const pdfFormatId = ref<string | null>(null);
+
+const badgeSelectValue = ref<string>('');
+
+const form = reactive({
+  name: '',
+  author: '',
+  category_id: '',
+  sku: '',
+  badge: null as string | null,
+  customBadgeText: '',
+  description: '',
+  cover_image_url: '',
+  pdfPrice: 149,
+  compareAtPrice: null as number | null,
+  pdfKey: null as string | null,
+  pdfFileUrl: null as string | null,
+  pdfFileSize: 0,
+  pdfFileName: '',
+});
+
+const STANDARD_BADGES = ['BESTSELLER', 'FLASH_SALE', 'NO1_PICK', 'DEAL_OF_WEEK', 'LIMITED_TIME'];
+
+async function loadBookData() {
+  try {
+    // 1. Fetch Categories
+    const catRaw = await ofetch<any>('/api/admin/categories');
+    const catList = catRaw?.data || catRaw;
+    if (Array.isArray(catList)) categories.value = catList;
+
+    // 2. Fetch Book Record (merged with formats via updated [id].get.ts)
+    const bookRaw = await ofetch<any>(`/api/admin/books/${productId}`);
+    const book = bookRaw?.data || bookRaw;
+
+    if (!book || !book.id) {
+      throw new Error('Book record could not be loaded.');
+    }
+
+    form.name = book.name || '';
+    
+    // Multi-casing category hydration
+    form.category_id = book.category_id || book.categoryId || book.category?.id || '';
+    
+    form.sku = book.sku || '';
+    form.description = book.description || '';
+    form.pdfPrice = Number(book.price) || 149;
+    form.compareAtPrice = (book.compare_at_price || book.compareAtPrice) 
+      ? Number(book.compare_at_price || book.compareAtPrice) 
+      : null;
+
+    // Badge Hydration: Presets vs Custom
+    if (book.badge) {
+      if (STANDARD_BADGES.includes(book.badge)) {
+        badgeSelectValue.value = book.badge;
+        form.badge = book.badge;
+      } else {
+        badgeSelectValue.value = '__CUSTOM__';
+        form.badge = book.badge;
+        form.customBadgeText = book.badge;
+      }
+    } else {
+      badgeSelectValue.value = '';
+      form.badge = null;
+      form.customBadgeText = '';
+    }
+
+    // Prefill author from description if prefixed "By ..."
+    if (book.description && book.description.startsWith('By ')) {
+      const match = book.description.match(/^By\s+([^.]+)\.\s*(.*)$/);
+      if (match) {
+        form.author = match[1].trim();
+        form.description = match[2].trim();
+      }
+    } else if (book.author) {
+      form.author = book.author;
+    }
+
+    // Prefill cover image
+    const firstImg = book.images?.[0];
+    if (typeof firstImg === 'string') {
+      form.cover_image_url = firstImg;
+    } else if (firstImg?.image_url) {
+      form.cover_image_url = firstImg.image_url;
+    } else if (book.cover_image_url) {
+      form.cover_image_url = book.cover_image_url;
+	}
+	      // Formats Hydration (Strictly digital PDF/ePub format)
+    const formats: any[] = book.formats || [];
+    const pdf = formats.find((f) => f.format === 'pdf') || formats.find((f) => f.format === 'epub');
+    if (pdf) {
+      pdfFormatId.value = pdf.id;
+      form.pdfPrice = Number(pdf.price) || form.pdfPrice;
+      const cp = pdf.compare_at_price || pdf.compareAtPrice;
+      form.compareAtPrice = cp ? Number(cp) : form.compareAtPrice;
+      form.pdfKey = pdf.file_public_id || pdf.file_url || null;
+      form.pdfFileUrl = pdf.file_url || null;
+      form.pdfFileSize = pdf.file_size_bytes ? Number(pdf.file_size_bytes) : 0;
+      form.pdfFileName = pdf.file_public_id
+        ? pdf.file_public_id.split('/').pop()?.replace(/^\d+-/, '') || 'eBook-edition.pdf'
+        : `${book.name}.pdf`;
+    }
+  } catch (err: any) {
+    formError.value =
+      err.data?.data?.message || err.data?.message || err.message || 'Failed to load book data.';
+  } finally {
+    isLoadingInitial.value = false;
+  }
+}
+
+onMounted(() => {
+  loadBookData();
+});
+
+function handleBadgeSelectChange() {
+  if (badgeSelectValue.value === '__CUSTOM__') {
+    form.badge = form.customBadgeText.trim() || null;
+  } else if (badgeSelectValue.value === '') {
+    form.badge = null;
+    form.customBadgeText = '';
+  } else {
+    form.badge = badgeSelectValue.value;
+  }
+}
+
+function handleCategoryCreated(newCat: { id: string; name: string; slug: string }) {
+  if (!categories.value.some((c) => c.id === newCat.id)) {
+    categories.value.push(newCat);
+  }
+  form.category_id = newCat.id;
+}
+
+async function handleAutoFindCover() {
+  if (!form.name.trim()) {
+    pushToast({ message: 'Enter a book title first to search for cover art', variant: 'info' });
+    return;
+  }
+
+  isFindingCover.value = true;
+  try {
+    const res = await ofetch<{ coverUrl: string | null; title: string; source: string | null }>(
+      `/api/admin/books/find-cover`,
+      {
+        query: {
+          title: form.name.trim(),
+          author: form.author ? form.author.trim() : undefined,
+        },
+      }
+    );
+
+    if (res?.coverUrl) {
+      form.cover_image_url = res.coverUrl;
+      pushToast({
+        message: `High-res cover located (${(res.source || 'Studio').toUpperCase()})!`,
+        variant: 'success',
+      });
+    } else {
+      pushToast({ message: 'No online cover found. You can upload an image file.', variant: 'info' });
+    }
+  } catch {
+    pushToast({ message: 'Auto-find cover search timed out. You can upload manually.', variant: 'error' });
+  } finally {
+    isFindingCover.value = false;
+  }
+}
+
+async function handleCoverFileSelected(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  isUploadingCover.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await ofetch<{ url: string }>('/api/admin/banners/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (res?.url) {
+      form.cover_image_url = res.url;
+      pushToast({ message: 'Cover image uploaded successfully!', variant: 'success' });
+    }
+  } catch (err: any) {
+    pushToast({ message: err.data?.message || 'Failed to upload cover image.', variant: 'error' });
+  } finally {
+    isUploadingCover.value = false;
+    target.value = '';
+  }
+}
+
+function handlePdfReplaced(payload: { key: string; fileUrl: string; sizeBytes: number; fileName: string }) {
+  form.pdfKey = payload.key;
+  form.pdfFileUrl = payload.fileUrl;
+  form.pdfFileSize = payload.sizeBytes;
+  form.pdfFileName = payload.fileName;
+  isPdfDirty.value = true;
+}
+
+function handlePdfRemoved() {
+  form.pdfKey = null;
+  form.pdfFileUrl = null;
+  form.pdfFileSize = 0;
+  form.pdfFileName = '';
+  isPdfDirty.value = true;
+}
+
+async function handleUpdate() {
+  formError.value = '';
+  successToast.value = '';
+
+  if (!form.name.trim()) {
+    formError.value = 'Book title is required.';
+    return;
+  }
+
+  if (!form.category_id) {
+    formError.value = 'Please select a category.';
+    return;
+  }
+
+  isSubmitting.value = true;
+
+  try {
+    // Resolve final badge string
+    let resolvedBadge: string | null = null;
+    if (badgeSelectValue.value === '__CUSTOM__') {
+      resolvedBadge = form.customBadgeText.trim() || null;
+    } else if (badgeSelectValue.value) {
+      resolvedBadge = badgeSelectValue.value;
+    }
+
+    const compareAtValue = form.compareAtPrice 
+      ? Math.max(0, Number(form.compareAtPrice)) 
+      : null;
+
+    // 1. Update Base Product (providing dual camelCase & snake_case for DTO compatibility)
+    await ofetch(`/api/admin/books/${productId}`, {
+      method: 'PATCH',
+      body: {
+        name: form.name.trim(),
+        category_id: form.category_id,
+        categoryId: form.category_id,
+        price: Math.max(0, Number(form.pdfPrice) || 0),
+        compare_at_price: compareAtValue,
+        compareAtPrice: compareAtValue,
+        sku: form.sku.trim() || null,
+        badge: resolvedBadge,
+        description: form.author ? `By ${form.author.trim()}. ${form.description}` : form.description,
+        images: form.cover_image_url
+          ? [{ image_url: form.cover_image_url, image_public_id: 'cover_img' }]
+          : [],
+      },
+    });
+
+    const formatBody = {
+      format: 'pdf',
+      price: Math.max(0, Number(form.pdfPrice) || 0),
+      compare_at_price: compareAtValue,
+      compareAtPrice: compareAtValue,
+      file_url: form.pdfFileUrl || form.pdfKey,
+      file_public_id: form.pdfKey,
+      file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
+    };
+
+    // 2. Update OR Create Pure Digital PDF Format
+    if (pdfFormatId.value) {
+      await ofetch(`/api/admin/books/${productId}/formats/${pdfFormatId.value}`, {
+        method: 'PATCH',
+        body: formatBody,
+      });
+    } else {
+      await ofetch(`/api/admin/books/${productId}/formats`, {
+        method: 'POST',
+        body: formatBody,
+      }).then((res: any) => {
+        pdfFormatId.value = res?.id || res?.data?.id || null;
+      });
+    }
+
+    isPdfDirty.value = false;
+    successToast.value = 'eBook details, discounts, badges, cover art, and PDF file saved successfully!';
+    pushToast({ message: successToast.value, variant: 'success' });
+
+    // Reload book data to ensure live synchronized state
+    await loadBookData();
+  } catch (err: any) {
+    formError.value =
+      err.data?.message ||
+      err.data?.error?.message ||
+      err.statusMessage ||
+      err.message ||
+      'Failed to save changes.';
+    pushToast({ message: formError.value, variant: 'error' });
+  } finally {
+    isSubmitting.value = false;
+  }
+	}
+</script>
 </file>
 
 <file path="pages/index.vue">
@@ -17270,6 +17227,322 @@ onUnmounted(() => {
 	transform: translateY(-6px);
 }
 </style>
+</file>
+
+<file path="components/storefront/BookCard.vue">
+<!-- components/storefront/BookCard.vue -->
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { Download, Zap, Flame, Star, Tag, Clock, FileText } from 'lucide-vue-next';
+import { useCart } from '~/composables/useCart';
+import { useToast } from '~/composables/useToast';
+import type { Book, ProductFormat } from '~/types';
+
+interface Props {
+  book: Book;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{
+  requestSeed: [title: string, author?: string];
+}>();
+
+const { addItem, openDrawer } = useCart();
+const { push: pushToast } = useToast();
+
+const imageFailed = ref(false);
+
+const activePdfFormat = computed<ProductFormat>(() => {
+  const formats = props.book?.formats || [];
+  const pdf = formats.find((f) => f.format === 'pdf');
+  if (pdf) return pdf;
+
+  const epub = formats.find((f) => f.format === 'epub');
+  if (epub) return epub;
+
+  const defaultEbookPrice = props.book.price && props.book.price < 500 ? props.book.price : 149;
+  return {
+    id: `pdf-${props.book.id}`,
+    product_id: props.book.id,
+    format: 'pdf',
+    price: defaultEbookPrice,
+    compare_at_price: props.book.compare_at_price || null,
+    file_url: null,
+    file_public_id: null,
+    file_size_bytes: null,
+    stock: null,
+    created_at: props.book.created_at || '',
+    updated_at: props.book.updated_at || '',
+  };
+});
+
+const pricing = computed(() => {
+  const fmt = activePdfFormat.value;
+  const p = fmt.price;
+  const cp = fmt.compare_at_price ?? null;
+
+  if (cp !== null && cp !== undefined && cp > p && p > 0) {
+    const diff = cp - p;
+    const percentDown = Math.round((diff / cp) * 100);
+    return {
+      currentPrice: p,
+      originalPrice: cp,
+      discountPercentage: percentDown > 0 ? percentDown : 0,
+    };
+  }
+
+  return {
+    currentPrice: p,
+    originalPrice: null,
+    discountPercentage: 0,
+  };
+});
+
+const currentPrice = computed<number>(() => pricing.value.currentPrice);
+const originalPrice = computed<number | null>(() => pricing.value.originalPrice);
+const discountPercentage = computed<number>(() => pricing.value.discountPercentage);
+
+const coverImage = computed<string | null>(() => {
+  if (!props.book) return null;
+  const rawImg: unknown = props.book.images?.[0];
+  if (typeof rawImg === 'string' && rawImg.trim().length > 5) return rawImg.trim();
+  if (rawImg && typeof rawImg === 'object' && 'image_url' in rawImg) {
+    const url = (rawImg as { image_url?: string }).image_url;
+    if (typeof url === 'string' && url.trim().length > 5) return url.trim();
+  }
+  const fallback = (props.book as any).cover_image_url;
+  if (typeof fallback === 'string' && fallback.trim().length > 5) return fallback.trim();
+  return null;
+});
+
+const displayAuthor = computed(() => {
+  if (!props.book.author) return 'Original Edition';
+  return props.book.author.startsWith('By ') ? props.book.author : `By ${props.book.author}`;
+});
+
+type BadgeInfo = { icon: typeof Zap; label: string } | null;
+
+function getBadgeInfo(badgeStr?: string | null): BadgeInfo {
+  if (!badgeStr) return null;
+  switch (badgeStr) {
+    case 'FLASH_SALE':
+      return { icon: Zap, label: 'FLASH' };
+    case 'BESTSELLER':
+      return { icon: Flame, label: 'BESTSELLER' };
+    case 'NO1_PICK':
+      return { icon: Star, label: '#1 PICK' };
+    case 'DEAL_OF_WEEK':
+      return { icon: Tag, label: 'DEAL' };
+    case 'LIMITED_TIME':
+      return { icon: Clock, label: 'LIMITED' };
+    default:
+      return { icon: Tag, label: badgeStr.replace(/_/g, ' ') };
+  }
+}
+
+const badgeInfo = computed(() => getBadgeInfo(props.book.badge));
+
+function handleImageError(): void {
+  imageFailed.value = true;
+}
+
+function formatCurrency(val: number): string {
+  return `KSh ${val.toLocaleString('en-KE')}`;
+}
+
+function handleCardClick(event: Event): void {
+  if (props.book.isSeed) {
+    event.preventDefault();
+    emit('requestSeed', props.book.name, props.book.author || undefined);
+  }
+}
+
+function handleAddToCart(event: Event): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (props.book.isSeed) {
+    emit('requestSeed', props.book.name, props.book.author || undefined);
+    return;
+  }
+
+  const fmt = activePdfFormat.value;
+  const isSynthetic = !fmt.id || fmt.id.startsWith('pdf-');
+  const validFormatId = isSynthetic ? '' : fmt.id;
+
+  addItem({
+    productId: props.book.id,
+    formatId: validFormatId,
+    title: props.book.name,
+    format: 'pdf',
+    price: currentPrice.value,
+    compare_at_price: originalPrice.value,
+    quantity: 1,
+    deliveryMethod: 'digital',
+    coverUrl: coverImage.value,
+    author: props.book.author,
+  });
+
+  pushToast({
+    message: `Added "${props.book.name}" (PDF eBook) to cart!`,
+    variant: 'success',
+  });
+
+  openDrawer();
+}
+</script>
+
+<template>
+  <!-- Unified Card: The whole card elevates & scales as a single solid unit on hover -->
+  <div class="relative w-full h-full bg-theme-surface text-theme-ink rounded-2xl p-3.5 sm:p-4 shadow-card hover:shadow-xl hover:-translate-y-1.5 hover:scale-[1.01] hover:border-theme-accent/60 transition-all duration-200 flex flex-col justify-between group select-none text-left border border-theme-border">
+    <div class="flex flex-col flex-1">
+      
+      <!-- Studio Display Stage (Exact bounding dimension preserved: aspect-[1/1.37], mb-3; NO overflow: hidden) -->
+      <div class="ebookreads-book-stage relative mb-3 w-full aspect-[1/1.37] rounded-xl flex items-center justify-center p-4 sm:p-5">
+        
+        <!-- Multi-Planar 3D Physical Book Assembly (Rotated -24° with 14px thickness) -->
+        <NuxtLink
+          :to="book.isSeed ? '#' : `/book/${book.slug}`"
+          class="ebookreads-3d-book-assembly block cursor-pointer"
+          :aria-label="`View details for ${book.name}`"
+          @click="handleCardClick"
+        >
+          <!-- 1. Directional Perspective Ground Shadow -->
+          <div class="ebookreads-3d-cast-shadow" aria-hidden="true" />
+
+          <!-- 2. Back Cover Board (translateZ(-7.5px)) -->
+          <div class="ebookreads-3d-back-board" aria-hidden="true" />
+
+          <!-- 3. Fore-Edge Page Block (Tucked between -7px and +7px) -->
+          <div class="ebookreads-3d-pages-side" aria-hidden="true" />
+
+          <!-- 4. Front Cover Board (translateZ(7.5px)) -->
+          <div class="ebookreads-3d-front bg-theme-surface-subtle">
+            <!-- Missing Cover Fallback -->
+            <div
+              v-if="imageFailed || !coverImage"
+              class="w-full h-full flex flex-col justify-between p-2.5 bg-gradient-to-br from-theme-dark to-theme-dark-surface text-white text-left select-none"
+            >
+              <div class="space-y-0.5">
+                <span class="text-[9.5px] font-mono uppercase tracking-widest text-theme-accent font-bold block truncate">
+                  {{ book.category_name || 'eBook' }}
+                </span>
+                <h4 class="font-display font-bold text-xs sm:text-sm leading-tight line-clamp-3 text-white">
+                  {{ book.name }}
+                </h4>
+              </div>
+              <span class="text-[9.5px] font-mono text-white/70 truncate block pt-1 border-t border-white/10">
+                {{ book.author || 'Edition' }}
+              </span>
+            </div>
+
+            <!-- Cover Jacket Image -->
+            <img
+              v-else
+              :src="coverImage"
+              :alt="`Cover for ${book.name}`"
+              class="w-full h-full object-cover"
+              loading="lazy"
+              width="128"
+              height="186"
+              referrerpolicy="no-referrer"
+              @error="handleImageError"
+            />
+
+            <!-- Spine Roll & Debossed Joint Hinge Crease -->
+            <div class="ebookreads-3d-spine-crease" aria-hidden="true" />
+
+            <!-- Laminate Sheen Reflection -->
+            <div class="ebookreads-3d-sheen" aria-hidden="true" />
+          </div>
+
+          <!-- Identity Badge (Top Left of Front Cover) -->
+          <span
+            v-if="badgeInfo"
+            class="absolute top-1.5 left-2 bg-theme-dark/95 text-white font-mono font-bold text-[9px] px-1.5 py-0.5 rounded uppercase z-20 flex items-center gap-1 shadow-xs border border-white/15 pointer-events-none"
+          >
+            <component :is="badgeInfo.icon" :size="9" class="text-theme-accent" />
+            {{ badgeInfo.label }}
+          </span>
+        </NuxtLink>
+
+        <!-- Upright Crimson Red Starburst Discount Badge (Anchored cleanly to Stage Top-Right) -->
+        <div
+          v-if="discountPercentage > 0"
+          class="absolute top-2.5 right-2.5 z-20 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center pointer-events-none drop-shadow-[0_3px_8px_rgba(229,9,20,0.40)]"
+          aria-label="Discount badge"
+        >
+          <svg viewBox="0 0 100 100" class="w-full h-full text-theme-accent fill-current">
+            <polygon points="98,50 89.2,57.8 94.3,68.4 83.3,72.2 83.9,83.9 72.2,83.3 68.4,94.3 57.8,89.2 50,98 42.2,89.2 31.6,94.3 27.8,83.3 16.1,83.9 16.7,72.2 5.7,68.4 10.8,57.8 2,50 10.8,42.2 5.7,31.6 16.7,27.8 16.1,16.1 27.8,16.7 31.6,5.7 42.2,10.8 50,2 57.8,10.8 68.4,5.7 72.2,16.7 83.9,16.1 83.3,27.8 94.3,31.6 89.2,42.2" />
+          </svg>
+          <span class="absolute inset-0 flex items-center justify-center font-black font-mono text-[12px] sm:text-[13px] text-white tracking-tighter drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+            -{{ discountPercentage }}%
+          </span>
+        </div>
+      </div>
+
+      <!-- Format Line: Minimal Modern Publisher Tag -->
+      <div class="flex items-center justify-between gap-1 text-xs sm:text-[13px] pb-1.5">
+        <span class="font-bold text-theme-accent flex items-center gap-1.5">
+          <FileText :size="13" class="stroke-[2.5]" />
+          <span>eBook (PDF)</span>
+        </span>
+        <span class="text-theme-muted truncate text-[11px] sm:text-xs">
+          {{ book.category_name || 'General' }}
+        </span>
+      </div>
+
+      <!-- Book Title: Strictly Single-Line Clamp -->
+      <NuxtLink :to="book.isSeed ? '#' : `/book/${book.slug}`" class="block" @click="handleCardClick">
+        <h3
+          class="font-display font-extrabold text-base sm:text-lg lg:text-xl text-theme-ink group-hover:text-theme-accent transition-colors truncate block leading-tight tracking-tight"
+          :title="book.name"
+        >
+          {{ book.name }}
+        </h3>
+      </NuxtLink>
+
+      <!-- Author -->
+      <p class="text-xs sm:text-[13px] text-theme-muted italic truncate mt-0.5">
+        {{ displayAuthor }}
+      </p>
+
+      <!-- Rating Line -->
+      <div class="flex items-center gap-1.5 pt-1.5 text-xs select-none">
+        <span class="text-amber-500 font-bold tracking-tight">★★★★★</span>
+        <span class="text-theme-ink font-mono font-bold text-xs">4.9</span>
+      </div>
+    </div>
+
+    <!-- Bottom Pricing & Full-Width Crimson Red Download Action Button -->
+    <div class="pt-3 mt-3 border-t border-theme-border space-y-2.5">
+      <!-- Price Row with Crimson Strikethrough -->
+      <div class="flex items-baseline gap-2.5">
+        <span class="text-lg sm:text-xl font-extrabold font-mono text-theme-ink tabular-figure tracking-tight">
+          {{ formatCurrency(currentPrice) }}
+        </span>
+        <span
+          v-if="originalPrice && originalPrice > currentPrice"
+          class="text-xs sm:text-sm font-semibold font-mono text-theme-accent line-through decoration-theme-accent"
+        >
+          {{ formatCurrency(originalPrice) }}
+        </span>
+      </div>
+
+      <!-- Full-Width Download Action Button -->
+      <button
+        type="button"
+        class="w-full bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-theme-accent"
+        :title="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
+        :aria-label="book.isSeed ? 'Request eBook' : 'Download eBook (PDF)'"
+        @click="handleAddToCart"
+      >
+        <Download :size="17" class="stroke-[2.5]" />
+        <span>{{ book.isSeed ? 'Request eBook' : 'Download' }}</span>
+      </button>
+    </div>
+  </div>
+</template>
 </file>
 
 </files>

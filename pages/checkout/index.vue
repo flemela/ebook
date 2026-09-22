@@ -107,7 +107,7 @@ async function handlePlaceOrder(): Promise<void> {
 			customerEmail: customerEmail.value.trim(),
 			deliveryType: "delivery",
 			deliveryLocation:
-				"Instant Digital Delivery (eBook PDF via Cloudflare R2)",
+				"Instant Digital Download (eBook PDF)",
 			paymentMethod: paymentMethod.value,
 			mpesaCode:
 				paymentMethod.value === "mpesa_manual"
@@ -187,20 +187,19 @@ async function handlePlaceOrder(): Promise<void> {
 				<div class="lg:col-span-7 space-y-6">
 					<!-- Instant Digital Delivery Banner -->
 					<div
-						class="bg-theme-accent-soft border border-theme-accent-border rounded-2xl p-4 flex items-center gap-3.5 text-xs text-theme-accent-hover shadow-soft"
+						class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3.5 text-xs text-emerald-950 shadow-soft"
 					>
 						<div
-							class="w-9 h-9 rounded-full bg-theme-accent text-white flex items-center justify-center flex-shrink-0"
+							class="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs"
 						>
 							<Download :size="18" />
 						</div>
 						<div>
-							<strong class="font-bold text-theme-ink block"
-								>Instant Cloudflare R2 Delivery</strong
+							<strong class="font-bold text-emerald-950 block"
+								>Instant eBook Download</strong
 							>
-							<span>
-								Download links unlock immediately upon M-Pesa
-								approval and are emailed to your inbox.
+							<span class="text-emerald-800">
+								Download links unlock immediately after payment and are sent straight to your email.
 							</span>
 						</div>
 					</div>
@@ -342,7 +341,7 @@ async function handlePlaceOrder(): Promise<void> {
 								class="border-2 rounded-2xl p-4 sm:p-5 flex flex-col gap-3.5 cursor-pointer transition-all relative overflow-hidden"
 								:class="
 									paymentMethod === 'mpesa_manual'
-										? 'border-theme-accent bg-theme-accent-soft/40 shadow-soft ring-1 ring-theme-accent'
+										? 'border-emerald-600 bg-emerald-50/50 shadow-soft ring-1 ring-emerald-600'
 										: 'border-theme-border bg-theme-surface hover:border-theme-border-strong'
 								"
 							>
@@ -354,7 +353,12 @@ async function handlePlaceOrder(): Promise<void> {
 										class="sr-only"
 									/>
 									<div
-										class="w-9 h-9 rounded-full bg-theme-accent-soft text-theme-accent flex items-center justify-center flex-shrink-0 mt-0.5"
+										class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors"
+										:class="
+											paymentMethod === 'mpesa_manual'
+												? 'bg-emerald-100 text-emerald-700'
+												: 'bg-slate-100 text-slate-400'
+										"
 									>
 										<CheckCircle2 :size="18" />
 									</div>
@@ -366,7 +370,7 @@ async function handlePlaceOrder(): Promise<void> {
 												Till</strong
 											>
 											<span
-												class="bg-theme-accent text-white text-[9px] font-mono font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+												class="bg-emerald-700 text-white text-[9px] font-mono font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
 											>
 												Instant
 											</span>
@@ -425,7 +429,7 @@ async function handlePlaceOrder(): Promise<void> {
 												:size="13"
 												:class="
 													isTillCopied
-														? 'text-theme-accent'
+														? 'text-emerald-600'
 														: 'text-theme-ink'
 												"
 											/>
@@ -466,7 +470,7 @@ async function handlePlaceOrder(): Promise<void> {
 								class="border rounded-2xl p-4 sm:p-4.5 flex items-start gap-3.5 cursor-pointer transition-all"
 								:class="
 									paymentMethod === 'mpesa'
-										? 'border-theme-accent bg-theme-accent-soft/40 shadow-soft ring-1 ring-theme-accent'
+										? 'border-emerald-600 bg-emerald-50/50 shadow-soft ring-1 ring-emerald-600'
 										: 'border-theme-border bg-theme-surface hover:border-theme-border-strong'
 								"
 							>
@@ -477,7 +481,12 @@ async function handlePlaceOrder(): Promise<void> {
 									class="sr-only"
 								/>
 								<div
-									class="w-9 h-9 rounded-full bg-theme-accent-soft text-theme-accent flex items-center justify-center flex-shrink-0 mt-0.5"
+									class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors"
+									:class="
+										paymentMethod === 'mpesa'
+											? 'bg-emerald-100 text-emerald-700'
+											: 'bg-slate-100 text-slate-400'
+									"
 								>
 									<Zap :size="18" />
 								</div>
@@ -566,6 +575,7 @@ async function handlePlaceOrder(): Promise<void> {
 					</div>
 
 					<!-- Totals -->
+					<!-- Totals -->
 					<div
 						class="space-y-2.5 border-t border-theme-border pt-4 text-xs"
 					>
@@ -582,8 +592,8 @@ async function handlePlaceOrder(): Promise<void> {
 						<div
 							class="flex justify-between text-theme-muted font-medium"
 						>
-							<span>Cloudflare R2 Delivery Fee</span>
-							<span class="text-theme-accent font-bold font-mono">
+							<span>Digital Delivery Fee</span>
+							<span class="text-emerald-700 font-bold font-mono">
 								FREE (INSTANT)
 							</span>
 						</div>
@@ -626,7 +636,7 @@ async function handlePlaceOrder(): Promise<void> {
 						<span v-else>
 							{{
 								paymentMethod === "mpesa_manual"
-									? `Complete Order • ${formatCurrency(subtotal)}`
+									? `Complete Order â€¢ ${formatCurrency(subtotal)}`
 									: `Pay ${formatCurrency(subtotal)} via M-Pesa`
 							}}
 						</span>
@@ -637,11 +647,10 @@ async function handlePlaceOrder(): Promise<void> {
 					>
 						<ShieldCheck
 							:size="14"
-							class="text-theme-accent flex-shrink-0"
+							class="text-emerald-600 flex-shrink-0"
 						/>
 						<span
-							>Instant Cloudflare R2 Download Tokens Issued Upon
-							Payment</span
+							>Instant eBook Download Links Sent Immediately After Payment</span
 						>
 					</div>
 				</div>

@@ -309,7 +309,7 @@ async function handleBulkDelete(): Promise<void> {
               v-for="book in books"
               :key="book.id"
               class="hover:bg-theme-surface-subtle transition-colors"
-              :class="{ 'bg-theme-accent-soft': selectedBookIds.includes(book.id) }"
+              :class="{ 'bg-emerald-50/40': selectedBookIds.includes(book.id) }"
             >
               <td class="py-3.5 px-4">
                 <input
@@ -356,7 +356,7 @@ async function handleBulkDelete(): Promise<void> {
                     class="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border"
                     :class="{
                       'bg-theme-surface-subtle text-theme-ink border-theme-border': fmt.format === 'hardcopy',
-                      'bg-theme-accent-soft text-theme-accent-hover border-theme-accent-border': fmt.format === 'pdf',
+                      'bg-emerald-50 text-emerald-800 border-emerald-200': fmt.format === 'pdf',
                       'bg-theme-surface-muted text-theme-ink border-theme-border': fmt.format === 'epub',
                     }"
                   >
@@ -370,9 +370,9 @@ async function handleBulkDelete(): Promise<void> {
               <td class="py-3.5 px-4">
                 <span
                   class="inline-flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border"
-                  :class="book.status === 'published' ? 'bg-theme-accent-soft text-theme-accent-hover border-theme-accent-border' : 'bg-theme-surface-muted text-theme-muted border-theme-border'"
+                  :class="book.status === 'published' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'"
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="book.status === 'published' ? 'bg-theme-accent' : 'bg-theme-muted'" />
+                  <span class="w-1.5 h-1.5 rounded-full" :class="book.status === 'published' ? 'bg-emerald-600' : 'bg-slate-400'" />
                   {{ book.status }}
                 </span>
               </td>

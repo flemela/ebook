@@ -507,7 +507,7 @@ const whatsappHelpUrl = computed(() => {
 								class="text-[11px] text-theme-muted flex items-center gap-1.5 font-medium"
 							>
 								<span
-									class="w-2 h-2 rounded-full bg-theme-accent animate-pulse"
+									class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"
 								/>
 								<span
 									>eBook PDF downloads unlock automatically
@@ -690,15 +690,15 @@ const whatsappHelpUrl = computed(() => {
 						class="text-center space-y-2 pb-5 border-b border-theme-border"
 					>
 						<div
-							class="w-13 h-13 bg-theme-accent-soft text-theme-accent rounded-full flex items-center justify-center mx-auto shadow-sm"
+							class="w-13 h-13 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto shadow-sm"
 						>
 							<CheckCircle2
 								:size="28"
-								class="text-theme-accent"
+								class="text-emerald-700"
 							/>
 						</div>
 						<span
-							class="text-[10px] font-mono font-bold uppercase tracking-widest text-theme-accent-hover bg-theme-accent-soft px-2.5 py-0.5 rounded-full border border-theme-accent-border"
+							class="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200"
 						>
 							Payment Verified &amp; Approved
 						</span>
@@ -723,7 +723,7 @@ const whatsappHelpUrl = computed(() => {
 						class="p-4 bg-theme-surface-subtle border border-theme-border rounded-2xl flex items-center gap-3.5 text-xs text-theme-ink shadow-2xs"
 					>
 						<div
-							class="w-9 h-9 rounded-full bg-theme-accent-soft text-theme-accent flex items-center justify-center flex-shrink-0"
+							class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0"
 						>
 							<MailCheck :size="18" />
 						</div>
@@ -748,12 +748,12 @@ const whatsappHelpUrl = computed(() => {
 							>
 								<Download
 									:size="16"
-									class="text-theme-accent"
+									class="text-emerald-700"
 								/>
 								Your Digital Editions (Direct Download)
 							</h3>
 							<span
-								class="text-[10px] text-theme-accent-hover font-mono font-bold bg-theme-accent-soft px-2 py-0.5 rounded border border-theme-accent-border"
+								class="text-[10px] text-emerald-800 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"
 							>
 								Access Valid: 90 Days
 							</span>
@@ -841,7 +841,7 @@ const whatsappHelpUrl = computed(() => {
 						>
 							<span>Delivery Format</span>
 							<span class="font-medium text-theme-ink"
-								>Instant Cloudflare R2 Token Stream</span
+								>Instant Direct Download</span
 							>
 						</div>
 						<div
@@ -849,7 +849,7 @@ const whatsappHelpUrl = computed(() => {
 						>
 							<span>Total Amount</span>
 							<span
-								class="font-display font-extrabold text-theme-ink font-mono tabular-figure text-base sm:text-lg"
+								class="font-display font-extrabold text-xl sm:text-2xl text-theme-ink font-mono tabular-figure text-base sm:text-lg"
 							>
 								{{
 									orderData

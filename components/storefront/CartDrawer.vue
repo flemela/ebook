@@ -84,7 +84,7 @@ function formatCurrency(val: number): string {
                 </div>
 
                 <div class="flex items-center gap-2">
-                  <span class="inline-flex items-center gap-1 text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded border bg-theme-accent-soft text-theme-accent-hover border-theme-accent-border">
+                  <span class="inline-flex items-center gap-1 text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded border bg-emerald-50 text-emerald-800 border-emerald-200">
                     <Download :size="9" />
                     eBook (PDF)
                   </span>
@@ -113,8 +113,8 @@ function formatCurrency(val: number): string {
             </div>
 
             <div class="flex items-center gap-2 text-xs text-theme-muted">
-              <ShieldCheck :size="16" class="text-theme-accent flex-shrink-0" />
-              <span>Instant Cloudflare R2 download tokens unlocked upon payment.</span>
+              <ShieldCheck :size="16" class="text-emerald-600 flex-shrink-0" />
+              <span>Instant eBook download links unlocked immediately after payment.</span>
             </div>
 
             <NuxtLink

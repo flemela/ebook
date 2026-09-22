@@ -275,7 +275,7 @@ function handleResetFilters(): void {
                     <div class="mt-1 flex items-center gap-1.5">
                       <span
                         v-if="order.delivery_type === 'pickup'"
-                        class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-theme-accent-hover bg-theme-accent-soft px-1.5 py-0.2 rounded border border-theme-accent-border"
+                        class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200"
                       >
                         <Store :size="10" /> Store Pickup
                       </span>
@@ -307,7 +307,7 @@ function handleResetFilters(): void {
                       <span>{{ order.customer_phone }}</span>
                     </div>
                     <div class="text-[11px] text-theme-subtle truncate mt-1 flex items-center gap-1" :title="order.delivery_location">
-                      <MapPin :size="11" class="flex-shrink-0 text-theme-accent" />
+                      <MapPin :size="11" class="flex-shrink-0 text-emerald-600" />
                       <span>{{ order.delivery_location }}</span>
                     </div>
                   </td>
@@ -317,7 +317,7 @@ function handleResetFilters(): void {
                       <span
                         class="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded"
                         :class="{
-                          'bg-theme-accent-soft text-theme-accent-hover': order.payment_method === 'mpesa_manual',
+                          'bg-emerald-50 text-emerald-900 border border-emerald-200': order.payment_method === 'mpesa_manual',
                           'bg-theme-surface-muted text-theme-ink': order.payment_method === 'mpesa_cash',
                           'bg-theme-dark text-white': order.payment_method === 'mpesa' || order.payment_method === 'mpesa_direct',
                         }"
@@ -345,22 +345,29 @@ function handleResetFilters(): void {
                     <span
                       class="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border block max-w-fit"
                       :class="{
-                        'bg-theme-accent-soft text-theme-accent-hover border-theme-accent-border': order.payment_status === 'paid',
-                        'bg-theme-surface-subtle text-theme-ink border-theme-border': order.payment_status === 'pending',
-                        'bg-theme-surface-muted text-theme-muted border-theme-border': order.payment_status === 'failed',
+                        'bg-emerald-50 text-emerald-900 border-emerald-200': order.payment_status === 'paid',
+                        'bg-amber-50 text-amber-900 border-amber-200': order.payment_status === 'pending',
+                        'bg-red-50 text-red-900 border-red-200': order.payment_status === 'failed',
                       }"
                     >
-                      <span class="w-1.5 h-1.5 rounded-full" :class="order.payment_status === 'paid' ? 'bg-theme-accent' : 'bg-theme-muted'" />
-                      {{ order.payment_status === 'paid' ? 'Payment Verified' : 'Payment Pending' }}
+                      <span
+                        class="w-1.5 h-1.5 rounded-full"
+                        :class="{
+                          'bg-emerald-600': order.payment_status === 'paid',
+                          'bg-amber-600': order.payment_status === 'pending',
+                          'bg-red-600': order.payment_status === 'failed',
+                        }"
+                      />
+                      {{ order.payment_status === 'paid' ? 'Payment Verified' : (order.payment_status === 'pending' ? 'Payment Pending' : 'Payment Failed') }}
                     </span>
 
                     <span
                       class="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border block max-w-fit"
                       :class="{
-                        'bg-theme-surface-subtle text-theme-accent border-theme-border': order.status === 'out_for_delivery',
-                        'bg-theme-accent-soft text-theme-accent-hover border-theme-accent-border': order.status === 'confirmed' || order.status === 'delivered',
-                        'bg-theme-surface-subtle text-theme-ink border-theme-border': order.status === 'pending',
-                        'bg-theme-surface-muted text-theme-muted border-theme-border': order.status === 'cancelled',
+                        'bg-blue-50 text-blue-900 border-blue-200': order.status === 'out_for_delivery',
+                        'bg-emerald-50 text-emerald-900 border-emerald-200': order.status === 'confirmed' || order.status === 'delivered',
+                        'bg-amber-50 text-amber-900 border-amber-200': order.status === 'pending',
+                        'bg-red-50 text-red-900 border-red-200': order.status === 'cancelled',
                       }"
                     >
                       {{ order.status }}
@@ -368,7 +375,7 @@ function handleResetFilters(): void {
 
                     <div v-if="order.delivery_confirmation_code" class="pt-0.5">
                       <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-theme-muted">
-                        <KeyRound :size="10" class="text-theme-accent" />
+                        <KeyRound :size="10" class="text-emerald-700" />
                         <span>Code: {{ order.delivery_confirmation_code }}</span>
                       </span>
                     </div>
@@ -382,7 +389,7 @@ function handleResetFilters(): void {
                       :disabled="updatingOrderId === order.id"
                       @click="handleApprovePayment(order.id)"
                     >
-                      <CheckCircle2 :size="12" class="text-theme-accent" />
+                      <CheckCircle2 :size="12" class="text-emerald-400" />
                       <span>{{ updatingOrderId === order.id ? 'Approving...' : 'Verify Deposit' }}</span>
                     </button>
 
@@ -400,7 +407,7 @@ function handleResetFilters(): void {
                     <button
                       v-if="order.status === 'out_for_delivery' || (order.status === 'confirmed' && order.delivery_type === 'pickup')"
                       type="button"
-                      class="bg-theme-accent hover:bg-theme-accent-hover text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
+                      class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
                       :disabled="updatingOrderId === order.id"
                       @click="handleUpdateStatus(order.id, 'delivered')"
                     >

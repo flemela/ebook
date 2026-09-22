@@ -130,9 +130,9 @@ function handleSubmit(): void {
           </div>
 
           <!-- Pure Digital Edition Notice -->
-          <div class="p-3.5 rounded-xl border border-theme-accent-border bg-theme-accent-soft text-xs text-theme-accent-hover flex items-center gap-2">
-            <Download :size="14" class="text-theme-accent flex-shrink-0" />
-            <span>Title will be prepared as an authentic digital PDF eBook with instant Cloudflare R2 download.</span>
+          <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 text-xs text-emerald-950 flex items-center gap-2">
+            <Download :size="14" class="text-emerald-700 flex-shrink-0" />
+            <span class="text-emerald-900">Title will be prepared as an authentic digital PDF eBook with an instant download link.</span>
           </div>
 
           <div class="pt-2 flex justify-end gap-2.5">
