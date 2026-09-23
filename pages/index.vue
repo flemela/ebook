@@ -1,4 +1,4 @@
-<!-- pages/index.vue (EbookReads) -->
+<!-- pages/index.vue (EbookReads - 70/20/10 White/Charcoal/Crimson System) -->
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import PromoTickerStrip, {
@@ -6,6 +6,7 @@ import PromoTickerStrip, {
 } from "~/components/storefront/PromoTickerStrip.vue";
 import StoreNavbar from "~/components/storefront/StoreNavbar.vue";
 import HeroCarousel from "~/components/storefront/HeroCarousel.vue";
+import FlashSaleStrip from "~/components/storefront/FlashSaleStrip.vue";
 import BentoCategories from "~/components/storefront/BentoCategories.vue";
 import DealsWeek from "~/components/storefront/DealsWeek.vue";
 import StoreFooter from "~/components/storefront/StoreFooter.vue";
@@ -23,11 +24,11 @@ type SortOption = 'first_added' | 'newest' | 'price_asc' | 'price_desc' | 'title
 
 const route = useRoute();
 
-// Pagination, Filter & Sort Reactive State
+// Pagination, Filter & Sort State
 const currentPage = ref(1);
 const itemsPerPage = ref(48);
 const activeCategoryFilter = ref<string>("General");
-const activeSort = ref<SortOption>("first_added"); // Defaults strictly to FIFO: foundational bestsellers first
+const activeSort = ref<SortOption>("first_added"); // FIFO: foundational bestsellers first
 const searchQuery = ref<string>("" );
 const debouncedSearch = ref<string>("");
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -50,7 +51,7 @@ const { data: catalogData, status: booksStatus } =
 		watch: [currentPage, activeCategoryFilter, debouncedSearch, activeSort],
 	});
 
-// Dedicated Showcase fetch for Bestsellers shelf (first-added books first)
+// Dedicated Showcase fetch for Bestsellers & Flash Sale shelves (first-added books first)
 const { data: showcaseData } = await useFetch<PaginatedProductsResponse>(
 	"/api/products",
 	{
@@ -174,6 +175,19 @@ const isFilterActive = computed<boolean>(() => {
 	);
 });
 
+/**
+ * Strict deliberate curation: Flash sale shelf contains ONLY books where
+ * an admin has explicitly assigned the 'FLASH_SALE' badge and sale has not expired.
+ */
+const flashSaleBooks = computed<Book[]>(() => {
+  const list: Book[] = showcaseData.value?.products || [];
+  return list.filter((b) => {
+    if (b.badge !== 'FLASH_SALE') return false;
+    if (b.sale_ends_at && new Date(b.sale_ends_at).getTime() < Date.now()) return false;
+    return true;
+  });
+});
+
 const bestsellersOfWeek = computed<Book[]>(() => {
 	const list: Book[] = showcaseData.value?.products || [];
 	const tagged = list.filter((b) => b.badge === "BESTSELLER" || b.badge === "DEAL_OF_WEEK");
@@ -220,6 +234,22 @@ const currentSortLabel = computed(() => {
   const match = SORT_OPTIONS.find((s) => s.value === activeSort.value);
   return match?.label || 'First Added';
 });
+
+const currentCategoryLabel = computed(() => {
+  return activeCategoryFilter.value.toLowerCase() === 'general'
+    ? 'General (All Books)'
+    : activeCategoryFilter.value;
+});
+
+const catalogueHeading = computed(() => {
+  return activeCategoryFilter.value.toLowerCase() === 'general'
+    ? 'Browse All Books'
+    : activeCategoryFilter.value;
+});
+
+function formatCategoryDisplay(cat: string): string {
+  return cat.toLowerCase() === 'general' ? 'General (All Books)' : cat;
+}
 
 const isCatalogueDropdownOpen = ref(false);
 const isSortDropdownOpen = ref(false);
@@ -336,13 +366,17 @@ onUnmounted(() => {
 		<!-- 1. Hero Carousel -->
 		<HeroCarousel @search="handleSearch" @select-category="handleCategorySelect" />
 
-		<!-- 2. Bento Categories Grid -->
+		<!-- 2. Deliberate Flash Sale Shelf: Renders ONLY if admin explicitly assigned FLASH_SALE -->
+		<FlashSaleStrip v-if="flashSaleBooks.length > 0" :books="flashSaleBooks" title="FLASH SALE DEALS"
+			badge-label="LIMITED TIME EBOOKS" @request-seed="handleRequestSeed" />
+
+		<!-- 3. Bento Categories Grid -->
 		<BentoCategories @select="handleCategorySelect" />
 
-		<!-- 3. Bestsellers of the Week (1-Row Scrollable Shelf) -->
+		<!-- 4. Bestsellers of the Week (1-Row Scrollable Shelf) -->
 		<DealsWeek :books="bestsellersOfWeek" @request-seed="handleRequestSeed" />
 
-		<!-- 4. Catalogue Section with Server-Authoritative First-Added Sort -->
+		<!-- 5. Catalogue Section with Server-Authoritative First-Added Sort -->
 		<section id="catalog-results" class="pt-8 sm:pt-12 pb-14 px-4 max-w-6xl mx-auto w-full space-y-6">
 			<!-- Section Header -->
 			<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-theme-border">
@@ -358,17 +392,13 @@ onUnmounted(() => {
 					</div>
 					<h2
 						class="font-sans font-extrabold text-2xl sm:text-3xl lg:text-4xl text-theme-ink tracking-tight leading-tight">
-						{{
-						activeCategoryFilter.toLowerCase() === "general"
-						? "Browse All Books"
-						: activeCategoryFilter
-						}}
+						{{ catalogueHeading }}
 					</h2>
 				</div>
 
 				<!-- Filter & Sort Dropdown Actions -->
 				<div class="flex items-center gap-2.5 flex-wrap">
-					<!-- 1. Category Filter Dropdown -->
+					<!-- Category Filter Dropdown -->
 					<div class="relative">
 						<button id="catalogue-category-trigger" type="button"
 							class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-surface-subtle hover:bg-theme-accent-soft border border-theme-border hover:border-theme-accent text-xs font-bold text-theme-ink transition-all cursor-pointer shadow-2xs"
@@ -381,12 +411,7 @@ onUnmounted(() => {
 							">
 							<Filter :size="14" class="text-theme-accent" />
 							<span>Category:
-								<strong>{{
-									activeCategoryFilter.toLowerCase() ===
-									"general"
-									? "General (All Books)"
-									: activeCategoryFilter
-									}}</strong></span>
+								<strong>{{ currentCategoryLabel }}</strong></span>
 							<ChevronDown :size="14" class="transition-transform duration-200 text-theme-muted" :class="{
 									'rotate-180 text-theme-accent':
 										isCatalogueDropdownOpen,
@@ -416,11 +441,7 @@ onUnmounted(() => {
 												? 'bg-theme-accent-soft text-theme-accent font-extrabold'
 												: 'text-theme-ink font-semibold'
 										" @click="selectCatalogueCategory(cat)">
-										<span>{{
-											cat === "General"
-											? "General (All Books)"
-											: cat
-											}}</span>
+										<span>{{ formatCategoryDisplay(cat) }}</span>
 										<Check v-if="activeCategoryFilter === cat" :size="14"
 											class="text-theme-accent" />
 									</button>
@@ -429,7 +450,7 @@ onUnmounted(() => {
 						</Transition>
 					</div>
 
-					<!-- 2. Sort Dropdown (Defaults strictly to first_added) -->
+					<!-- Sort Dropdown (Defaults strictly to first_added) -->
 					<div class="relative">
 						<button id="catalogue-sort-trigger" type="button"
 							class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-surface-subtle hover:bg-theme-accent-soft border border-theme-border hover:border-theme-accent text-xs font-bold text-theme-ink transition-all cursor-pointer shadow-2xs"
@@ -477,7 +498,7 @@ onUnmounted(() => {
 					<!-- Reset Filter Button -->
 					<button v-if="isFilterActive" type="button"
 						class="px-3.5 py-2 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 border border-theme-border"
-						title="Reset Search and Category Filters" @click="clearAllFilters">
+						title="Reset Search, Sort and Category Filters" @click="clearAllFilters">
 						<X :size="13" />
 						<span>Reset</span>
 					</button>

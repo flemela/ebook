@@ -1,6 +1,6 @@
 // =============================================================================
-// server/api/checkout.post.ts
-// Pure Digital Checkout Endpoint with Zero Physical Logistics Overhead
+// server/api/checkout.post.ts (EbookReads)
+// Pure Digital Checkout Endpoint with Verified Asset Availability Protection
 // =============================================================================
 
 import { z } from 'zod';
@@ -94,9 +94,15 @@ export default defineEventHandler(async (event) => {
       phone: cleanPhone,
     };
   } catch (err: any) {
+    const errorMsg =
+      err.data?.error?.message ||
+      err.data?.message ||
+      err.statusMessage ||
+      'Failed to place eBook order. If a book has no PDF, please request it on WhatsApp.';
+
     throw createError({
       statusCode: err.statusCode || 500,
-      statusMessage: err.statusMessage || 'Failed to place eBook order',
+      statusMessage: errorMsg,
       data: err.data,
     });
   }
