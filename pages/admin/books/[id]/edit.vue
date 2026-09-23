@@ -1,352 +1,309 @@
-<!-- pages/admin/books/[id]/edit.vue -->
+<!-- pages/admin/books/[id]/edit.vue (EbookReads - 70/20/10 White/Charcoal/Crimson System) -->
 <template>
-  <div class="min-h-screen bg-theme-canvas py-8 px-4 sm:px-6 lg:px-8 font-sans text-theme-ink">
-    <div class="max-w-4xl mx-auto">
+	<div class="min-h-screen bg-theme-canvas py-8 px-4 sm:px-6 lg:px-8 font-sans text-theme-ink">
+		<div class="max-w-4xl mx-auto">
 
-      <!-- Loading Skeleton -->
-      <div v-if="isLoadingInitial" class="space-y-6">
-        <div class="h-10 bg-theme-surface-muted rounded-lg w-1/3 animate-pulse"></div>
-        <div class="h-64 bg-theme-surface rounded-2xl border border-theme-border p-6 animate-pulse"></div>
-      </div>
+			<!-- Loading Skeleton -->
+			<div v-if="isLoadingInitial" class="space-y-6">
+				<div class="h-10 bg-theme-surface-muted rounded-lg w-1/3 animate-pulse"></div>
+				<div class="h-64 bg-theme-surface rounded-2xl border border-theme-border p-6 animate-pulse"></div>
+			</div>
 
-      <div v-else>
-        <!-- Top Action Bar -->
-        <div class="flex items-center justify-between mb-8">
-          <div class="flex items-center space-x-3">
-            <NuxtLink
-              to="/admin/books"
-              class="w-9 h-9 rounded-lg bg-theme-surface border border-theme-border flex items-center justify-center text-theme-muted hover:text-theme-ink transition-colors shadow-sm cursor-pointer"
-            >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </NuxtLink>
-            <div>
-              <h1 class="text-2xl font-bold text-theme-ink tracking-tight">Edit PDF eBook</h1>
-              <p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, discounts, badges, categories, and eBook file</p>
-            </div>
-          </div>
+			<div v-else>
+				<!-- Top Action Bar -->
+				<div class="flex items-center justify-between mb-8">
+					<div class="flex items-center space-x-3">
+						<NuxtLink to="/admin/books"
+							class="w-9 h-9 rounded-lg bg-theme-surface border border-theme-border flex items-center justify-center text-theme-muted hover:text-theme-ink transition-colors shadow-sm cursor-pointer">
+							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+									d="M15 19l-7-7 7-7" />
+							</svg>
+						</NuxtLink>
+						<div>
+							<h1 class="text-2xl font-bold text-theme-ink tracking-tight">Edit PDF eBook</h1>
+							<p class="text-xs text-theme-muted mt-0.5">Manage digital pricing, discounts, badges,
+								categories, and eBook file</p>
+						</div>
+					</div>
 
-          <div class="flex items-center space-x-3">
-            <NuxtLink
-              to="/admin/books"
-              class="px-4 py-2 text-xs font-semibold text-theme-muted bg-theme-surface border border-theme-border rounded-lg hover:bg-theme-surface-subtle shadow-sm transition-colors"
-            >
-              Cancel
-            </NuxtLink>
-            <button
-              type="button"
-              :disabled="isSubmitting"
-              @click="handleUpdate"
-              class="inline-flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active disabled:opacity-50 rounded-lg shadow-sm transition-all cursor-pointer"
-            >
-              <svg v-if="isSubmitting" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-              </svg>
-              <span>{{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}</span>
-            </button>
-          </div>
-        </div>
+					<div class="flex items-center space-x-3">
+						<NuxtLink to="/admin/books"
+							class="px-4 py-2 text-xs font-semibold text-theme-muted bg-theme-surface border border-theme-border rounded-lg hover:bg-theme-surface-subtle shadow-sm transition-colors">
+							Cancel
+						</NuxtLink>
+						<button type="button" :disabled="isSubmitting" @click="handleUpdate"
+							class="inline-flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-theme-accent hover:bg-theme-accent-hover active:bg-theme-accent-active disabled:opacity-50 rounded-lg shadow-sm transition-all cursor-pointer">
+							<svg v-if="isSubmitting" class="animate-spin w-4 h-4 text-white" fill="none"
+								viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+									stroke-width="4"></circle>
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+							</svg>
+							<span>{{ isSubmitting ? 'Saving Changes...' : 'Save Changes' }}</span>
+						</button>
+					</div>
+				</div>
 
-        <form @submit.prevent="handleUpdate" class="space-y-6">
+				<form @submit.prevent="handleUpdate" class="space-y-6">
 
-          <!-- Success Alert -->
-          <div v-if="successToast" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <p class="text-xs font-bold text-emerald-900">{{ successToast }}</p>
-            </div>
-            <button type="button" @click="successToast = ''" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer">Dismiss</button>
-          </div>
+					<!-- Success Alert -->
+					<div v-if="successToast"
+						class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+						<div class="flex items-center space-x-3">
+							<svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+									d="M5 13l4 4L19 7" />
+							</svg>
+							<p class="text-xs font-bold text-emerald-900">{{ successToast }}</p>
+						</div>
+						<button type="button" @click="successToast = ''"
+							class="text-xs text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer">Dismiss</button>
+					</div>
 
-          <!-- Error Alert -->
-          <div v-if="formError" class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-start space-x-3">
-            <svg class="w-5 h-5 text-theme-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h4 class="text-xs font-bold text-theme-accent-hover">Update Blocked</h4>
-              <p class="text-xs text-theme-accent mt-0.5">{{ formError }}</p>
-            </div>
-          </div>
+					<!-- Error Alert -->
+					<div v-if="formError"
+						class="p-4 rounded-xl bg-theme-accent-soft border border-theme-accent-border flex items-start space-x-3">
+						<svg class="w-5 h-5 text-theme-accent flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
+							stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+								d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						<div>
+							<h4 class="text-xs font-bold text-theme-accent-hover">Update Blocked</h4>
+							<p class="text-xs text-theme-accent mt-0.5">{{ formError }}</p>
+						</div>
+					</div>
 
-          <!-- Section 1: Book Essentials -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
-            <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider border-b border-theme-border pb-3">
-              Book Details
-            </h2>
+					<!-- Section 1: Book Essentials -->
+					<div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
+						<h2
+							class="text-sm font-bold text-theme-ink uppercase tracking-wider border-b border-theme-border pb-3">
+							Book Details
+						</h2>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Book Title *</label>
-                <input
-                  v-model="form.name"
-                  type="text"
-                  placeholder="e.g. The Psychology of Money"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                  required
-                />
-              </div>
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+							<div class="sm:col-span-2">
+								<label class="block text-xs font-bold text-theme-ink mb-1.5">Book Title *</label>
+								<input v-model="form.name" type="text" placeholder="e.g. The Psychology of Money"
+									class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
+									required />
+							</div>
 
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Author</label>
-                <input
-                  v-model="form.author"
-                  type="text"
-                  placeholder="e.g. Morgan Housel"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                />
-              </div>
+							<div>
+								<label class="block text-xs font-bold text-theme-ink mb-1.5">Author</label>
+								<input v-model="form.author" type="text" placeholder="e.g. Morgan Housel"
+									class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all" />
+							</div>
 
-              <!-- Category with "+ New Category" Action Button -->
-              <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="block text-xs font-bold text-theme-ink">Category *</label>
-                  <button
-                    type="button"
-                    class="text-[11px] font-bold text-theme-accent hover:text-theme-accent-hover hover:underline cursor-pointer flex items-center gap-1"
-                    @click="isCategoryModalOpen = true"
-                  >
-                    <span>+ New Category</span>
-                  </button>
-                </div>
-                <select
-                  v-model="form.category_id"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all cursor-pointer"
-                  required
-                >
-                  <option value="" disabled>Select category</option>
-                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                    {{ cat.name }}
-                  </option>
-                </select>
-              </div>
+							<div>
+								<div class="flex items-center justify-between mb-1.5">
+									<label class="block text-xs font-bold text-theme-ink">Category *</label>
+									<button type="button"
+										class="text-[11px] font-bold text-theme-accent hover:text-theme-accent-hover hover:underline cursor-pointer flex items-center gap-1"
+										@click="isCategoryModalOpen = true">
+										<span>+ New Category</span>
+									</button>
+								</div>
+								<select v-model="form.category_id"
+									class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all cursor-pointer"
+									required>
+									<option value="" disabled>Select category</option>
+									<option v-for="cat in categories" :key="cat.id" :value="cat.id">
+										{{ cat.name }}
+									</option>
+								</select>
+							</div>
 
-              <div>
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">SKU / ISBN</label>
-                <input
-                  v-model="form.sku"
-                  type="text"
-                  placeholder="e.g. 978-0857197689"
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all"
-                />
-              </div>
+							<div>
+								<label class="block text-xs font-bold text-theme-ink mb-1.5">SKU / ISBN</label>
+								<input v-model="form.sku" type="text" placeholder="e.g. 978-0857197689"
+									class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all" />
+							</div>
 
-              <!-- Promotional Badge (Presets + Custom Badge Input) -->
-              <div class="space-y-1.5">
-                <label class="block text-xs font-bold text-theme-ink">Promotional Badge</label>
-                <div class="space-y-2">
-                  <select
-                    v-model="badgeSelectValue"
-                    class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all cursor-pointer"
-                    @change="handleBadgeSelectChange"
-                  >
-                    <option value="">None (Standard)</option>
-                    <option value="BESTSELLER">Bestseller (BESTSELLER)</option>
-                    <option value="FLASH_SALE">Flash Sale (FLASH_SALE)</option>
-                    <option value="NO1_PICK">#1 Staff Pick (NO1_PICK)</option>
-                    <option value="DEAL_OF_WEEK">Deal of the Week (DEAL_OF_WEEK)</option>
-                    <option value="LIMITED_TIME">Limited Time (LIMITED_TIME)</option>
-                    <option value="__CUSTOM__">✨ Custom Badge...</option>
-                  </select>
+							<!-- Promotional Badge -->
+							<div class="space-y-1.5">
+								<label class="block text-xs font-bold text-theme-ink">Promotional Badge</label>
+								<div class="space-y-2">
+									<select v-model="badgeSelectValue"
+										class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all cursor-pointer"
+										@change="handleBadgeSelectChange">
+										<option value="">None (Standard)</option>
+										<option value="BESTSELLER">Bestseller (BESTSELLER)</option>
+										<option value="FLASH_SALE">Flash Sale (FLASH_SALE)</option>
+										<option value="NO1_PICK">#1 Staff Pick (NO1_PICK)</option>
+										<option value="DEAL_OF_WEEK">Deal of the Week (DEAL_OF_WEEK)</option>
+										<option value="LIMITED_TIME">Limited Time (LIMITED_TIME)</option>
+										<option value="__CUSTOM__">✨ Custom Badge...</option>
+									</select>
 
-                  <!-- Custom Badge Input Box -->
-                  <div v-if="badgeSelectValue === '__CUSTOM__'" class="space-y-1 animate-in fade-in duration-200">
-                    <input
-                      v-model="form.customBadgeText"
-                      type="text"
-                      placeholder="Type custom badge (e.g. EDITOR'S CHOICE, 20% OFF)"
-                      class="w-full px-3 py-2 bg-theme-surface border border-theme-accent rounded-lg text-xs font-mono font-bold uppercase text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-accent/20"
-                      maxlength="30"
-                    />
-                    <p class="text-[10px] text-theme-muted">Appears as an editorial promotional badge across the digital storefront.</p>
-                  </div>
-                </div>
-              </div>
+									<div v-if="badgeSelectValue === '__CUSTOM__'"
+										class="space-y-1 animate-in fade-in duration-200">
+										<input v-model="form.customBadgeText" type="text"
+											placeholder="Type custom badge (e.g. EDITOR'S CHOICE, 20% OFF)"
+											class="w-full px-3 py-2 bg-theme-surface border border-theme-accent rounded-lg text-xs font-mono font-bold uppercase text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-accent/20"
+											maxlength="30" />
+										<p class="text-[10px] text-theme-muted">Appears as an editorial promotional
+											badge across the digital storefront.</p>
+									</div>
+								</div>
+							</div>
 
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-theme-ink mb-1.5">Synopsis / Description</label>
-                <textarea
-                  v-model="form.description"
-                  rows="3"
-                  placeholder="Describe the eBook content..."
-                  class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all resize-none"
-                ></textarea>
-              </div>
-            </div>
-          </div>
+							<div class="sm:col-span-2">
+								<label class="block text-xs font-bold text-theme-ink mb-1.5">Synopsis /
+									Description</label>
+								<textarea v-model="form.description" rows="3"
+									placeholder="Describe the eBook content..."
+									class="w-full px-3.5 py-2.5 bg-theme-surface-subtle border border-theme-border rounded-lg text-sm text-theme-ink focus:bg-white focus:outline-none focus:ring-2 focus:ring-theme-accent/20 focus:border-theme-accent transition-all resize-none"></textarea>
+							</div>
+						</div>
+					</div>
 
-          <!-- Section 2: Book Cover Art -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
-            <div class="flex items-center justify-between border-b border-theme-border pb-3">
-              <div>
-                <h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Book Cover Art</h2>
-                <p class="text-xs text-theme-muted mt-0.5">High-definition publisher jacket</p>
-              </div>
-              <button
-                type="button"
-                :disabled="isFindingCover || !form.name.trim()"
-                @click="handleAutoFindCover"
-                class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink border border-theme-border rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
-              >
-                <svg v-if="isFindingCover" class="animate-spin w-3.5 h-3.5 text-theme-ink" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span v-else>🔍</span>
-                <span>{{ isFindingCover ? 'Searching Studio Art...' : 'Auto-Find Cover' }}</span>
-              </button>
-            </div>
+					<!-- Section 2: Book Cover Art -->
+					<div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-5">
+						<div class="flex items-center justify-between border-b border-theme-border pb-3">
+							<div>
+								<h2 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Book Cover Art
+								</h2>
+								<p class="text-xs text-theme-muted mt-0.5">High-definition publisher jacket</p>
+							</div>
+							<button type="button" :disabled="isFindingCover || !form.name.trim()"
+								@click="handleAutoFindCover"
+								class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-theme-surface-subtle hover:bg-theme-surface-muted text-theme-ink border border-theme-border rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer">
+								<svg v-if="isFindingCover" class="animate-spin w-3.5 h-3.5 text-theme-ink" fill="none"
+									viewBox="0 0 24 24">
+									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+										stroke-width="4"></circle>
+									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+								</svg>
+								<span v-else>🔍</span>
+								<span>{{ isFindingCover ? 'Searching Studio Art...' : 'Auto-Find Cover' }}</span>
+							</button>
+						</div>
 
-            <div class="flex flex-col sm:flex-row items-start gap-6">
-              <div class="w-32 h-44 bg-theme-surface-subtle rounded-xl border border-theme-border overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
-                <img
-                  v-if="form.cover_image_url"
-                  :src="form.cover_image_url"
-                  alt="Book cover preview"
-                  class="w-full h-full object-cover"
-                  @error="form.cover_image_url = ''"
-                />
-                <div v-else class="text-center p-3 text-theme-subtle">
-                  <svg class="w-8 h-8 mx-auto mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  <span class="text-[10px] block">No Cover</span>
-                </div>
-              </div>
+						<div class="flex flex-col sm:flex-row items-start gap-6">
+							<div
+								class="w-32 h-44 bg-theme-surface-subtle rounded-xl border border-theme-border overflow-hidden flex-shrink-0 flex items-center justify-center relative shadow-sm">
+								<img v-if="form.cover_image_url" :src="form.cover_image_url" alt="Book cover preview"
+									class="w-full h-full object-cover" @error="form.cover_image_url = ''" />
+								<div v-else class="text-center p-3 text-theme-subtle">
+									<svg class="w-8 h-8 mx-auto mb-1 opacity-50" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+											d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+									</svg>
+									<span class="text-[10px] block">No Cover</span>
+								</div>
+							</div>
 
-              <div class="flex-1 space-y-3 w-full">
-                <div class="flex items-center gap-2">
-                  <input
-                    ref="coverFileInputRef"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="handleCoverFileSelected"
-                  />
-                  <button
-                    type="button"
-                    :disabled="isUploadingCover"
-                    @click="coverFileInputRef?.click()"
-                    class="px-4 py-2 bg-theme-dark hover:bg-theme-dark-surface text-white rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
-                  >
-                    <svg v-if="isUploadingCover" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                    <span>{{ isUploadingCover ? 'Uploading...' : 'Upload Cover Image' }}</span>
-                  </button>
+							<div class="flex-1 space-y-3 w-full">
+								<div class="flex items-center gap-2">
+									<input ref="coverFileInputRef" type="file" accept="image/*" class="hidden"
+										@change="handleCoverFileSelected" />
+									<button type="button" :disabled="isUploadingCover"
+										@click="coverFileInputRef?.click()"
+										class="px-4 py-2 bg-theme-dark hover:bg-theme-dark-surface text-white rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5 shadow-sm disabled:opacity-50 cursor-pointer">
+										<svg v-if="isUploadingCover" class="animate-spin w-3.5 h-3.5 text-white"
+											fill="none" viewBox="0 0 24 24">
+											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+												stroke-width="4"></circle>
+											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z">
+											</path>
+										</svg>
+										<span>{{ isUploadingCover ? 'Uploading...' : 'Upload Cover Image' }}</span>
+									</button>
 
-                  <button
-                    v-if="form.cover_image_url"
-                    type="button"
-                    @click="form.cover_image_url = ''"
-                    class="px-3 py-2 text-xs font-semibold text-theme-accent hover:bg-theme-accent-soft rounded-lg transition-colors cursor-pointer"
-                  >
-                    Remove
-                  </button>
-                </div>
+									<button v-if="form.cover_image_url" type="button" @click="form.cover_image_url = ''"
+										class="px-3 py-2 text-xs font-semibold text-theme-accent hover:bg-theme-accent-soft rounded-lg transition-colors cursor-pointer">
+										Remove
+									</button>
+								</div>
 
-                <div class="space-y-1">
-                  <label class="block text-[11px] font-semibold text-theme-muted">Or paste image URL directly:</label>
-                  <input
-                    v-model="form.cover_image_url"
-                    type="url"
-                    placeholder="https://..."
-                    class="w-full px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-lg text-xs text-theme-ink focus:bg-white focus:outline-none focus:border-theme-accent font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+								<div class="space-y-1">
+									<label class="block text-[11px] font-semibold text-theme-muted">Or paste image URL
+										directly:</label>
+									<input v-model="form.cover_image_url" type="url" placeholder="https://..."
+										class="w-full px-3 py-2 bg-theme-surface-subtle border border-theme-border rounded-lg text-xs text-theme-ink focus:bg-white focus:outline-none focus:border-theme-accent font-mono" />
+								</div>
+							</div>
+						</div>
+					</div>
 
-          <!-- Section 3: Pure Digital Edition Management with Strikethrough Pricing UI -->
-          <div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
-            <div class="flex items-center justify-between border-b border-theme-border pb-3">
-              <div class="flex items-center space-x-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                <h3 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Digital PDF Edition</h3>
-              </div>
-              <span v-if="pdfFormatId" class="text-xs text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-                Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
-              </span>
-              <span v-else class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                Will be generated upon save
-              </span>
-            </div>
+					<!-- Section 3: Digital PDF Edition with Persistent Strikethrough Pricing -->
+					<div class="bg-theme-surface rounded-2xl border border-theme-border p-6 shadow-sm space-y-6">
+						<div class="flex items-center justify-between border-b border-theme-border pb-3">
+							<div class="flex items-center space-x-2.5">
+								<span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+								<h3 class="text-sm font-bold text-theme-ink uppercase tracking-wider">Digital PDF
+									Edition</h3>
+							</div>
+							<span v-if="pdfFormatId"
+								class="text-xs text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+								Format Active (ID: {{ pdfFormatId.slice(0, 8) }})
+							</span>
+							<span v-else class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+								Will be generated upon save
+							</span>
+						</div>
 
-            <div class="p-5 rounded-xl border border-theme-border bg-theme-surface-subtle space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- PDF Selling Price -->
-                <div>
-                  <label class="block text-xs font-semibold text-theme-ink mb-1">eBook Price (KSh) *</label>
-                  <input
-                    v-model.number="form.pdfPrice"
-                    type="number"
-                    min="0"
-                    placeholder="e.g. 149"
-                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono font-bold"
-                    required
-                  />
-                </div>
+						<div class="p-5 rounded-xl border border-theme-border bg-theme-surface-subtle space-y-4">
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<!-- PDF Selling Price -->
+								<div>
+									<label class="block text-xs font-semibold text-theme-ink mb-1">eBook Price (KSh)
+										*</label>
+									<input v-model.number="form.pdfPrice" type="number" min="0" placeholder="e.g. 149"
+										class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono font-bold"
+										required />
+								</div>
 
-                <!-- PDF Strikethrough Price -->
-                <div>
-                  <label class="block text-xs font-semibold text-theme-ink mb-1">
-                    Original Price (KSh)
-                    <span class="text-[10px] text-theme-muted font-normal">Strikethrough</span>
-                  </label>
-                  <input
-                    v-model.number="form.compareAtPrice"
-                    type="number"
-                    min="0"
-                    placeholder="e.g. 299 (Optional discount)"
-                    class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono"
-                  />
-                </div>
-              </div>
+								<!-- PDF Strikethrough Price -->
+								<div>
+									<label class="block text-xs font-semibold text-theme-ink mb-1">
+										Original Price (KSh)
+										<span class="text-[10px] text-theme-muted font-normal">Strikethrough
+											(Optional)</span>
+									</label>
+									<input v-model.number="form.compareAtPrice" type="number" min="0"
+										placeholder="e.g. 299 (Must be > selling price)"
+										class="w-full px-3 py-2 bg-theme-surface border border-theme-border rounded-lg text-sm text-theme-ink font-mono" />
+								</div>
+							</div>
 
-              <!-- SINGLE PDF UPLOADER -->
-              <div>
-                <label class="block text-xs font-semibold text-theme-ink mb-1.5">
-                  eBook PDF Document
-                </label>
-                <SinglePdfUploader
-                  v-model="form.pdfKey"
-                  :initial-file-name="form.pdfFileName"
-                  :initial-file-size="form.pdfFileSize"
-                  :max-file-size-mb="50"
-                  @success="handlePdfReplaced"
-                  @remove="handlePdfRemoved"
-                />
-              </div>
+							<!-- Single PDF Uploader -->
+							<div>
+								<label class="block text-xs font-semibold text-theme-ink mb-1.5">
+									eBook PDF Document
+								</label>
+								<SinglePdfUploader v-model="form.pdfKey" :initial-file-name="form.pdfFileName"
+									:initial-file-size="form.pdfFileSize" :max-file-size-mb="50"
+									@success="handlePdfReplaced" @remove="handlePdfRemoved" />
+							</div>
 
-              <div v-if="isPdfDirty" class="p-3 bg-theme-surface-muted border border-theme-border rounded-lg flex items-center space-x-2">
-                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p class="text-[11px] text-theme-ink font-medium">
-                  New PDF file ready. Click <strong>Save Changes</strong> to update customer download streams.
-                </p>
-              </div>
-            </div>
-          </div>
+							<div v-if="isPdfDirty"
+								class="p-3 bg-theme-surface-muted border border-theme-border rounded-lg flex items-center space-x-2">
+								<svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+									stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+										d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+								<p class="text-[11px] text-theme-ink font-medium">
+									New PDF file ready. Click <strong>Save Changes</strong> to update customer download
+									streams.
+								</p>
+							</div>
+						</div>
+					</div>
 
-        </form>
-      </div>
+				</form>
+			</div>
 
-      <!-- Add Category Modal -->
-      <AddCategoryModal
-        :open="isCategoryModalOpen"
-        @close="isCategoryModalOpen = false"
-        @created="handleCategoryCreated"
-      />
+			<!-- Add Category Modal -->
+			<AddCategoryModal :open="isCategoryModalOpen" @close="isCategoryModalOpen = false"
+				@created="handleCategoryCreated" />
 
-    </div>
-  </div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -406,7 +363,7 @@ async function loadBookData() {
     const catList = catRaw?.data || catRaw;
     if (Array.isArray(catList)) categories.value = catList;
 
-    // 2. Fetch Book Record (merged with formats via updated [id].get.ts)
+    // 2. Fetch Book Record
     const bookRaw = await ofetch<any>(`/api/admin/books/${productId}`);
     const book = bookRaw?.data || bookRaw;
 
@@ -415,18 +372,19 @@ async function loadBookData() {
     }
 
     form.name = book.name || '';
-    
-    // Multi-casing category hydration
     form.category_id = book.category_id || book.categoryId || book.category?.id || '';
-    
     form.sku = book.sku || '';
     form.description = book.description || '';
-    form.pdfPrice = Number(book.price) || 149;
-    form.compareAtPrice = (book.compare_at_price || book.compareAtPrice) 
-      ? Number(book.compare_at_price || book.compareAtPrice) 
-      : null;
 
-    // Badge Hydration: Presets vs Custom
+    const parentPrice = Number(book.price) || 149;
+    const parentCompareAt = (book.compare_at_price !== null && book.compare_at_price !== undefined)
+      ? Number(book.compare_at_price)
+      : (book.compareAtPrice !== null && book.compareAtPrice !== undefined ? Number(book.compareAtPrice) : null);
+
+    form.pdfPrice = parentPrice;
+    form.compareAtPrice = parentCompareAt;
+
+    // Badge Hydration
     if (book.badge) {
       if (STANDARD_BADGES.includes(book.badge)) {
         badgeSelectValue.value = book.badge;
@@ -463,14 +421,19 @@ async function loadBookData() {
       form.cover_image_url = book.cover_image_url;
     }
 
-    // Formats Hydration (Strictly digital PDF/ePub format)
+    // Formats Hydration (Hierarchical Fallback: format discount takes precedence, then parent discount)
     const formats: any[] = book.formats || [];
     const pdf = formats.find((f) => f.format === 'pdf') || formats.find((f) => f.format === 'epub');
+
     if (pdf) {
       pdfFormatId.value = pdf.id;
       form.pdfPrice = Number(pdf.price) || form.pdfPrice;
-      const cp = pdf.compare_at_price || pdf.compareAtPrice;
-      form.compareAtPrice = cp ? Number(cp) : form.compareAtPrice;
+
+      const formatCompareAt = (pdf.compare_at_price !== null && pdf.compare_at_price !== undefined)
+        ? Number(pdf.compare_at_price)
+        : (pdf.compareAtPrice !== null && pdf.compareAtPrice !== undefined ? Number(pdf.compareAtPrice) : null);
+
+      form.compareAtPrice = formatCompareAt ?? parentCompareAt ?? null;
       form.pdfKey = pdf.file_public_id || pdf.file_url || null;
       form.pdfFileUrl = pdf.file_url || null;
       form.pdfFileSize = pdf.file_size_bytes ? Number(pdf.file_size_bytes) : 0;
@@ -506,9 +469,8 @@ function handleCategoryCreated(newCat: { id: string; name: string; slug: string 
     categories.value.push(newCat);
   }
   form.category_id = newCat.id;
-}
-
-async function handleAutoFindCover() {
+	}
+	async function handleAutoFindCover() {
   if (!form.name.trim()) {
     pushToast({ message: 'Enter a book title first to search for cover art', variant: 'info' });
     return;
@@ -540,8 +502,9 @@ async function handleAutoFindCover() {
   } finally {
     isFindingCover.value = false;
   }
-		 }
-	async function handleCoverFileSelected(e: Event) {
+}
+
+async function handleCoverFileSelected(e: Event) {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
@@ -598,10 +561,18 @@ async function handleUpdate() {
     return;
   }
 
+  const sellingPrice = Math.max(0, Number(form.pdfPrice) || 0);
+  const compareAtValue = form.compareAtPrice ? Math.max(0, Number(form.compareAtPrice)) : null;
+
+  // Defensive validation: original price must be strictly greater than selling price
+  if (compareAtValue !== null && compareAtValue <= sellingPrice) {
+    formError.value = `Original / Strikethrough price (KSh ${compareAtValue}) must be strictly greater than the selling price (KSh ${sellingPrice}).`;
+    return;
+  }
+
   isSubmitting.value = true;
 
   try {
-    // Resolve final badge string
     let resolvedBadge: string | null = null;
     if (badgeSelectValue.value === '__CUSTOM__') {
       resolvedBadge = form.customBadgeText.trim() || null;
@@ -609,18 +580,14 @@ async function handleUpdate() {
       resolvedBadge = badgeSelectValue.value;
     }
 
-    const compareAtValue = form.compareAtPrice 
-      ? Math.max(0, Number(form.compareAtPrice)) 
-      : null;
-
-    // 1. Update Base Product
+    // 1. Update Base Product Record
     await ofetch(`/api/admin/books/${productId}`, {
       method: 'PATCH',
       body: {
         name: form.name.trim(),
         category_id: form.category_id,
         categoryId: form.category_id,
-        price: Math.max(0, Number(form.pdfPrice) || 0),
+        price: sellingPrice,
         compare_at_price: compareAtValue,
         compareAtPrice: compareAtValue,
         sku: form.sku.trim() || null,
@@ -634,7 +601,7 @@ async function handleUpdate() {
 
     const formatBody = {
       format: 'pdf',
-      price: Math.max(0, Number(form.pdfPrice) || 0),
+      price: sellingPrice,
       compare_at_price: compareAtValue,
       compareAtPrice: compareAtValue,
       file_url: form.pdfFileUrl || form.pdfKey,
@@ -642,13 +609,13 @@ async function handleUpdate() {
       file_size_bytes: form.pdfFileSize ? Number(form.pdfFileSize) : null,
     };
 
-    // 2. Update OR Create Pure Digital PDF Format
+    // 2. Update OR Create Digital PDF Format
     if (pdfFormatId.value) {
       await ofetch(`/api/admin/books/${productId}/formats/${pdfFormatId.value}`, {
         method: 'PATCH',
         body: formatBody,
       });
-    } else {
+    } else if (form.pdfKey) {
       await ofetch(`/api/admin/books/${productId}/formats`, {
         method: 'POST',
         body: formatBody,
@@ -658,10 +625,10 @@ async function handleUpdate() {
     }
 
     isPdfDirty.value = false;
-    successToast.value = 'eBook details, discounts, badges, cover art, and PDF file saved successfully!';
+    successToast.value = 'eBook details, strikethrough discount, badges, and PDF saved successfully!';
     pushToast({ message: successToast.value, variant: 'success' });
 
-    // Reload book data to ensure live synchronized state
+    // Re-hydrate fresh database record
     await loadBookData();
   } catch (err: any) {
     formError.value =
@@ -674,5 +641,5 @@ async function handleUpdate() {
   } finally {
     isSubmitting.value = false;
   }
-}
+	}
 </script>
