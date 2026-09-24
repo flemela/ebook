@@ -1,16 +1,11 @@
 // server/routes/sitemap.xml.ts
-// =============================================================================
-// Dynamic Search Engine XML Sitemap Generator
-// Automatically crawls all published book titles and outputs a valid XML sitemap
-// =============================================================================
-
 import { sokoClient } from '../utils/sokoClient';
 import type { Book } from '~/types';
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const baseUrl = 'https://www.ebookreads.com';
-  const storeSlug = config.public.storeSlug || 'ebookreads';
+  const baseUrl = config.public.siteUrl || 'https://www.ebookreads.org';
+  const storeSlug = config.public.storeSlug || 'flemela';
 
   let books: Book[] = [];
   try {
@@ -47,13 +42,15 @@ export default defineEventHandler(async (event) => {
   }
 
   const xmlEntries = urls
-    .map((item) => `
+    .map(
+      (item) => `
   <url>
     <loc>${item.loc}</loc>
     <lastmod>${item.lastmod}</lastmod>
     <changefreq>${item.changefreq}</changefreq>
     <priority>${item.priority}</priority>
-  </url>`)
+  </url>`
+    )
     .join('');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

@@ -1,8 +1,4 @@
-# =============================================================================
-# The Sunrise Bookstore (www.thesunrisebookstore.com)
-# Robots Exclusion Protocol (RFC 9309)
-# =============================================================================
-
+# public/robots.txt
 User-agent: *
 Allow: /
 Allow: /images/
@@ -19,5 +15,4 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /server/
 
-# Dedicated XML Sitemap location for Googlebot & Bingbot
-Sitemap: https://www.thesunrisebookstore.com/sitemap.xml
+Sitemap: https://www.ebookreads.org/sitemap.xml

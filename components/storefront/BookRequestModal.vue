@@ -40,7 +40,7 @@ function handleSubmit(): void {
   isSubmitting.value = true;
 
   const lines = [
-    `*📚 The Sunrise Bookstore — Custom eBook (PDF) Request*`,
+    `*📚 EbookReads — Custom eBook (PDF) Request*`,
     `Book Title: ${title.value.trim()}`,
     author.value.trim() ? `Author: ${author.value.trim()}` : null,
     `Requested Format: DIGITAL EBOOK (PDF)`,

@@ -23,13 +23,18 @@ import type { PaginatedProductsResponse } from "~/server/api/products/index.get"
 type SortOption = 'first_added' | 'newest' | 'price_asc' | 'price_desc' | 'title_asc';
 
 const route = useRoute();
+const config = useRuntimeConfig();
+const siteUrl = computed(() => {
+	const url = config.public.siteUrl || "https://www.ebookreads.org";
+	return url.replace(/\/+$/, "");
+});
 
 // Pagination, Filter & Sort State
 const currentPage = ref(1);
 const itemsPerPage = ref(48);
 const activeCategoryFilter = ref<string>("General");
 const activeSort = ref<SortOption>("first_added"); // FIFO: foundational bestsellers first
-const searchQuery = ref<string>("" );
+const searchQuery = ref<string>("");
 const debouncedSearch = ref<string>("");
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -60,43 +65,47 @@ const { data: showcaseData } = await useFetch<PaginatedProductsResponse>(
 );
 const { data: storeMetadata } = await useFetch<any>("/api/stores/current");
 
-useHead({
-	title: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
-	link: [{ rel: "canonical", href: "https://www.ebookreads.com" }],
+useHead(() => ({
+	title: "EbookReads — Download PDF eBooks & Bestsellers Globally",
+	link: [
+		{ rel: "canonical", href: `${siteUrl.value}/` },
+		{ rel: "alternate", hreflang: "en", href: `${siteUrl.value}/` },
+		{ rel: "alternate", hreflang: "x-default", href: `${siteUrl.value}/` },
+	],
 	meta: [
 		{
 			name: "description",
 			content:
-				"Shop bestsellers, finance, business, psychology, and African literature at EbookReads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads across Kenya.",
+				"Discover handpicked bestsellers, finance, business, psychology, and classic literature eBooks. Instant, worldwide digital PDF downloads at EbookReads.",
 		},
 		{
 			property: "og:title",
-			content: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
+			content: "EbookReads — Download PDF eBooks & Bestsellers Globally",
 		},
 		{
 			property: "og:description",
 			content:
-				"Shop bestsellers, finance, business, psychology, and African literature at EbookReads, Diamond Mall, Parklands, Nairobi. Instant eBook PDF downloads.",
+				"Download bestselling eBooks instantly in PDF format across finance, self-help, and literature.",
 		},
-		{ property: "og:url", content: "https://www.ebookreads.com" },
+		{ property: "og:url", content: `${siteUrl.value}/` },
 		{
 			property: "og:image",
-			content: "https://www.ebookreads.com/images/hero-cover.jpg",
+			content: `${siteUrl.value}/images/hero-cover.jpg`,
 		},
 		{ property: "og:type", content: "website" },
 		{ name: "twitter:card", content: "summary_large_image" },
 		{
 			name: "twitter:title",
-			content: "EbookReads — Online Bookstore & eBooks in Nairobi, Kenya",
+			content: "EbookReads — Download PDF eBooks & Bestsellers Globally",
 		},
 		{
 			name: "twitter:description",
 			content:
-				"Shop bestsellers, finance, business, and literature at EbookReads. Instant eBook downloads.",
+				"Download bestselling eBooks instantly in PDF format across finance, self-help, and literature.",
 		},
 		{
 			name: "twitter:image",
-			content: "https://www.ebookreads.com/images/hero-cover.jpg",
+			content: `${siteUrl.value}/images/hero-cover.jpg`,
 		},
 	],
 	script: [
@@ -106,29 +115,36 @@ useHead({
 				"@context": "https://schema.org",
 				"@graph": [
 					{
-						"@type": "BookStore",
-						"@id": "https://www.ebookreads.com/#bookstore",
+						"@type": "WebSite",
+						"@id": `${siteUrl.value}/#website`,
+						url: siteUrl.value,
 						name: "EbookReads",
-						url: "https://www.ebookreads.com",
-						logo: "https://www.ebookreads.com/images/logo.png",
-						image: "https://www.ebookreads.com/images/hero-cover.jpg",
-						email: "admin@ebookreads.com",
+						description: "Global digital bookstore for instant PDF eBooks",
+						potentialAction: {
+							"@type": "SearchAction",
+							target: {
+								"@type": "EntryPoint",
+								urlTemplate: `${siteUrl.value}/?q={search_term_string}#catalog-results`,
+							},
+							"query-input": "required name=search_term_string",
+						},
+					},
+					{
+						"@type": "Organization",
+						"@id": `${siteUrl.value}/#organization`,
+						name: "EbookReads",
+						url: siteUrl.value,
+						logo: `${siteUrl.value}/images/logo.png`,
+						image: `${siteUrl.value}/images/hero-cover.jpg`,
+						email: "admin@ebookreads.org",
 						telephone: "+254143304460",
 						priceRange: "KSh 149 - KSh 4500",
-						currenciesAccepted: "KES",
-						address: {
-							"@type": "PostalAddress",
-							streetAddress:
-								"Diamond Mall / Diamond Plaza, 4th Parklands Ave",
-							addressLocality: "Nairobi",
-							addressCountry: "KE",
-						},
 					},
 				],
 			}),
 		},
 	],
-});
+}));
 
 const tickerItems = computed<PromoTickerMessage[]>(
 	() => storeMetadata.value?.promo_ticker || [],
@@ -176,16 +192,16 @@ const isFilterActive = computed<boolean>(() => {
 });
 
 /**
- * Strict deliberate curation: Flash sale shelf contains ONLY books where
+ * Deliberate curation: Flash sale shelf contains ONLY books where
  * an admin has explicitly assigned the 'FLASH_SALE' badge and sale has not expired.
  */
 const flashSaleBooks = computed<Book[]>(() => {
-  const list: Book[] = showcaseData.value?.products || [];
-  return list.filter((b) => {
-    if (b.badge !== 'FLASH_SALE') return false;
-    if (b.sale_ends_at && new Date(b.sale_ends_at).getTime() < Date.now()) return false;
-    return true;
-  });
+	const list: Book[] = showcaseData.value?.products || [];
+	return list.filter((b) => {
+		if (b.badge !== "FLASH_SALE") return false;
+		if (b.sale_ends_at && new Date(b.sale_ends_at).getTime() < Date.now()) return false;
+		return true;
+	});
 });
 
 const bestsellersOfWeek = computed<Book[]>(() => {
@@ -223,32 +239,32 @@ const catalogueCategories = computed<string[]>(() => {
 });
 
 const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
-  { value: 'first_added', label: 'First Added (Bestsellers First)' },
-  { value: 'newest', label: 'Newest Additions' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'title_asc', label: 'Title: A to Z' },
+	{ value: "first_added", label: "First Added (Bestsellers First)" },
+	{ value: "newest", label: "Newest Additions" },
+	{ value: "price_asc", label: "Price: Low to High" },
+	{ value: "price_desc", label: "Price: High to Low" },
+	{ value: "title_asc", label: "Title: A to Z" },
 ];
 
 const currentSortLabel = computed(() => {
-  const match = SORT_OPTIONS.find((s) => s.value === activeSort.value);
-  return match?.label || 'First Added';
+	const match = SORT_OPTIONS.find((s) => s.value === activeSort.value);
+	return match?.label || "First Added";
 });
 
 const currentCategoryLabel = computed(() => {
-  return activeCategoryFilter.value.toLowerCase() === 'general'
-    ? 'General (All Books)'
-    : activeCategoryFilter.value;
+	return activeCategoryFilter.value.toLowerCase() === "general"
+		? "General (All Books)"
+		: activeCategoryFilter.value;
 });
 
 const catalogueHeading = computed(() => {
-  return activeCategoryFilter.value.toLowerCase() === 'general'
-    ? 'Browse All Books'
-    : activeCategoryFilter.value;
+	return activeCategoryFilter.value.toLowerCase() === "general"
+		? "Browse All Books"
+		: activeCategoryFilter.value;
 });
 
 function formatCategoryDisplay(cat: string): string {
-  return cat.toLowerCase() === 'general' ? 'General (All Books)' : cat;
+	return cat.toLowerCase() === "general" ? "General (All Books)" : cat;
 }
 
 const isCatalogueDropdownOpen = ref(false);
@@ -283,10 +299,10 @@ function selectCatalogueCategory(cat: string): void {
 }
 
 function selectSortOption(sort: SortOption): void {
-  activeSort.value = sort;
-  currentPage.value = 1;
-  isSortDropdownOpen.value = false;
-  scrollToSection("catalog-results");
+	activeSort.value = sort;
+	currentPage.value = 1;
+	isSortDropdownOpen.value = false;
+	scrollToSection("catalog-results");
 }
 
 function handlePageChange(newPage: number): void {

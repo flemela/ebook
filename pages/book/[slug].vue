@@ -19,6 +19,12 @@ import { useToast } from "~/composables/useToast";
 import type { Book, ProductFormat } from "~/types";
 
 const route = useRoute();
+const config = useRuntimeConfig();
+const siteUrl = computed(() => {
+	const url = config.public.siteUrl || "https://www.ebookreads.org";
+	return url.replace(/\/+$/, "");
+});
+
 const slug = computed<string>(() => route.params.slug as string);
 
 const { data: book, error } = await useFetch<Book>(
@@ -38,8 +44,11 @@ const hasDigitalFile = computed<boolean>(() => {
 	return formats.some((f) => {
 		const isDigital = f.format === "pdf" || f.format === "epub";
 		if (!isDigital) return false;
-		const hasUrl = typeof f.file_url === "string" && f.file_url.trim().length > 0;
-		const hasPublicId = typeof f.file_public_id === "string" && f.file_public_id.trim().length > 0;
+		const hasUrl =
+			typeof f.file_url === "string" && f.file_url.trim().length > 0;
+		const hasPublicId =
+			typeof f.file_public_id === "string" &&
+			f.file_public_id.trim().length > 0;
 		return hasUrl || hasPublicId;
 	});
 });
@@ -54,7 +63,9 @@ const activePdfFormat = computed<ProductFormat | null>(() => {
 
 	if (hasDigitalFile.value) {
 		const defaultEbookPrice =
-			book.value?.price && book.value.price < 500 ? book.value.price : 149;
+			book.value?.price && book.value.price < 500
+				? book.value.price
+				: 149;
 		return {
 			id: `pdf-${book.value?.id || "book"}`,
 			product_id: book.value?.id || "book",
@@ -75,8 +86,10 @@ const activePdfFormat = computed<ProductFormat | null>(() => {
 
 const activePricing = computed(() => {
 	const fmt = activePdfFormat.value;
-	const p = fmt ? fmt.price : (book.value?.price || 149);
-	const cp = fmt ? (fmt.compare_at_price ?? book.value?.compare_at_price ?? null) : (book.value?.compare_at_price ?? null);
+	const p = fmt ? fmt.price : book.value?.price || 149;
+	const cp = fmt
+		? fmt.compare_at_price ?? book.value?.compare_at_price ?? null
+		: book.value?.compare_at_price ?? null;
 
 	if (cp !== null && cp !== undefined && cp > p && p > 0) {
 		const diff = cp - p;
@@ -96,18 +109,18 @@ const activePricing = computed(() => {
 });
 
 const primaryImage = computed<string>(() => {
-	if (!book.value) return "/images/book-placeholder.svg";
+	if (!book.value) return `${siteUrl.value}/images/book-placeholder.svg`;
 	const rawImg = book.value.images?.[0];
 	if (!rawImg)
 		return (
 			(book.value as any).cover_image_url ||
-			"/images/book-placeholder.svg"
+			`${siteUrl.value}/images/book-placeholder.svg`
 		);
 	if (typeof rawImg === "string") return rawImg;
 	return (
 		rawImg.image_url ||
 		(book.value as any).cover_image_url ||
-		"/images/book-placeholder.svg"
+		`${siteUrl.value}/images/book-placeholder.svg`
 	);
 });
 
@@ -125,18 +138,22 @@ const pageTitle = computed(() => `${book.value?.name || "Book"} — EbookReads`)
 const pageDescription = computed(() => {
 	const authorText = book.value?.author ? `by ${book.value.author}. ` : "";
 	const priceText = activePricing.value.currentPrice
-		? `Only KSh ${activePricing.value.currentPrice.toLocaleString("en-KE")} in Kenya. `
+		? `Instant download for KSh ${activePricing.value.currentPrice.toLocaleString("en-KE")}. `
 		: "";
-	return `${book.value?.name || "Book"} ${authorText}${priceText}Instant digital eBook PDF download at EbookReads.`;
+	return `Download ${book.value?.name || "Book"} ${authorText}in PDF format. ${priceText}Worldwide digital delivery at EbookReads.`;
 });
 
 const canonicalUrl = computed(
-	() => `https://www.ebookreads.com/book/${slug.value}`,
+	() => `${siteUrl.value}/book/${slug.value}`,
 );
 
 useHead(() => ({
 	title: pageTitle.value,
-	link: [{ rel: "canonical", href: canonicalUrl.value }],
+	link: [
+		{ rel: "canonical", href: canonicalUrl.value },
+		{ rel: "alternate", hreflang: "en", href: canonicalUrl.value },
+		{ rel: "alternate", hreflang: "x-default", href: canonicalUrl.value },
+	],
 	meta: [
 		{ name: "description", content: pageDescription.value },
 		{ property: "og:title", content: pageTitle.value },
@@ -144,6 +161,7 @@ useHead(() => ({
 		{ property: "og:url", content: canonicalUrl.value },
 		{ property: "og:type", content: "book" },
 		{ property: "og:image", content: primaryImage.value },
+		{ property: "og:image:alt", content: `Cover artwork for ${book.value?.name || "Book"}` },
 		{ name: "twitter:card", content: "summary_large_image" },
 		{ name: "twitter:title", content: pageTitle.value },
 		{ name: "twitter:description", content: pageDescription.value },
@@ -159,6 +177,7 @@ useHead(() => ({
 				image: primaryImage.value,
 				description: pageDescription.value,
 				sku: book.value?.sku || slug.value,
+				inLanguage: "en",
 				bookFormat: "https://schema.org/EBook",
 				author: book.value?.author
 					? {
@@ -173,11 +192,13 @@ useHead(() => ({
 					price: activePricing.value.currentPrice || 149,
 					priceValidUntil: "2027-12-31",
 					itemCondition: "https://schema.org/NewCondition",
-					availability: hasDigitalFile.value ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+					availability: hasDigitalFile.value
+						? "https://schema.org/InStock"
+						: "https://schema.org/PreOrder",
 					seller: {
-						"@type": "BookStore",
+						"@type": "Organization",
 						name: "EbookReads",
-						url: "https://www.ebookreads.com",
+						url: siteUrl.value,
 					},
 				},
 			}),
@@ -334,7 +355,7 @@ function handlePrimaryAction(): void {
 							</div>
 						</div>
 
-						<!-- Case 2: No PDF Attached — Sourced on Request (Charcoal & Red theme) -->
+						<!-- Case 2: No PDF Attached — Sourced on Request -->
 						<div v-else
 							class="p-4 rounded-xl border border-theme-border bg-theme-surface-subtle space-y-2 shadow-2xs">
 							<div class="flex items-center justify-between">
@@ -380,10 +401,10 @@ function handlePrimaryAction(): void {
 						<CheckCircle2 v-if="hasDigitalFile" :size="15" class="text-emerald-600 flex-shrink-0" />
 						<AlertCircle v-else :size="15" class="text-theme-accent flex-shrink-0" />
 						<span v-if="hasDigitalFile">
-							Instant download link &amp; permanent email backup issued upon M-Pesa approval.
+							Instant download link &amp; permanent email backup issued upon payment approval.
 						</span>
 						<span v-else>
-							Zero payment required until our team verifies and unlocks the eBook for your device.
+							Zero upfront payment required until our team verifies and unlocks the eBook for your device.
 						</span>
 					</div>
 

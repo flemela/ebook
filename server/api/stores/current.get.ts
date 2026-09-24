@@ -29,12 +29,12 @@ export default defineEventHandler(async () => {
     return await sokoClient<PublicStoreMetadata>(`/public/stores/${storeSlug}`);
   } catch (err: any) {
     return {
-      name: 'Flemela Bookstore',
+      name: 'EbookReads Bookstore',
       description: 'Books that inspire. Knowledge that transforms.',
       logo_url: '/images/logo.png',
       cover_image_url: '/images/hero-cover.jpg',
       contact_phone: '0700000000',
-      contact_email: 'support@flemela.co.ke',
+      contact_email: 'admin@ebookreads.org',
       location: 'Sarit Centre, Westlands, Nairobi',
       delivery_info: 'Free delivery across Nairobi on orders above KSh 2,500',
       hero_layout: 'editorial',
